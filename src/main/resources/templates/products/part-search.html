@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<head>
+    <th:block th:fragment="head-extra">
+        <title th:text="${searchType} + ' Search Results - Car Parts Marketplace'">Part Search Results</title>
+    </th:block>
+</head>
+<body>
+    <div th:fragment="content">
+        <!-- Search Header -->
+        <section class="bg-primary text-white py-4">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="h3 mb-2">
+                            <i class="fas fa-search"></i> <span th:text="${searchType}">Search Type</span> Search
+                        </h1>
+                        <p class="mb-0">
+                            Found <span th:text="${#lists.size(products)}">0</span> results for 
+                            "<strong th:text="${partNumber != null ? partNumber : oemNumber}">search term</strong>"
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <a th:href="@{/}" class="btn btn-outline-light">
+                            <i class="fas fa-arrow-left"></i> Back to Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Search Form -->
+        <section class="py-4 bg-light">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title mb-3">
+                                    <i class="fas fa-search"></i> Search by <span th:text="${searchType}">Search Type</span>
+                                </h5>
+                                
+                                <form th:action="@{/products/search}" method="get" class="mb-3">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" 
+                                               name="q" th:placeholder="'Enter ' + ${searchType == 'Part Number' ? 'part number' : 'OEM number'} + '...'"
+                                               th:value="${partNumber != null ? partNumber : oemNumber}">
+                                        <button class="btn btn-primary" type="submit">
+                                            <i class="fas fa-search"></i> Search
+                                        </button>
+                                    </div>
+                                </form>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <a th:href="@{/products/part/{partNumber}(partNumber=${partNumber != null ? partNumber : ''})}" 
+                                           class="btn btn-outline-primary w-100 mb-2">
+                                            <i class="fas fa-hashtag"></i> Search by Part Number
+                                        </a>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <a th:href="@{/products/oem/{oemNumber}(oemNumber=${oemNumber != null ? oemNumber : ''})}" 
+                                           class="btn btn-outline-primary w-100 mb-2">
+                                            <i class="fas fa-barcode"></i> Search by OEM Number
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Search Results -->
+        <section class="py-5">
+            <div class="container">
+                <!-- Error Messages -->
+                <div th:if="${errorMessage}" class="row mb-4">
+                    <div class="col">
+                        <div class="alert alert-danger" role="alert">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span th:text="${errorMessage}">Error message</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Results Header -->
+                <div class="row mb-4">
+                    <div class="col">
+                        <h2>Search Results</h2>
+                        <p class="text-muted mb-0">
+                            <span th:text="${searchType}">Search Type</span>: 
+                            "<strong th:text="${partNumber != null ? partNumber : oemNumber}">search term</strong>"
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Results Grid -->
+                <div th:if="${!products.empty}" class="row">
+                    <div class="col-md-6 col-lg-4 mb-4" th:each="product : ${products}">
+                        <div class="card product-card h-100">
+                            <div class="position-relative">
+                                <img th:src="${product.primaryImage != null ? product.primaryImage.imageUrl : '/images/no-image.png'}" 
+                                     class="card-img-top product-image" 
+                                     th:alt="${product.name}">
+                                
+                                <span class="badge position-absolute top-0 end-0 m-2" 
+                                      th:classappend="${product.inStock ? 'bg-success' : 'bg-danger'}"
+                                      th:text="${product.inStock ? 'In Stock' : 'Out of Stock'}">
+                                    Stock Status
+                                </span>
+                            </div>
+                            
+                            <div class="card-body d-flex flex-column">
+                                <h6 class="card-title" th:text="${product.name}">Product Name</h6>
+                                <p class="card-text text-muted small" 
+                                   th:text="${#strings.abbreviate(product.description, 80)}">
+                                    Product description...
+                                </p>
+                                
+                                <div class="mb-3">
+                                    <div class="row text-center">
+                                        <div class="col-6">
+                                            <small class="text-muted d-block">Part Number</small>
+                                            <strong th:text="${product.partNumber != null ? product.partNumber : 'N/A'}">N/A</strong>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="text-muted d-block">OEM Number</small>
+                                            <strong th:text="${product.oemNumber != null ? product.oemNumber : 'N/A'}">N/A</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-auto">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="price fw-bold" th:text="${product.formattedPrice}">€0.00</span>
+                                        <small class="text-muted" th:text="${product.condition.name()}">Condition</small>
+                                    </div>
+                                    
+                                    <div class="d-flex gap-2">
+                                        <a th:href="@{/products/{id}(id=${product.id})}" 
+                                           class="btn btn-primary btn-sm flex-fill">
+                                            <i class="fas fa-eye"></i> View Details
+                                        </a>
+                                        <button class="btn btn-outline-primary btn-sm" 
+                                                th:onclick="'addToCart(' + ${product.id} + ')'"
+                                                th:disabled="${!product.inStock}">
+                                            <i class="fas fa-cart-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- No Results -->
+                <div th:if="${products.empty}" class="text-center py-5">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h3>No Results Found</h3>
+                    <p class="text-muted mb-4">
+                        We couldn't find any products with the 
+                        <span th:text="${searchType}">search type</span> 
+                        "<strong th:text="${partNumber != null ? partNumber : oemNumber}">search term</strong>"
+                    </p>
+                    
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+                            <h5>Try these suggestions:</h5>
+                            <ul class="list-unstyled">
+                                <li>• Verify the part number or OEM number is correct</li>
+                                <li>• Try searching by product name instead</li>
+                                <li>• Check if the part might be listed under a different number</li>
+                                <li>• Contact our support team for assistance</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <a th:href="@{/products}" class="btn btn-primary me-2">
+                            <i class="fas fa-cogs"></i> Browse All Products
+                        </a>
+                        <a th:href="@{/}" class="btn btn-outline-primary">
+                            <i class="fas fa-home"></i> Back to Home
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Alternative Search Options -->
+                <div th:if="${!products.empty}" class="mt-5">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h5>Need to find more parts?</h5>
+                            <p class="text-muted mb-3">
+                                Try searching by product name or browse our categories
+                            </p>
+                            <div class="d-flex gap-2 justify-content-center flex-wrap">
+                                <a th:href="@{/products}" class="btn btn-outline-primary">
+                                    <i class="fas fa-cogs"></i> Browse All Products
+                                </a>
+                                <a th:href="@{/}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-home"></i> Back to Home
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <th:block th:fragment="scripts-extra">
+        <script>
+            function addToCart(productId) {
+                // TODO: Implement add to cart functionality
+                console.log('Adding product to cart:', productId);
+                // Show success message
+                alert('Product added to cart!');
+            }
+        </script>
+        
+        <style>
+            .product-card {
+                transition: transform 0.2s, box-shadow 0.2s;
+                border: none;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            }
+            .product-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            }
+            .product-image {
+                height: 200px;
+                object-fit: cover;
+            }
+            .price {
+                color: #0d6efd;
+                font-size: 1.1rem;
+            }
+        </style>
+    </th:block>
+</body>
+</html>
