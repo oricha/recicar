@@ -113,3 +113,8 @@ docker-compose.override.yml
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# IDE and Editor specific folders
+.gemini/
+.cursor/
+.kiro/
