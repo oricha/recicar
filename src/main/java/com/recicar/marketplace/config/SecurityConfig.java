@@ -67,6 +67,7 @@ public class SecurityConfig {
                 .requestMatchers("/", "/home", "/products/**", "/search/**", "/api/products/**").permitAll()
                 .requestMatchers("/register", "/login", "/forgot-password", "/reset-password").permitAll()
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
+                .requestMatchers("/assets/**", "/static/**").permitAll()
                 .requestMatchers("/actuator/health").permitAll()
                 .requestMatchers("/test/**").permitAll()
                 
