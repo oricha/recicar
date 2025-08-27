@@ -37,11 +37,20 @@ dependencies {
     // Redis for caching
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     
+    // Rate Limiting - temporarily disabled due to dependency issues
+    // implementation 'io.github.bucket4j:bucket4j-core:8.7.0'
+    
     // Development tools
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
     
     // Annotation processors
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
     
     // Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

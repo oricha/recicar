@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<head>
+    <th:block th:fragment="head-extra">
+        <title>Test Page - Car Parts Marketplace</title>
+    </th:block>
+</head>
+<body>
+    <div th:fragment="content" class="container my-4">
+        <div class="row">
+            <div class="col">
+                <h1>Test Page</h1>
+                <p th:text="${message}">Test message</p>
+                <a href="/" class="btn btn-primary">Go Home</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

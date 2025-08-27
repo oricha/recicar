@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/new-base :: html}">
+<head>
+    <th:block th:fragment="head-extra">
+        <title>Vendor Dashboard - Car Parts Marketplace</title>
+    </th:block>
+</head>
+<body>
+<div th:fragment="content">
+    <!-- Vendor Dashboard Section -->
+    <section class="vendor_dashboard_area py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="dashboard_wrapper">
+                        <div class="page_header text-center mb-5">
+                            <h1 class="page_title">Vendor Dashboard</h1>
+                            <p class="page_subtitle">Welcome, <span th:text="${vendor.businessName}"></span>!</p>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="dashboard_card">
+                                    <div class="card_icon">
+                                        <i class="ion-ios-box"></i>
+                                    </div>
+                                    <div class="card_content">
+                                        <h3 class="card_title">Active Products</h3>
+                                        <p class="card_value" th:text="${activeProductCount}">0</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="dashboard_card">
+                                    <div class="card_icon">
+                                        <i class="ion-social-usd"></i>
+                                    </div>
+                                    <div class="card_content">
+                                        <h3 class="card_title">Total Sales (This Month)</h3>
+                                        <p class="card_value">$0.00</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="dashboard_card">
+                                    <div class="card_icon">
+                                        <i class="ion-ios-cart"></i>
+                                    </div>
+                                    <div class="card_content">
+                                        <h3 class="card_title">Pending Orders</h3>
+                                        <p class="card_value">0</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-lg-6 mb-4">
+                                <div class="dashboard_section">
+                                    <h3 class="section_title">Low Stock Products</h3>
+                                    <div th:if="${lowStockProducts.empty}" class="alert alert-info">
+                                        No products are currently low on stock.
+                                    </div>
+                                    <table th:if="${!lowStockProducts.empty}" class="table table-striped">
+                                        <thead>
+                                        <tr>
+                                            <th>Product Name</th>
+                                            <th>Stock</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr th:each="product : ${lowStockProducts}">
+                                            <td th:text="${product.name}"></td>
+                                            <td th:text="${product.stockQuantity}"></td>
+                                            <td>
+                                                <a th:href="@{/vendor/products/edit/{id}(id=${product.id})}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 mb-4">
+                                <div class="dashboard_section">
+                                    <h3 class="section_title">Recent Orders</h3>
+                                    <div class="alert alert-info">
+                                        No recent orders.
+                                    </div>
+                                    <!-- Table for recent orders -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="dashboard_section">
+                                    <h3 class="section_title">Sales Analytics</h3>
+                                    <div class="alert alert-info">
+                                        Sales analytics coming soon!
+                                    </div>
+                                    <!-- Charts and graphs for sales data -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+</body>
+</html>

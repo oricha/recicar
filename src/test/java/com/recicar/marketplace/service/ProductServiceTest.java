@@ -2,6 +2,8 @@ package com.recicar.marketplace.service;
 
 import com.recicar.marketplace.entity.*;
 import com.recicar.marketplace.repository.ProductRepository;
+import com.recicar.marketplace.repository.CategoryRepository;
+import com.recicar.marketplace.repository.VendorRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,8 +32,14 @@ class ProductServiceTest {
     @Mock
     private ProductRepository productRepository;
 
+    @Mock
+    private CategoryRepository categoryRepository;
+
+    @Mock
+    private VendorRepository vendorRepository;
+
     @InjectMocks
-    private ProductService productService;
+    private ProductServiceImpl productService;
 
     private Product testProduct;
     private Category testCategory;
@@ -348,5 +356,174 @@ class ProductServiceTest {
         // Then
         assertThat(result).isFalse();
         verify(productRepository).findById(1L);
+    }
+
+    @Test
+    void shouldCreateProduct() {
+        // Given
+        ProductRequest request = new ProductRequest();
+        request.setName("New Product");
+        request.setDescription("New Description");
+        request.setPrice(new BigDecimal("50.00"));
+        request.setCondition(ProductCondition.NEW);
+        request.setStockQuantity(5);
+        request.setActive(true);
+        request.setVendorId(testVendor.getId());
+        request.setCategoryId(testCategory.getId());
+
+        when(vendorRepository.findById(testVendor.getId())).thenReturn(Optional.of(testVendor));
+        when(categoryRepository.findById(testCategory.getId())).thenReturn(Optional.of(testCategory));
+        when(productRepository.save(any(Product.class))).thenAnswer(invocation -> {
+            Product savedProduct = invocation.getArgument(0);
+            if (savedProduct.getId() == null) {
+                savedProduct.setId(2L); // Simulate ID generation for new product
+            }
+            return savedProduct;
+        });
+
+        // When
+        Product createdProduct = productService.createOrUpdateProduct(request);
+
+        // Then
+        assertThat(createdProduct).isNotNull();
+        assertThat(createdProduct.getId()).isNotNull();
+        assertThat(createdProduct.getName()).isEqualTo("New Product");
+        assertThat(createdProduct.getVendor()).isEqualTo(testVendor);
+        assertThat(createdProduct.getCategory()).isEqualTo(testCategory);
+        verify(productRepository).save(any(Product.class));
+    }
+
+    @Test
+    void shouldUpdateExistingProduct() {
+        // Given
+        ProductRequest request = new ProductRequest();
+        request.setId(testProduct.getId());
+        request.setName("Updated Product");
+        request.setDescription("Updated Description");
+        request.setPrice(new BigDecimal("120.00"));
+        request.setCondition(ProductCondition.USED);
+        request.setStockQuantity(15);
+        request.setActive(false);
+        request.setVendorId(testVendor.getId());
+        request.setCategoryId(testCategory.getId());
+
+        when(productRepository.findById(testProduct.getId())).thenReturn(Optional.of(testProduct));
+        when(vendorRepository.findById(testVendor.getId())).thenReturn(Optional.of(testVendor));
+        when(categoryRepository.findById(testCategory.getId())).thenReturn(Optional.of(testCategory));
+        when(productRepository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // When
+        Product updatedProduct = productService.createOrUpdateProduct(request);
+
+        // Then
+        assertThat(updatedProduct).isNotNull();
+        assertThat(updatedProduct.getId()).isEqualTo(testProduct.getId());
+        assertThat(updatedProduct.getName()).isEqualTo("Updated Product");
+        assertThat(updatedProduct.getPrice()).isEqualTo(new BigDecimal("120.00"));
+        assertThat(updatedProduct.getCondition()).isEqualTo(ProductCondition.USED);
+        assertThat(updatedProduct.getStockQuantity()).isEqualTo(15);
+        assertThat(updatedProduct.isActive()).isFalse();
+        verify(productRepository).findById(testProduct.getId());
+        verify(productRepository).save(testProduct);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUpdatingNonExistentProduct() {
+        // Given
+        ProductRequest request = new ProductRequest();
+        request.setId(99L); // Non-existent ID
+
+        when(productRepository.findById(99L)).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThatThrownBy(() -> productService.createOrUpdateProduct(request))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Product not found");
+        verify(productRepository).findById(99L);
+        verify(productRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldBulkUpdateStock() {
+        // Given
+        Product product1 = new Product();
+        product1.setId(1L);
+        product1.setStockQuantity(10);
+        Product product2 = new Product();
+        product2.setId(2L);
+        product2.setStockQuantity(5);
+
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product1));
+        when(productRepository.findById(2L)).thenReturn(Optional.of(product2));
+        when(productRepository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        List<Long> productIds = Arrays.asList(1L, 2L);
+        List<Integer> quantities = Arrays.asList(8, 3);
+
+        // When
+        productService.bulkUpdateStock(productIds, quantities);
+
+        // Then
+        assertThat(product1.getStockQuantity()).isEqualTo(8);
+        assertThat(product2.getStockQuantity()).isEqualTo(3);
+        verify(productRepository, times(2)).save(any(Product.class));
+    }
+
+    @Test
+    void shouldGetInventoryReport() {
+        // Given
+        List<Product> allProducts = Arrays.asList(testProduct);
+        when(productRepository.findAll()).thenReturn(allProducts);
+
+        // When
+        List<Product> report = productService.getInventoryReport();
+
+        // Then
+        assertThat(report).isEqualTo(allProducts);
+        verify(productRepository).findAll();
+    }
+
+    @Test
+    void shouldGetInventoryReportByVendor() {
+        // Given
+        List<Product> vendorProducts = Arrays.asList(testProduct);
+        when(productRepository.findByVendor(testVendor)).thenReturn(vendorProducts);
+
+        // When
+        List<Product> report = productService.getInventoryReportByVendor(testVendor);
+
+        // Then
+        assertThat(report).isEqualTo(vendorProducts);
+        verify(productRepository).findByVendor(testVendor);
+    }
+
+    @Test
+    void shouldFindOtherVendorsSellingProduct() {
+        // Given
+        Product product1 = new Product();
+        product1.setId(1L);
+        product1.setPartNumber("PN123");
+        product1.setVendor(testVendor);
+
+        Vendor otherVendor = new Vendor();
+        otherVendor.setId(2L);
+        otherVendor.setBusinessName("Other Vendor");
+
+        Product product2 = new Product();
+        product2.setId(3L);
+        product2.setPartNumber("PN123");
+        product2.setVendor(otherVendor);
+
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product1));
+        when(productRepository.findByPartNumber("PN123")).thenReturn(Arrays.asList(product1, product2));
+
+        // When
+        List<Vendor> vendors = productService.findOtherVendorsSellingProduct(1L);
+
+        // Then
+        assertThat(vendors).hasSize(1);
+        assertThat(vendors.get(0)).isEqualTo(otherVendor);
+        verify(productRepository).findById(1L);
+        verify(productRepository).findByPartNumber("PN123");
     }
 }

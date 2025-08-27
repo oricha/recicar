@@ -1,354 +1,164 @@
 package com.recicar.marketplace.service;
 
+import com.recicar.marketplace.dto.ProductRequest;
 import com.recicar.marketplace.entity.Product;
 import com.recicar.marketplace.entity.ProductCondition;
 import com.recicar.marketplace.entity.Category;
 import com.recicar.marketplace.entity.Vendor;
-import com.recicar.marketplace.repository.ProductRepository;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-@Service
-@Transactional
-public class ProductService {
-
-    private final ProductRepository productRepository;
-
-    public ProductService(ProductRepository productRepository) {
-        this.productRepository = productRepository;
-    }
+public interface ProductService {
 
     /**
-     * Get all active products with pagination
+     * Create or update product
      */
-    @Transactional(readOnly = true)
-    public Page<Product> findActiveProducts(Pageable pageable) {
-        return productRepository.findByActiveTrue(pageable);
-    }
+    Product createOrUpdateProduct(ProductRequest request);
 
     /**
      * Get all active products with default pagination (12 per page, sorted by creation date)
      */
-    @Transactional(readOnly = true)
-    public Page<Product> findActiveProducts(int page) {
-        Pageable pageable = PageRequest.of(page, 12, Sort.by(Sort.Direction.DESC, "createdAt"));
-        return productRepository.findByActiveTrue(pageable);
-    }
+    Page<Product> findActiveProducts(int page);
 
     /**
      * Find product by ID
      */
-    @Transactional(readOnly = true)
-    public Optional<Product> findById(Long id) {
-        return productRepository.findById(id);
-    }
+    Optional<Product> findById(Long id);
 
     /**
      * Find active product by ID
      */
-    @Transactional(readOnly = true)
-    public Optional<Product> findActiveById(Long id) {
-        return productRepository.findById(id)
-                .filter(Product::isActive);
-    }
+    Optional<Product> findActiveById(Long id);
 
     /**
      * Search products by name or part number
      */
-    @Transactional(readOnly = true)
-    public Page<Product> searchProducts(String searchTerm, Pageable pageable) {
-        if (searchTerm == null || searchTerm.trim().isEmpty()) {
-            return findActiveProducts(pageable);
-        }
-        return productRepository.searchByNameOrPartNumber(searchTerm.trim(), pageable);
-    }
+    Page<Product> searchProducts(String searchTerm, Pageable pageable);
 
     /**
      * Search products with default pagination
      */
-    @Transactional(readOnly = true)
-    public Page<Product> searchProducts(String searchTerm, int page) {
-        Pageable pageable = PageRequest.of(page, 12, Sort.by(Sort.Direction.DESC, "createdAt"));
-        return searchProducts(searchTerm, pageable);
-    }
+    Page<Product> searchProducts(String searchTerm, int page);
 
     /**
      * Find products by category
      */
-    @Transactional(readOnly = true)
-    public Page<Product> findByCategory(Category category, Pageable pageable) {
-        return productRepository.findByCategoryAndActiveTrue(category, pageable);
-    }
+    Page<Product> findByCategory(Category category, Pageable pageable);
 
     /**
      * Find products by category with default pagination
      */
-    @Transactional(readOnly = true)
-    public Page<Product> findByCategory(Category category, int page) {
-        Pageable pageable = PageRequest.of(page, 12, Sort.by(Sort.Direction.DESC, "createdAt"));
-        return findByCategory(category, pageable);
-    }
+    Page<Product> findByCategory(Category category, int page);
 
     /**
      * Find products by vendor
      */
-    @Transactional(readOnly = true)
-    public Page<Product> findByVendor(Vendor vendor, Pageable pageable) {
-        return productRepository.findByVendorAndActiveTrue(vendor, pageable);
-    }
+    Page<Product> findByVendor(Vendor vendor, Pageable pageable);
 
     /**
      * Find products by condition
      */
-    @Transactional(readOnly = true)
-    public Page<Product> findByCondition(ProductCondition condition, Pageable pageable) {
-        return productRepository.findByConditionAndActiveTrue(condition, pageable);
-    }
+    Page<Product> findByCondition(ProductCondition condition, Pageable pageable);
 
     /**
      * Find products by price range
      */
-    @Transactional(readOnly = true)
-    public Page<Product> findByPriceRange(BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
-        return productRepository.findByPriceRange(minPrice, maxPrice, pageable);
-    }
+    Page<Product> findByPriceRange(BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable);
 
     /**
      * Advanced search with multiple filters
      */
-    @Transactional(readOnly = true)
-    public Page<Product> findWithFilters(String searchTerm, Category category, ProductCondition condition,
+    Page<Product> findWithFilters(String searchTerm, Category category, ProductCondition condition,
                                         BigDecimal minPrice, BigDecimal maxPrice, Vendor vendor,
-                                        Pageable pageable) {
-        return productRepository.findWithFilters(searchTerm, category, condition, minPrice, maxPrice, vendor, pageable);
-    }
+                                        Pageable pageable);
 
     /**
      * Advanced search with comprehensive filtering including stock and availability
      */
-    @Transactional(readOnly = true)
-    public Page<Product> findWithAdvancedFilters(String searchTerm, Category category, ProductCondition condition,
+    Page<Product> findWithAdvancedFilters(String searchTerm, Category category, ProductCondition condition,
                                                 BigDecimal minPrice, BigDecimal maxPrice, Boolean inStock,
-                                                Boolean lowStock, Vendor vendor, int page, String sortBy, String sortDir) {
-        
-        Sort.Direction direction = "desc".equalsIgnoreCase(sortDir) ? Sort.Direction.DESC : Sort.Direction.ASC;
-        String sortField = getSortField(sortBy);
-        
-        Pageable pageable = PageRequest.of(page, 12, Sort.by(direction, sortField));
-        
-        // Build dynamic query based on filters
-        if (searchTerm == null && category == null && condition == null && 
-            minPrice == null && maxPrice == null && inStock == null && 
-            lowStock == null && vendor == null) {
-            // No filters, return all active products
-            return findActiveProducts(pageable);
-        }
-        
-        // Use the existing findWithFilters method for basic filters
-        Page<Product> products = findWithFilters(searchTerm, category, condition, minPrice, maxPrice, vendor, pageable);
-        
-        // Apply additional stock filters if needed
-        if (inStock != null || lowStock != null) {
-            List<Product> filteredProducts = products.getContent().stream()
-                .filter(product -> {
-                    if (inStock != null && inStock && !product.isInStock()) {
-                        return false;
-                    }
-                    if (lowStock != null && lowStock && !product.isLowStock()) {
-                        return false;
-                    }
-                    return true;
-                })
-                .toList();
-            
-            // Create a new page with filtered content
-            return new PageImpl<>(filteredProducts, pageable, filteredProducts.size());
-        }
-        
-        return products;
-    }
+                                                Boolean lowStock, Vendor vendor, int page, String sortBy, String sortDir);
 
     /**
      * Advanced search with filters and default pagination
      */
-    @Transactional(readOnly = true)
-    public Page<Product> findWithFilters(String searchTerm, Category category, ProductCondition condition,
+    Page<Product> findWithFilters(String searchTerm, Category category, ProductCondition condition,
                                         BigDecimal minPrice, BigDecimal maxPrice, Vendor vendor,
-                                        int page, String sortBy, String sortDir) {
-        
-        Sort.Direction direction = "desc".equalsIgnoreCase(sortDir) ? Sort.Direction.DESC : Sort.Direction.ASC;
-        String sortField = getSortField(sortBy);
-        
-        Pageable pageable = PageRequest.of(page, 12, Sort.by(direction, sortField));
-        return findWithFilters(searchTerm, category, condition, minPrice, maxPrice, vendor, pageable);
-    }
+                                        int page, String sortBy, String sortDir);
 
     /**
      * Find products compatible with specific vehicle
      */
-    @Transactional(readOnly = true)
-    public Page<Product> findByVehicleCompatibility(String make, String model, Integer year, Pageable pageable) {
-        return productRepository.findByVehicleCompatibility(make, model, year, pageable);
-    }
+    Page<Product> findByVehicleCompatibility(String make, String model, Integer year, Pageable pageable);
 
     /**
-     * Find products by part number (exact match)
+     * Find products by part number
      */
-    @Transactional(readOnly = true)
-    public List<Product> findByPartNumber(String partNumber) {
-        return productRepository.findByPartNumberIgnoreCase(partNumber);
-    }
+    List<Product> findByPartNumber(String partNumber);
 
     /**
-     * Find products by OEM number (exact match)
+     * Find products by OEM number
      */
-    @Transactional(readOnly = true)
-    public List<Product> findByOemNumber(String oemNumber) {
-        return productRepository.findByOemNumberIgnoreCase(oemNumber);
-    }
+    List<Product> findByOemNumber(String oemNumber);
 
     /**
-     * Get low stock products
+     * Find products by vehicle compatibility with default pagination
      */
-    @Transactional(readOnly = true)
-    public List<Product> findLowStockProducts() {
-        return productRepository.findLowStockProducts();
-    }
+    Page<Product> findByVehicleCompatibility(String make, String model, Integer year, int page);
+
+
 
     /**
-     * Get out of stock products
+     * Decrease product stock
      */
-    @Transactional(readOnly = true)
-    public List<Product> findOutOfStockProducts() {
-        return productRepository.findOutOfStockProducts();
-    }
+    void decreaseStock(Long productId, Integer quantity);
 
     /**
-     * Get low stock products for a specific vendor
+     * Increase product stock
      */
-    @Transactional(readOnly = true)
-    public List<Product> findLowStockProductsByVendor(Vendor vendor) {
-        return productRepository.findLowStockProductsByVendor(vendor);
-    }
+    void increaseStock(Long productId, Integer quantity);
 
     /**
-     * Save or update product
+     * Update product stock
      */
-    public Product save(Product product) {
-        return productRepository.save(product);
-    }
+    void updateStock(Long productId, Integer quantity);
 
     /**
-     * Delete product (soft delete by setting active = false)
+     * Bulk update stock for multiple products
      */
-    public void deactivateProduct(Long productId) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
-        product.setActive(false);
-        productRepository.save(product);
-    }
+    void bulkUpdateStock(List<Long> productIds, List<Integer> quantities);
 
     /**
-     * Activate product
+     * Get inventory report
      */
-    public void activateProduct(Long productId) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
-        product.setActive(true);
-        productRepository.save(product);
-    }
+    List<Product> getInventoryReport();
 
     /**
-     * Update product stock quantity
+     * Get inventory report by vendor
      */
-    public void updateStock(Long productId, Integer newQuantity) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
-        product.setStockQuantity(newQuantity);
-        productRepository.save(product);
-    }
+    List<Product> getInventoryReportByVendor(Vendor vendor);
 
     /**
-     * Decrease stock quantity (for orders)
+     * Find other vendors selling the same product
      */
-    public void decreaseStock(Long productId, Integer quantity) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
-        
-        if (product.getStockQuantity() < quantity) {
-            throw new IllegalArgumentException("Insufficient stock");
-        }
-        
-        product.setStockQuantity(product.getStockQuantity() - quantity);
-        productRepository.save(product);
-    }
+    List<Vendor> findOtherVendorsSellingProduct(Long productId);
 
     /**
-     * Increase stock quantity (for returns/restocking)
+     * Find products with low stock (less than 5 items)
      */
-    public void increaseStock(Long productId, Integer quantity) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
-        
-        product.setStockQuantity(product.getStockQuantity() + quantity);
-        productRepository.save(product);
-    }
+    List<Product> findLowStockProducts();
 
     /**
-     * Count products by vendor
+     * Find products with low stock for a specific vendor
      */
-    @Transactional(readOnly = true)
-    public long countByVendor(Vendor vendor) {
-        return productRepository.countByVendor(vendor);
-    }
+    List<Product> findLowStockProductsByVendor(Vendor vendor);
 
     /**
      * Count active products by vendor
      */
-    @Transactional(readOnly = true)
-    public long countActiveByVendor(Vendor vendor) {
-        return productRepository.countByVendorAndActiveTrue(vendor);
-    }
-
-    /**
-     * Get valid sort field for queries
-     */
-    private String getSortField(String sortBy) {
-        return switch (sortBy) {
-            case "name" -> "name";
-            case "price" -> "price";
-            case "created" -> "createdAt";
-            case "updated" -> "updatedAt";
-            default -> "createdAt";
-        };
-    }
-
-    /**
-     * Check if product is available for purchase
-     */
-    @Transactional(readOnly = true)
-    public boolean isAvailable(Long productId) {
-        return productRepository.findById(productId)
-                .map(Product::isAvailable)
-                .orElse(false);
-    }
-
-    /**
-     * Check stock availability for quantity
-     */
-    @Transactional(readOnly = true)
-    public boolean hasStock(Long productId, Integer requiredQuantity) {
-        return productRepository.findById(productId)
-                .map(product -> product.getStockQuantity() >= requiredQuantity)
-                .orElse(false);
-    }
+    long countActiveByVendor(Vendor vendor);
 }
