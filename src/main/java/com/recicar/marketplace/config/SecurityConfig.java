@@ -14,6 +14,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.time.Duration;
 
 @Configuration
 @EnableWebSecurity
@@ -52,12 +55,20 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+            .headers(headers -> headers
+                .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self';"))
+                .frameOptions(frameOptions -> frameOptions.sameOrigin())
+                .xssProtection(xss -> xss.disable())
+                .cacheControl(cache -> cache.disable())
+                .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).maxAgeInSeconds(31536000))
+            )
             .authorizeHttpRequests(authz -> authz
                 // Public endpoints
                 .requestMatchers("/", "/home", "/products/**", "/search/**", "/api/products/**").permitAll()
                 .requestMatchers("/register", "/login", "/forgot-password", "/reset-password").permitAll()
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
                 .requestMatchers("/actuator/health").permitAll()
+                .requestMatchers("/test/**").permitAll()
                 
                 // Cart endpoints (allow both authenticated and anonymous users)
                 .requestMatchers("/cart/**", "/api/cart/**").permitAll()

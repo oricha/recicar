@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/new-base :: html}">
+<head>
+    <th:block th:fragment="head-extra">
+        <title th:text="${vendor.businessName + ' Profile - Car Parts Marketplace'}">Vendor Profile - Car Parts Marketplace</title>
+    </th:block>
+</head>
+<body>
+<div th:fragment="content">
+    <!-- Vendor Profile Section -->
+    <section class="vendor_profile_area py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="profile_wrapper">
+                        <div class="profile_header text-center mb-5">
+                            <h1 class="profile_title" th:text="${vendor.businessName}">Vendor Name</h1>
+                            <p class="profile_subtitle" th:text="${vendor.description}">Vendor Description</p>
+                            <div class="vendor_status" th:classappend="${vendor.approved ? 'text-success' : 'text-warning'}">
+                                <i class="ion-checkmark-circled" th:if="${vendor.approved}"></i>
+                                <i class="ion-alert-circled" th:if="${!vendor.approved}"></i>
+                                <span th:text="${vendor.status.name()}">Status</span>
+                            </div>
+                        </div>
+
+                        <div class="profile_details mb-5">
+                            <h3 class="section_title">Contact Information</h3>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <strong>Email:</strong> <span th:text="${vendor.user.email}"></span>
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>Phone:</strong> <span th:text="${vendor.user.phone}"></span>
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>Tax ID:</strong> <span th:text="${vendor.taxId}"></span>
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>Member Since:</strong> <span th:text="${#temporals.format(vendor.createdAt, 'MMMM dd, yyyy')}"></span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="profile_products mb-5">
+                            <h3 class="section_title">Products from This Vendor</h3>
+                            <!-- TODO: Display products from this vendor -->
+                            <div class="alert alert-info">
+                                Products coming soon!
+                            </div>
+                        </div>
+
+                        <div class="profile_reviews">
+                            <h3 class="section_title">Customer Reviews</h3>
+                            <!-- TODO: Display customer reviews -->
+                            <div class="alert alert-info">
+                                No reviews yet.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+</body>
+</html>

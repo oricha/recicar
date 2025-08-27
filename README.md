@@ -74,7 +74,7 @@ A comprehensive web application that connects customers with junkyards and auto 
 
 2. **Start the database and Redis**
    ```bash
-   docker-compose up -d
+   docker compose up -d   # new style
    ```
 
 3. **Run the application**

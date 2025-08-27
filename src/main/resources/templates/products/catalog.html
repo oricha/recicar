@@ -81,6 +81,20 @@
                                 </div>
                             </div>
 
+                            <!-- Vendor Filter -->
+                            <div class="mb-3">
+                                <label for="vendorId" class="form-label">Vendor</label>
+                                <select class="form-select" id="vendorId" name="vendorId">
+                                    <option value="">All Vendors</option>
+                                    <option th:each="vendor : ${vendors}" 
+                                            th:value="${vendor.id}" 
+                                            th:text="${vendor.businessName}"
+                                            th:selected="${vendor.id == currentVendorId}">
+                                        Vendor
+                                    </option>
+                                </select>
+                            </div>
+
                             <!-- Hidden fields for pagination -->
                             <input type="hidden" name="sortBy" th:value="${currentSortBy}">
                             <input type="hidden" name="sortDir" th:value="${currentSortDir}">

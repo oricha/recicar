@@ -6,6 +6,9 @@ import com.recicar.marketplace.entity.Category;
 import com.recicar.marketplace.entity.Vendor;
 import com.recicar.marketplace.service.ProductService;
 import com.recicar.marketplace.service.CategoryService;
+import com.recicar.marketplace.service.VendorService;
+import com.recicar.marketplace.client.VehicleApiClient;
+import com.recicar.marketplace.dto.VehicleInfo;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,10 +24,14 @@ public class ProductController {
 
     private final ProductService productService;
     private final CategoryService categoryService;
+    private final VendorService vendorService;
+    private final VehicleApiClient vehicleApiClient;
 
-    public ProductController(ProductService productService, CategoryService categoryService) {
+    public ProductController(ProductService productService, CategoryService categoryService, VendorService vendorService, VehicleApiClient vehicleApiClient) {
         this.productService = productService;
         this.categoryService = categoryService;
+        this.vendorService = vendorService;
+        this.vehicleApiClient = vehicleApiClient;
     }
 
     /**
@@ -39,6 +46,7 @@ public class ProductController {
                                    @RequestParam(required = false) ProductCondition condition,
                                    @RequestParam(required = false) BigDecimal minPrice,
                                    @RequestParam(required = false) BigDecimal maxPrice,
+                                   @RequestParam(required = false) Long vendorId,
                                    Model model) {
 
         // Get category if specified
@@ -47,15 +55,22 @@ public class ProductController {
             category = categoryService.findById(categoryId).orElse(null);
         }
 
+        // Get vendor if specified
+        Vendor vendor = null;
+        if (vendorId != null) {
+            vendor = vendorService.findById(vendorId).orElse(null);
+        }
+
         // Search products with filters
         Page<Product> products = productService.findWithFilters(
-            search, category, condition, minPrice, maxPrice, null, page, sortBy, sortDir
+            search, category, condition, minPrice, maxPrice, vendor, page, sortBy, sortDir
         );
 
         // Add attributes to model
         model.addAttribute("products", products);
         model.addAttribute("categories", categoryService.findAllActive());
         model.addAttribute("conditions", ProductCondition.values());
+        model.addAttribute("vendors", vendorService.findAllApproved());
         
         // Current filter values
         model.addAttribute("currentSearch", search);
@@ -63,6 +78,7 @@ public class ProductController {
         model.addAttribute("currentCondition", condition);
         model.addAttribute("currentMinPrice", minPrice);
         model.addAttribute("currentMaxPrice", maxPrice);
+        model.addAttribute("currentVendorId", vendorId);
         model.addAttribute("currentSortBy", sortBy);
         model.addAttribute("currentSortDir", sortDir);
         
@@ -94,6 +110,9 @@ public class ProductController {
                 .filter(p -> !p.getId().equals(id))
                 .limit(4)
                 .toList());
+
+        // Get other vendors selling this product
+        model.addAttribute("otherVendors", productService.findOtherVendorsSellingProduct(id));
         
         return "products/detail";
     }
@@ -288,11 +307,31 @@ public class ProductController {
      * Find products by vehicle compatibility
      */
     @GetMapping("/vehicle")
-    public String findByVehicle(@RequestParam String make,
-                               @RequestParam String model,
-                               @RequestParam Integer year,
+    public String findByVehicle(@RequestParam(required = false) String licensePlate,
+                               @RequestParam(required = false) String make,
+                               @RequestParam(required = false) String model,
+                               @RequestParam(required = false) Integer year,
                                @RequestParam(defaultValue = "0") int page,
                                Model modelAttr) {
+
+        // If license plate is provided, try to lookup vehicle info
+        if (licensePlate != null && !licensePlate.trim().isEmpty()) {
+            VehicleInfo vehicleInfo = vehicleApiClient.lookupLicensePlate(licensePlate.trim());
+            if (vehicleInfo != null) {
+                make = vehicleInfo.getMake();
+                model = vehicleInfo.getModel();
+                year = vehicleInfo.getYear();
+                modelAttr.addAttribute("licensePlate", licensePlate);
+            } else {
+                modelAttr.addAttribute("errorMessage", "Could not find vehicle information for the provided license plate.");
+                modelAttr.addAttribute("licensePlate", licensePlate);
+                modelAttr.addAttribute("products", Page.empty());
+                modelAttr.addAttribute("currentPage", 0);
+                modelAttr.addAttribute("totalPages", 0);
+                modelAttr.addAttribute("totalElements", 0);
+                return "products/vehicle-compatibility";
+            }
+        }
         
         // Validate vehicle parameters
         if (make == null || make.trim().isEmpty() || 
@@ -387,8 +426,7 @@ public class ProductController {
             // Get vendor if specified
             Vendor vendor = null;
             if (vendorId != null) {
-                // TODO: Implement VendorService to get vendor by ID
-                // vendor = vendorService.findById(vendorId).orElse(null);
+                vendor = vendorService.findById(vendorId).orElse(null);
             }
 
             // Search products with advanced filters
@@ -400,7 +438,7 @@ public class ProductController {
             model.addAttribute("products", products);
             model.addAttribute("categories", categoryService.findAllActive());
             model.addAttribute("conditions", ProductCondition.values());
-            model.addAttribute("vendors", List.of()); // TODO: Get from VendorService
+            model.addAttribute("vendors", vendorService.findAllApproved());
             
             // Current filter values
             model.addAttribute("currentSearch", q);

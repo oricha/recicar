@@ -1,0 +1,280 @@
+<!doctype html>
+<html class="no-js" lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title th:text="${pageTitle != null ? pageTitle + ' - Car Parts Marketplace' : 'Car Parts Marketplace'}">Car Parts Marketplace</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/static/favicon.ico}">
+
+    <!-- CSS -->
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/owl.carousel.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/slick.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/magnific-popup.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/font.awesome.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/ionicons.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/animate.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/jquery-ui.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/slinky.menu.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/plugins.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+    
+    <!-- Additional head content -->
+    <th:block th:fragment="head-extra"></th:block>
+</head>
+
+<body>
+    <!-- Main Wrapper Start -->
+    
+    <!--header area start-->
+    <header class="header_area">
+        <!--header top start-->
+        <div class="header_top">
+            <div class="container">
+                <div class="top_inner">
+                    <div class="row align-items-center">
+                        <div class="col-lg-6 col-md-6">
+                            <div class="follow_us">
+                                <label>Follow Us:</label>
+                                <ul class="follow_link">
+                                    <li><a href="#"><i class="ion-social-facebook"></i></a></li>
+                                    <li><a href="#"><i class="ion-social-twitter"></i></a></li>
+                                    <li><a href="#"><i class="ion-social-googleplus"></i></a></li>
+                                    <li><a href="#"><i class="ion-social-youtube"></i></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6">
+                            <div class="top_right text-end">
+                                <ul>
+                                    <li class="top_links" sec:authorize="isAuthenticated()">
+                                        <a href="#"><i class="ion-android-person"></i> My Account<i class="ion-ios-arrow-down"></i></a>
+                                        <ul class="dropdown_links">
+                                            <li><a th:href="@{/profile}">My Profile</a></li>
+                                            <li><a th:href="@{/orders}">My Orders</a></li>
+                                            <li><a th:href="@{/cart}">Shopping Cart</a></li>
+                                            <li><a th:href="@{/wishlist}">Wishlist</a></li>
+                                        </ul>
+                                    </li>
+                                    <li class="top_links" sec:authorize="!isAuthenticated()">
+                                        <a th:href="@{/login}"><i class="ion-android-person"></i> Login</a>
+                                    </li>
+                                    <li class="top_links" sec:authorize="!isAuthenticated()">
+                                        <a th:href="@{/register}"><i class="ion-android-person"></i> Register</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--header top end-->
+        
+        <!--header middle start-->
+        <div class="header_middle">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-3 col-md-6">
+                        <div class="logo">
+                            <a th:href="@{/}"><img th:src="@{/static/img/logo/logo.png}" alt="Car Parts Marketplace"></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-9 col-md-6">
+                        <div class="middel_right">
+                            <div class="search-container">
+                                <form th:action="@{/products/search}" method="get">
+                                    <div class="search_box">
+                                        <input placeholder="Search entire store here ..." type="text" name="q" th:value="${searchQuery}">
+                                        <button type="submit"><i class="ion-ios-search-strong"></i></button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="middel_right_info">
+                                <div class="header_wishlist">
+                                    <a th:href="@{/wishlist}"><span class="lnr lnr-heart"></span> Wish list </a>
+                                    <span class="wishlist_quantity">0</span>
+                                </div>
+                                <div class="mini_cart_wrapper">
+                                    <a th:href="@{/cart}"><span class="lnr lnr-cart"></span>My Cart </a>
+                                    <span class="cart_quantity" id="cart-count">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--header middle end-->
+        
+        <!--header bottom start-->
+        <div class="header_bottom mb-0 sticky-header">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-12">
+                        <div class="main_menu header_position">
+                            <nav>
+                                <ul>
+                                    <li><a th:href="@{/}">home</a></li>
+                                    <li class="mega_items">
+                                        <a th:href="@{/products}">shop<i class="fa fa-angle-down"></i></a>
+                                        <div class="mega_menu">
+                                            <ul class="mega_menu_inner">
+                                                <li th:each="category : ${categories}" th:if="${!categories.empty}">
+                                                    <a th:href="@{/products/category/{id}(id=${category.id})}" th:text="${category.name}">Category</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                    <li><a th:href="@{/about}">about Us</a></li>
+                                    <li><a th:href="@{/contact}">Contact Us</a></li>
+                                    <li sec:authorize="hasRole('ADMIN')">
+                                        <a th:href="@{/admin/dashboard}">Admin</a>
+                                    </li>
+                                    <li sec:authorize="hasRole('VENDOR')">
+                                        <a th:href="@{/vendor/dashboard}">Vendor</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--header bottom end-->
+    </header>
+    <!--header area end-->
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Alert Messages -->
+        <div class="container mt-3" th:if="${success != null or error != null or message != null}">
+            <div th:if="${success != null}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle"></i>
+                <span th:text="${success}">Success message</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            
+            <div th:if="${error != null}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span th:text="${error}">Error message</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            
+            <div th:if="${message != null}" class="alert alert-info alert-dismissible fade show" role="alert">
+                <i class="fas fa-info-circle"></i>
+                <span th:text="${message}">Info message</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </div>
+
+        <!-- Page Content -->
+        <div th:fragment="content">
+            <!-- Content will be replaced by specific pages -->
+        </div>
+    </main>
+
+    <!--footer area start-->
+    <footer class="footer_widgets">
+        <div class="container">
+            <div class="footer_top">
+                <div class="row">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="widgets_container contact_us">
+                            <div class="footer_logo">
+                                <a th:href="@{/}"><img th:src="@{/static/img/logo/logo.png}" alt="Car Parts Marketplace"></a>
+                            </div>
+                            <div class="footer_contact">
+                                <p>Your trusted marketplace for genuine and aftermarket auto parts. Browse thousands of parts from verified sellers.</p>
+                                <p><span>Address</span> 123 Auto Parts St, Auto City, AC 12345, USA</p>
+                                <p><span>Need Help?</span>Call: <a href="tel:1-800-555-0123">1-800-555-0123</a></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6 col-sm-6">
+                        <div class="widgets_container widget_menu">
+                            <h3>Information</h3>
+                            <div class="footer_menu">
+                                <ul>
+                                    <li><a th:href="@{/about}">About Us</a></li>
+                                    <li><a href="#">Delivery Information</a></li>
+                                    <li><a href="#">Privacy Policy</a></li>
+                                    <li><a href="#">Terms & Conditions</a></li>
+                                    <li><a href="#">Returns</a></li>
+                                    <li><a href="#">Gift Certificates</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6 col-sm-6">
+                        <div class="widgets_container widget_menu">
+                            <h3>Extras</h3>
+                            <div class="footer_menu">
+                                <ul>
+                                    <li><a href="#">Returns</a></li>
+                                    <li><a th:href="@{/orders}">Order History</a></li>
+                                    <li><a th:href="@{/wishlist}">Wish List</a></li>
+                                    <li><a href="#">Newsletter</a></li>
+                                    <li><a href="#">Affiliate</a></li>
+                                    <li><a href="#">Specials</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="widgets_container">
+                            <h3>Newsletter Subscribe</h3>
+                            <p>We'll never share your email address with a third-party.</p>
+                            <div class="subscribe_form">
+                                <form id="mc-form" class="mc-form footer-newsletter">
+                                    <input id="mc-email" type="email" autocomplete="off" placeholder="Enter you email address here..." />
+                                    <button id="mc-submit">Subscribe</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer_bottom">
+                <div class="row">
+                    <div class="col-lg-6 col-md-6">
+                        <div class="copyright_area">
+                            <p>Copyright &copy; 2024 <a th:href="@{/}">Car Parts Marketplace</a> All Right Reserved.</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6">
+                        <div class="footer_payment text-right">
+                            <a href="#"><img th:src="@{/static/img/icon/payment.png}" alt="Payment Methods"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!--footer area end-->
+
+    <!-- JS -->
+    <script th:src="@{/assets/js/vendor/jquery-3.4.1.min.js}"></script>
+    <script th:src="@{/assets/js/popper.js}"></script>
+    <script th:src="@{/assets/js/bootstrap.min.js}"></script>
+    <script th:src="@{/assets/js/owl.carousel.min.js}"></script>
+    <script th:src="@{/assets/js/slick.min.js}"></script>
+    <script th:src="@{/assets/js/jquery.magnific-popup.min.js}"></script>
+    <script th:src="@{/assets/js/jquery.countdown.js}"></script>
+    <script th:src="@{/assets/js/jquery.ui.js}"></script>
+    <script th:src="@{/assets/js/jquery.elevatezoom.js}"></script>
+    <script th:src="@{/assets/js/isotope.pkgd.min.js}"></script>
+    <script th:src="@{/assets/js/slinky.menu.js}"></script>
+    <script th:src="@{/assets/js/plugins.js}"></script>
+    <script th:src="@{/assets/js/main.js}"></script>
+    
+    <!-- Additional scripts -->
+    <th:block th:fragment="scripts-extra"></th:block>
+</body>
+
+</html>

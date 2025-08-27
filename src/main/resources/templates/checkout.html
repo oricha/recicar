@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/new-base :: html}">
+<head>
+    <th:block th:fragment="head-extra">
+        <title>Checkout - Car Parts Marketplace</title>
+    </th:block>
+</head>
+<body>
+<div th:fragment="content">
+    <!-- Checkout Section -->
+    <section class="checkout_area py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="checkout_wrapper">
+                        <div class="page_header text-center mb-5">
+                            <h1 class="page_title">Checkout</h1>
+                            <p class="page_subtitle">Complete your order by providing the following information</p>
+                        </div>
+
+                        <form th:action="@{/checkout}" method="post">
+                            <div class="row">
+                                <div class="col-lg-7">
+                                    <div class="shipping_address_wrapper">
+                                        <h3 class="checkout_section_title">Shipping Address</h3>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group mb-3">
+                                                    <label for="firstName">First Name</label>
+                                                    <input type="text" id="firstName" name="firstName" class="form-control" th:field="*{firstName}" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group mb-3">
+                                                    <label for="lastName">Last Name</label>
+                                                    <input type="text" id="lastName" name="lastName" class="form-control" th:field="*{lastName}" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label for="address">Address</label>
+                                            <input type="text" id="address" name="address" class="form-control" th:field="*{address}" required>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group mb-3">
+                                                    <label for="city">City</label>
+                                                    <input type="text" id="city" name="city" class="form-control" th:field="*{city}" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group mb-3">
+                                                    <label for="state">State</label>
+                                                    <input type="text" id="state" name="state" class="form-control" th:field="*{state}" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group mb-3">
+                                                    <label for="zipCode">Zip Code</label>
+                                                    <input type="text" id="zipCode" name="zipCode" class="form-control" th:field="*{zipCode}" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group mb-3">
+                                                    <label for="country">Country</label>
+                                                    <input type="text" id="country" name="country" class="form-control" th:field="*{country}" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-5">
+                                    <div class="order_summary_wrapper">
+                                        <h3 class="checkout_section_title">Order Summary</h3>
+                                        <div class="order_summary">
+                                            <table class="table summary_table">
+                                                <thead>
+                                                <tr>
+                                                    <th>Product</th>
+                                                    <th class="text-end">Total</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr th:each="item : ${cart.items}">
+                                                    <td>
+                                                        <span th:text="${item.productName}">Product Name</span> x <span th:text="${item.quantity}">1</span>
+                                                    </td>
+                                                    <td class="text-end" th:text="${#numbers.formatCurrency(item.price * item.quantity)}">$0.00</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Subtotal</td>
+                                                    <td class="text-end" th:text="${#numbers.formatCurrency(cart.subtotal)}">$0.00</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Shipping</td>
+                                                    <td class="text-end" th:text="${#numbers.formatCurrency(shippingCost)}">$0.00</td>
+                                                </tr>
+                                                <tr class="total_row">
+                                                    <td><strong>Order Total</strong></td>
+                                                    <td class="text-end"><strong><span th:text="${#numbers.formatCurrency(cart.subtotal + shippingCost)}">$0.00</span></strong></td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="payment_method_wrapper">
+                                            <h3 class="checkout_section_title">Payment Method</h3>
+                                            <div class="form-group">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="paymentMethod" id="creditCard" value="creditCard" th:field="*{paymentMethod}" checked>
+                                                    <label class="form-check-label" for="creditCard">
+                                                        Credit Card
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="paymentMethod" id="paypal" value="paypal" th:field="*{paymentMethod}">
+                                                    <label class="form-check-label" for="paypal">
+                                                        PayPal
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="place_order_button text-center">
+                                            <button type="submit" class="btn btn-primary btn-lg w-100">Place Order</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+</body>
+</html>

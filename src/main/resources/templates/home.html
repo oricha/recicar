@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/new-base :: html}">
 <head>
     <th:block th:fragment="head-extra">
         <title>Car Parts Marketplace - Quality Auto Parts & Components</title>
@@ -8,68 +8,60 @@
 <body>
     <div th:fragment="content">
         <!-- Hero Section -->
-        <section class="bg-primary text-white py-5">
+        <section class="slider_area">
             <div class="container">
                 <div class="row align-items-center">
                     <div class="col-lg-6">
-                        <h1 class="display-4 fw-bold mb-3">
-                            Find Quality Car Parts
-                        </h1>
-                        <p class="lead mb-4">
-                            Your trusted marketplace for genuine and aftermarket auto parts. 
-                            Browse thousands of parts from verified sellers.
-                        </p>
-                        <div class="d-flex gap-3">
-                            <a th:href="@{/products}" class="btn btn-light btn-lg">
-                                <i class="fas fa-search"></i> Browse Parts
-                            </a>
-                            <a th:href="@{/register}" class="btn btn-outline-light btn-lg">
-                                <i class="fas fa-user-plus"></i> Join Now
-                            </a>
+                        <div class="slider_content">
+                            <h1 class="slider_title">Find Quality Car Parts</h1>
+                            <p class="slider_text">Your trusted marketplace for genuine and aftermarket auto parts. Browse thousands of parts from verified sellers.</p>
+                            <div class="slider_btn">
+                                <a th:href="@{/products}" class="btn btn-primary">Browse Parts</a>
+                                <a th:href="@{/register}" class="btn btn-outline-primary">Join Now</a>
+                            </div>
                         </div>
                     </div>
                     <div class="col-lg-6 text-center">
-                        <i class="fas fa-car fa-10x opacity-75"></i>
+                        <div class="slider_img">
+                            <img th:src="@{/static/img/hero/car-parts.jpg}" alt="Car Parts" class="img-fluid">
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Search Section -->
-        <section class="py-5 bg-light">
+        <section class="search_area py-5">
             <div class="container">
                 <div class="row justify-content-center">
                     <div class="col-lg-8">
-                        <div class="card shadow">
-                            <div class="card-body p-4">
-                                <h3 class="text-center mb-4">
-                                    <i class="fas fa-search text-primary"></i> 
-                                    Search for Parts
-                                </h3>
-                                
-                                <form th:action="@{/products/search}" method="get">
-                                    <div class="row g-3">
-                                        <div class="col-md-8">
-                                            <input type="text" class="form-control form-control-lg" 
-                                                   name="q" placeholder="Enter part name, number, or vehicle...">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <button type="submit" class="btn btn-primary btn-lg w-100">
-                                                <i class="fas fa-search"></i> Search
-                                            </button>
-                                        </div>
+                        <div class="search_wrapper">
+                            <h3 class="search_title text-center mb-4">
+                                <i class="ion-ios-search-strong"></i> Search for Parts
+                            </h3>
+                            
+                            <form th:action="@{/products/search}" method="get" class="search_form">
+                                <div class="row g-3">
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control form-control-lg" 
+                                               name="q" placeholder="Enter part name, number, or vehicle...">
                                     </div>
-                                </form>
-                                
-                                <div class="text-center mt-3">
-                                    <small class="text-muted">
-                                        Try searching for: "brake pads", "headlight", "oil filter"
-                                    </small>
-                                    <div class="mt-2">
-                                        <a th:href="@{/products/advanced-search}" class="btn btn-outline-primary btn-sm">
-                                            <i class="fas fa-filter"></i> Advanced Search
-                                        </a>
+                                    <div class="col-md-4">
+                                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                                            <i class="ion-ios-search-strong"></i> Search
+                                        </button>
                                     </div>
+                                </div>
+                            </form>
+                            
+                            <div class="text-center mt-3">
+                                <small class="text-muted">
+                                    Try searching for: "brake pads", "headlight", "oil filter"
+                                </small>
+                                <div class="mt-2">
+                                    <a th:href="@{/products/advanced-search}" class="btn btn-outline-primary btn-sm">
+                                        <i class="ion-ios-gear"></i> Advanced Search
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -79,27 +71,31 @@
         </section>
 
         <!-- Categories Section -->
-        <section class="py-5" th:if="${!categories.empty}">
+        <section class="category_area py-5" th:if="${!categories.empty}">
             <div class="container">
-                <h2 class="text-center mb-5">
-                    <i class="fas fa-list text-primary"></i> 
-                    Browse by Category
-                </h2>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="section_title text-center mb-5">
+                            <h2>Browse by Category</h2>
+                            <p>Find the right parts for your vehicle</p>
+                        </div>
+                    </div>
+                </div>
                 
                 <div class="row">
-                    <div class="col-md-6 col-lg-3 mb-4" th:each="category : ${categories}">
-                        <div class="card h-100 text-center category-card">
-                            <div class="card-body">
-                                <i class="fas fa-cogs fa-3x text-primary mb-3"></i>
-                                <h5 class="card-title" th:text="${category.name}">Category Name</h5>
-                                <p class="card-text text-muted" th:text="${category.description}">
-                                    Category description
-                                </p>
-                                <a th:href="@{/products/category/{id}(id=${category.id})}" 
-                                   class="btn btn-outline-primary">
-                                    <i class="fas fa-arrow-right"></i> Browse
-                                </a>
+                    <div class="col-lg-3 col-md-6 mb-4" th:each="category : ${categories}">
+                        <div class="category_item text-center">
+                            <div class="category_icon mb-3">
+                                <i class="ion-cog fa-3x text-primary"></i>
                             </div>
+                            <h5 class="category_title" th:text="${category.name}">Category Name</h5>
+                            <p class="category_text text-muted" th:text="${category.description}">
+                                Category description
+                            </p>
+                            <a th:href="@{/products/category/{id}(id=${category.id})}" 
+                               class="btn btn-outline-primary">
+                                <i class="ion-ios-arrow-right"></i> Browse
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -107,51 +103,54 @@
         </section>
 
         <!-- Featured Products Section -->
-        <section class="py-5 bg-light" th:if="${!featuredProducts.empty}">
+        <section class="featured_products py-5 bg-light" th:if="${!featuredProducts.empty}">
             <div class="container">
-                <div class="row mb-4">
-                    <div class="col">
-                        <h2 class="text-center">
-                            <i class="fas fa-star text-warning"></i> 
-                            Featured Products
-                        </h2>
-                        <p class="text-center text-muted">
-                            Check out our latest and most popular car parts
-                        </p>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="section_title text-center mb-5">
+                            <h2>Featured Products</h2>
+                            <p>Check out our latest and most popular car parts</p>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="row">
-                    <div class="col-md-6 col-lg-3 mb-4" th:each="product : ${featuredProducts}">
-                        <div class="card product-card h-100">
-                            <div class="position-relative">
-                                <img th:src="${product.primaryImage != null ? product.primaryImage.imageUrl : '/images/no-image.png'}" 
-                                     class="card-img-top product-image" 
-                                     th:alt="${product.name}">
-                                
-                                <span class="badge position-absolute top-0 end-0 m-2" 
-                                      th:classappend="${product.inStock ? 'bg-success' : 'bg-danger'}"
-                                      th:text="${product.inStock ? 'In Stock' : 'Out of Stock'}">
-                                    Stock Status
-                                </span>
+                    <div class="col-lg-3 col-md-6 mb-4" th:each="product : ${featuredProducts}">
+                        <div class="product_item">
+                            <div class="product_thumb">
+                                <a th:href="@{/products/{id}(id=${product.id})}" class="primary_img">
+                                    <img th:src="${product.primaryImage != null ? product.primaryImage.imageUrl : '/static/img/no-image.png'}" 
+                                         th:alt="${product.name}" class="img-fluid">
+                                </a>
+                                <div class="product_badge">
+                                    <span class="badge" 
+                                          th:classappend="${product.inStock ? 'badge-success' : 'badge-danger'}"
+                                          th:text="${product.inStock ? 'In Stock' : 'Out of Stock'}">
+                                        Stock Status
+                                    </span>
+                                </div>
                             </div>
                             
-                            <div class="card-body d-flex flex-column">
-                                <h6 class="card-title" th:text="${product.name}">Product Name</h6>
-                                <p class="card-text text-muted small" 
+                            <div class="product_content">
+                                <h6 class="product_title" th:text="${product.name}">Product Name</h6>
+                                <p class="product_text text-muted small" 
                                    th:text="${#strings.abbreviate(product.description, 60)}">
                                     Product description...
                                 </p>
                                 
-                                <div class="mt-auto">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="price" th:text="${product.formattedPrice}">€0.00</span>
+                                <div class="product_footer d-flex justify-content-between align-items-center">
+                                    <div class="price_box">
+                                        <span class="current_price" th:text="${product.formattedPrice}">€0.00</span>
+                                    </div>
+                                    <div class="product_condition">
                                         <small class="text-muted" th:text="${product.condition.name()}">Condition</small>
                                     </div>
-                                    
+                                </div>
+                                
+                                <div class="add_to_cart">
                                     <a th:href="@{/products/{id}(id=${product.id})}" 
                                        class="btn btn-primary btn-sm w-100">
-                                        <i class="fas fa-eye"></i> View Details
+                                        <i class="ion-ios-eye"></i> View Details
                                     </a>
                                 </div>
                             </div>
@@ -161,43 +160,59 @@
                 
                 <div class="text-center mt-4">
                     <a th:href="@{/products}" class="btn btn-outline-primary btn-lg">
-                        <i class="fas fa-cogs"></i> View All Products
+                        <i class="ion-ios-cart"></i> View All Products
                     </a>
                 </div>
             </div>
         </section>
 
         <!-- Features Section -->
-        <section class="py-5">
+        <section class="features_area py-5">
             <div class="container">
-                <h2 class="text-center mb-5">
-                    <i class="fas fa-shield-alt text-primary"></i> 
-                    Why Choose Us?
-                </h2>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="section_title text-center mb-5">
+                            <h2>Why Choose Us?</h2>
+                            <p>We provide the best service for our customers</p>
+                        </div>
+                    </div>
+                </div>
                 
                 <div class="row">
-                    <div class="col-md-4 text-center mb-4">
-                        <i class="fas fa-shipping-fast fa-3x text-primary mb-3"></i>
-                        <h4>Fast Shipping</h4>
-                        <p class="text-muted">
-                            Quick delivery on all orders with tracking information provided.
-                        </p>
+                    <div class="col-lg-4 col-md-6 text-center mb-4">
+                        <div class="feature_item">
+                            <div class="feature_icon mb-3">
+                                <i class="ion-ios-send fa-3x text-primary"></i>
+                            </div>
+                            <h4>Fast Shipping</h4>
+                            <p class="text-muted">
+                                Quick delivery on all orders with tracking information provided.
+                            </p>
+                        </div>
                     </div>
                     
-                    <div class="col-md-4 text-center mb-4">
-                        <i class="fas fa-certificate fa-3x text-primary mb-3"></i>
-                        <h4>Quality Guaranteed</h4>
-                        <p class="text-muted">
-                            All parts are verified for quality and authenticity by our team.
-                        </p>
+                    <div class="col-lg-4 col-md-6 text-center mb-4">
+                        <div class="feature_item">
+                            <div class="feature_icon mb-3">
+                                <i class="ion-ios-checkmark-circle fa-3x text-primary"></i>
+                            </div>
+                            <h4>Quality Guaranteed</h4>
+                            <p class="text-muted">
+                                All parts are verified for quality and authenticity by our team.
+                            </p>
+                        </div>
                     </div>
                     
-                    <div class="col-md-4 text-center mb-4">
-                        <i class="fas fa-headset fa-3x text-primary mb-3"></i>
-                        <h4>Expert Support</h4>
-                        <p class="text-muted">
-                            Our automotive experts are here to help you find the right parts.
-                        </p>
+                    <div class="col-lg-4 col-md-6 text-center mb-4">
+                        <div class="feature_item">
+                            <div class="feature_icon mb-3">
+                                <i class="ion-ios-people fa-3x text-primary"></i>
+                            </div>
+                            <h4>Expert Support</h4>
+                            <p class="text-muted">
+                                Our automotive experts are here to help you find the right parts.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -206,14 +221,63 @@
 
     <th:block th:fragment="scripts-extra">
         <style>
-            .category-card {
-                transition: transform 0.2s;
-                border: none;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            .slider_area {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 80px 0;
             }
-            .category-card:hover {
+            .slider_title {
+                font-size: 3rem;
+                font-weight: 700;
+                margin-bottom: 1rem;
+            }
+            .slider_text {
+                font-size: 1.2rem;
+                margin-bottom: 2rem;
+            }
+            .slider_btn .btn {
+                margin-right: 1rem;
+                margin-bottom: 1rem;
+            }
+            .search_wrapper {
+                background: white;
+                padding: 2rem;
+                border-radius: 10px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            }
+            .category_item {
+                background: white;
+                padding: 2rem;
+                border-radius: 10px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                transition: transform 0.2s;
+            }
+            .category_item:hover {
                 transform: translateY(-5px);
-                box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            }
+            .product_item {
+                background: white;
+                border-radius: 10px;
+                overflow: hidden;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                transition: transform 0.2s;
+            }
+            .product_item:hover {
+                transform: translateY(-5px);
+            }
+            .product_thumb {
+                position: relative;
+            }
+            .product_badge {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+            }
+            .product_content {
+                padding: 1.5rem;
+            }
+            .feature_item {
+                padding: 2rem;
             }
         </style>
     </th:block>
