@@ -5,11 +5,14 @@ import com.recicar.marketplace.dto.OrderRequest;
 import com.recicar.marketplace.dto.ShippingInfoRequest;
 import com.recicar.marketplace.dto.PaymentRequest;
 import com.recicar.marketplace.entity.Order;
+import com.recicar.marketplace.entity.Payment;
 import com.recicar.marketplace.entity.Product;
 import com.recicar.marketplace.entity.User;
 import com.recicar.marketplace.repository.OrderRepository;
 import com.recicar.marketplace.repository.ProductRepository;
 import com.recicar.marketplace.repository.UserRepository;
+import com.recicar.marketplace.service.PaymentService;
+import com.recicar.marketplace.service.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -23,6 +26,8 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 public class OrderServiceTest {
@@ -38,6 +43,12 @@ public class OrderServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private PaymentService paymentService;
+
+    @Mock
+    private NotificationService notificationService;
 
     @BeforeEach
     public void setUp() {
@@ -78,6 +89,12 @@ public class OrderServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(customer));
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
         when(orderRepository.save(any(Order.class))).thenAnswer(i -> i.getArguments()[0]);
+        
+        // Mock payment and notification services
+        Payment mockPayment = new Payment();
+        mockPayment.setStatus(Payment.PaymentStatus.COMPLETED);
+        when(paymentService.processPayment(any(Order.class), anyString())).thenReturn(mockPayment);
+        doNothing().when(notificationService).sendOrderConfirmationEmail(any(Order.class));
 
         Order order = orderService.createOrder(orderRequest);
 

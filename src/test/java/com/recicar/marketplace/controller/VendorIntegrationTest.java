@@ -5,14 +5,15 @@ import com.recicar.marketplace.dto.VendorRegistrationRequest;
 import com.recicar.marketplace.entity.Category;
 import com.recicar.marketplace.entity.ProductCondition;
 import com.recicar.marketplace.entity.User;
+import com.recicar.marketplace.entity.UserRole;
 import com.recicar.marketplace.entity.Vendor;
-import com.recicar.marketplace.entity.User.UserRole;
-import com.recicar.marketplace.entity.Vendor.VendorStatus;
+import com.recicar.marketplace.entity.VendorStatus;
 import com.recicar.marketplace.repository.CategoryRepository;
 import com.recicar.marketplace.repository.UserRepository;
 import com.recicar.marketplace.repository.VendorRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,6 +27,7 @@ import java.math.BigDecimal;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
@@ -52,29 +54,29 @@ public class VendorIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Create a user for the vendor
+        // Create a user for the vendor with unique email
         vendorUser = new User();
-        vendorUser.setEmail("vendor@example.com");
+        vendorUser.setEmail("vendor" + System.currentTimeMillis() + "@example.com");
         vendorUser.setPasswordHash(passwordEncoder.encode("password"));
         vendorUser.setFirstName("Vendor");
         vendorUser.setLastName("User");
         vendorUser.setRole(UserRole.VENDOR);
         vendorUser.setActive(true);
-        userRepository.save(vendorUser);
+        vendorUser = userRepository.save(vendorUser);
 
-        // Create a vendor
+        // Create a vendor with unique business name and tax ID
         vendor = new Vendor();
         vendor.setUser(vendorUser);
-        vendor.setBusinessName("Test Vendor Inc.");
-        vendor.setTaxId("TAX123");
+        vendor.setBusinessName("Test Vendor Inc. " + System.currentTimeMillis());
+        vendor.setTaxId("TAX" + System.currentTimeMillis());
         vendor.setStatus(VendorStatus.APPROVED);
-        vendorRepository.save(vendor);
+        vendor = vendorRepository.save(vendor);
 
-        // Create a category
+        // Create a category with unique name and slug
         category = new Category();
-        category.setName("Engine Parts");
-        category.setSlug("engine-parts");
-        categoryRepository.save(category);
+        category.setName("Engine Parts " + System.currentTimeMillis());
+        category.setSlug("engine-parts-" + System.currentTimeMillis());
+        category = categoryRepository.save(category);
     }
 
     @Test

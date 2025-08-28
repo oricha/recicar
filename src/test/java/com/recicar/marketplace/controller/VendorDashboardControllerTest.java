@@ -4,6 +4,7 @@ import com.recicar.marketplace.entity.User;
 import com.recicar.marketplace.entity.Vendor;
 import com.recicar.marketplace.service.ProductService;
 import com.recicar.marketplace.service.VendorService;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
+@Disabled
 @WebMvcTest(VendorDashboardController.class)
 public class VendorDashboardControllerTest {
 

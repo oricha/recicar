@@ -2,11 +2,14 @@ package com.recicar.marketplace.controller;
 
 import com.recicar.marketplace.dto.CartDto;
 import com.recicar.marketplace.dto.CheckoutForm;
+import com.recicar.marketplace.dto.OrderItemRequest;
+import com.recicar.marketplace.entity.Order;
 import com.recicar.marketplace.entity.Product;
 import com.recicar.marketplace.entity.User;
 import com.recicar.marketplace.repository.ProductRepository;
 import com.recicar.marketplace.repository.UserRepository;
 import com.recicar.marketplace.service.CartService;
+import com.recicar.marketplace.service.OrderService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +20,13 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -45,9 +50,13 @@ public class CheckoutControllerIntegrationTest {
     @MockBean
     private UserRepository userRepository;
 
+    @MockBean
+    private OrderService orderService;
+
     private User mockUser;
     private Product mockProduct;
     private CartDto mockCartDto;
+    private Order mockOrder;
 
     @BeforeEach
     void setUp() {
@@ -65,10 +74,18 @@ public class CheckoutControllerIntegrationTest {
         mockCartDto.setUserId(1L);
         mockCartDto.setSubtotal(new BigDecimal("10.00"));
 
+        mockOrder = new Order();
+        mockOrder.setId(1L);
+        mockOrder.setOrderNumber("ORD-12345");
+
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(mockUser));
         when(productRepository.findById(anyLong())).thenReturn(Optional.of(mockProduct));
         when(cartService.getCart(anyLong())).thenReturn(mockCartDto);
         when(cartService.calculateShippingCost(anyLong(), anyString(), anyString(), anyString())).thenReturn(new BigDecimal("5.00"));
+        doNothing().when(cartService).validateCart(anyLong());
+        doNothing().when(cartService).clearCart(anyLong());
+        when(orderService.convertCartItemsToOrderItems(any())).thenReturn(List.of());
+        when(orderService.createOrder(any())).thenReturn(mockOrder);
     }
 
     @Test
@@ -93,7 +110,14 @@ public class CheckoutControllerIntegrationTest {
         checkoutForm.setPaymentMethod("creditCard");
 
         mockMvc.perform(post("/checkout")
-                        .flashAttr("checkoutForm", checkoutForm))
+                        .param("firstName", checkoutForm.getFirstName())
+                        .param("lastName", checkoutForm.getLastName())
+                        .param("address", checkoutForm.getAddress())
+                        .param("city", checkoutForm.getCity())
+                        .param("state", checkoutForm.getState())
+                        .param("zipCode", checkoutForm.getZipCode())
+                        .param("country", checkoutForm.getCountry())
+                        .param("paymentMethod", checkoutForm.getPaymentMethod()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrlPattern("/orders/confirmation?orderNumber=*"));
     }
@@ -125,7 +149,14 @@ public class CheckoutControllerIntegrationTest {
         checkoutForm.setPaymentMethod("creditCard");
 
         mockMvc.perform(post("/checkout")
-                        .flashAttr("checkoutForm", checkoutForm))
+                        .param("firstName", checkoutForm.getFirstName())
+                        .param("lastName", checkoutForm.getLastName())
+                        .param("address", checkoutForm.getAddress())
+                        .param("city", checkoutForm.getCity())
+                        .param("state", checkoutForm.getState())
+                        .param("zipCode", checkoutForm.getZipCode())
+                        .param("country", checkoutForm.getCountry())
+                        .param("paymentMethod", checkoutForm.getPaymentMethod()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrlPattern("/orders/confirmation?orderNumber=*"));
     }

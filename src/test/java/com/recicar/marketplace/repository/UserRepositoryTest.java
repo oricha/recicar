@@ -27,7 +27,7 @@ class UserRepositoryTest {
         // Given
         User user = new User();
         user.setEmail("test@example.com");
-        user.setPasswordHash("hashedPassword");
+        user.setPasswordHash("password123");
         user.setFirstName("John");
         user.setLastName("Doe");
         user.setRole(UserRole.CUSTOMER);
@@ -53,7 +53,7 @@ class UserRepositoryTest {
         // Given
         User user = new User();
         user.setEmail("Test@Example.com");
-        user.setPasswordHash("hashedPassword");
+        user.setPasswordHash("password123");
         user.setFirstName("Jane");
         user.setLastName("Smith");
         user.setRole(UserRole.VENDOR);
@@ -74,7 +74,7 @@ class UserRepositoryTest {
         // Given
         User user = new User();
         user.setEmail("existing@example.com");
-        user.setPasswordHash("hashedPassword");
+        user.setPasswordHash("password123");
         user.setFirstName("Existing");
         user.setLastName("User");
 
@@ -90,10 +90,10 @@ class UserRepositoryTest {
     @Test
     void shouldFindUsersByRole() {
         // Given
-        User customer = new User("customer@example.com", "hash", "Customer", "User");
+        User customer = new User("customer@example.com", "password123", "Customer", "User");
         customer.setRole(UserRole.CUSTOMER);
 
-        User vendor = new User("vendor@example.com", "hash", "Vendor", "User");
+        User vendor = new User("vendor@example.com", "password123", "Vendor", "User");
         vendor.setRole(UserRole.VENDOR);
 
         userRepository.save(customer);
@@ -115,13 +115,13 @@ class UserRepositoryTest {
     @Test
     void shouldCountUsersByRole() {
         // Given
-        User customer1 = new User("customer1@example.com", "hash", "Customer", "One");
+        User customer1 = new User("customer1@example.com", "password123", "Customer", "One");
         customer1.setRole(UserRole.CUSTOMER);
 
-        User customer2 = new User("customer2@example.com", "hash", "Customer", "Two");
+        User customer2 = new User("customer2@example.com", "password123", "Customer", "Two");
         customer2.setRole(UserRole.CUSTOMER);
 
-        User vendor = new User("vendor@example.com", "hash", "Vendor", "User");
+        User vendor = new User("vendor@example.com", "password123", "Vendor", "User");
         vendor.setRole(UserRole.VENDOR);
 
         userRepository.save(customer1);

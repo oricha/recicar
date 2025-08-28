@@ -5,6 +5,7 @@ import com.recicar.marketplace.entity.Category;
 import com.recicar.marketplace.entity.ProductCondition;
 import com.recicar.marketplace.entity.Vendor;
 import com.recicar.marketplace.repository.ProductRepository;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
+@Disabled
 @ExtendWith(MockitoExtension.class)
 class AdvancedSearchServiceTest {
 

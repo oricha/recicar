@@ -3,9 +3,9 @@ package com.recicar.marketplace.service;
 import com.recicar.marketplace.dto.VendorRegistrationRequest;
 import com.recicar.marketplace.entity.User;
 import com.recicar.marketplace.entity.Vendor;
+import com.recicar.marketplace.entity.VendorStatus;
 import com.recicar.marketplace.repository.UserRepository;
 import com.recicar.marketplace.repository.VendorRepository;
-import com.recicar.marketplace.entity.Vendor.VendorStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -58,7 +58,7 @@ public class VendorServiceTest {
         Vendor vendor = vendorService.registerVendor(request);
 
         assertNotNull(vendor);
-        assertEquals(Vendor.VendorStatus.PENDING, vendor.getStatus());
+        assertEquals(VendorStatus.PENDING, vendor.getStatus());
         assertEquals("test@example.com", vendor.getUser().getEmail());
     }
 
@@ -66,7 +66,7 @@ public class VendorServiceTest {
     public void testApproveVendor() {
         Vendor vendor = new Vendor();
         vendor.setId(1L);
-        vendor.setStatus(Vendor.VendorStatus.PENDING);
+        vendor.setStatus(VendorStatus.PENDING);
         vendor.setUser(new User());
         vendor.getUser().setActive(false);
 
@@ -75,7 +75,7 @@ public class VendorServiceTest {
 
         Vendor approvedVendor = vendorService.approveVendor(1L);
 
-        assertEquals(Vendor.VendorStatus.APPROVED, approvedVendor.getStatus());
+        assertEquals(VendorStatus.APPROVED, approvedVendor.getStatus());
         assertTrue(approvedVendor.getUser().isActive());
     }
 
@@ -83,7 +83,7 @@ public class VendorServiceTest {
     public void testSuspendVendor() {
         Vendor vendor = new Vendor();
         vendor.setId(1L);
-        vendor.setStatus(Vendor.VendorStatus.APPROVED);
+        vendor.setStatus(VendorStatus.APPROVED);
         vendor.setUser(new User());
         vendor.getUser().setActive(true);
 
@@ -92,7 +92,7 @@ public class VendorServiceTest {
 
         Vendor suspendedVendor = vendorService.suspendVendor(1L);
 
-        assertEquals(Vendor.VendorStatus.SUSPENDED, suspendedVendor.getStatus());
+        assertEquals(VendorStatus.SUSPENDED, suspendedVendor.getStatus());
         assertFalse(suspendedVendor.getUser().isActive());
     }
 }
