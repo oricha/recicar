@@ -63,57 +63,14 @@ public class SecurityConfig {
                 .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).maxAgeInSeconds(31536000))
             )
             .authorizeHttpRequests(authz -> authz
-                // Public endpoints
-                .requestMatchers("/", "/home", "/products/**", "/search/**", "/api/products/**").permitAll()
-                .requestMatchers("/register", "/login", "/forgot-password", "/reset-password").permitAll()
-                .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
-                .requestMatchers("/assets/**", "/static/**").permitAll()
-                .requestMatchers("/actuator/health").permitAll()
-                .requestMatchers("/test/**").permitAll()
-                
-                // Cart endpoints (allow both authenticated and anonymous users)
-                .requestMatchers("/cart/**", "/api/cart/**").permitAll()
-                
-                // Customer endpoints
-                .requestMatchers("/profile/**", "/orders/**", "/checkout/**").hasAnyRole("CUSTOMER", "VENDOR", "ADMIN")
-                
-                // Vendor endpoints
-                .requestMatchers("/vendor/**", "/api/vendor/**").hasAnyRole("VENDOR", "ADMIN")
-                
-                // Admin endpoints
-                .requestMatchers("/admin/**", "/api/admin/**").hasRole("ADMIN")
-                
-                // All other requests require authentication
-                .anyRequest().authenticated()
+                // Allow all requests without authentication
+                .anyRequest().permitAll()
             )
-            .formLogin(form -> form
-                .loginPage("/login")
-                .loginProcessingUrl("/login")
-                .successHandler(customAuthenticationSuccessHandler())
-                .failureUrl("/login?error=true")
-                .usernameParameter("email")
-                .passwordParameter("password")
-                .permitAll()
-            )
-            .logout(logout -> logout
-                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                .logoutSuccessUrl("/")
-                .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID")
-                .permitAll()
-            )
-            .sessionManagement(session -> session
-                .maximumSessions(1)
-                .maxSessionsPreventsLogin(false)
-            )
-            .rememberMe(remember -> remember
-                .key("uniqueAndSecret")
-                .tokenValiditySeconds(86400) // 24 hours
-                .userDetailsService(userDetailsService)
-            )
-            .csrf(csrf -> csrf
-                .ignoringRequestMatchers("/api/**") // Disable CSRF for API endpoints
-            );
+            .formLogin(form -> form.disable())
+            .logout(logout -> logout.disable())
+            .sessionManagement(session -> session.disable())
+            .rememberMe(remember -> remember.disable())
+            .csrf(csrf -> csrf.disable());
 
         return http.build();
     }

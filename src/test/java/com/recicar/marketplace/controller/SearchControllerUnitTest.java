@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -243,7 +244,7 @@ class SearchControllerUnitTest {
                         .param("q", "nonexistentproduct"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("products/search-results"))
-                .andExpect(model().attribute("totalElements", 0L));
+                .andExpect(model().attribute("totalElements", 0));
     }
 
     @Test
@@ -259,9 +260,5 @@ class SearchControllerUnitTest {
                 .andExpect(model().attributeExists("products"));
     }
 
-    private static void assertNotNull(Object obj) {
-        if (obj == null) {
-            throw new AssertionError("Object should not be null");
-        }
-    }
+
 }

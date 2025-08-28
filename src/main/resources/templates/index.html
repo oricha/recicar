@@ -103,27 +103,17 @@
                 <div class="row align-items-center">
                     <div class="col-lg-3 col-md-6">
                         <div class="logo">
-                            <a href="index-1.html"><img src="/img/logo/logo.png" alt=""></a>
+                            <a href="index.html"><img src="/img/logo/logo.png" alt=""></a>
                         </div>
                     </div>
                     <div class="col-lg-9 col-md-6">
                         <div class="middel_right">
                             <div class="search-container">
-                                <form id="car-parts-search-form">
-                                    <select id="brand-select">
-                                        <option value="">Select Brand</option>
-                                        <!-- Brands will be populated here -->
-                                    </select>
-                                    <select id="model-select" disabled>
-                                        <option value="">Select Model</option>
-                                        <!-- Models will be populated here -->
-                                    </select>
-                                    <select id="engine-select" disabled>
-                                        <option value="">Select Engine/Modification</option>
-                                        <!-- Engines will be populated here -->
-                                    </select>
-                                    <input type="text" id="part-name" placeholder="Name of the part" disabled>
-                                    <button type="submit" id="search-button" disabled>Search</button>
+                                <form action="#">
+                                    <div class="search_box">
+                                        <input placeholder="Search entire store here ..." type="text">
+                                        <button type="submit"><i class="ion-ios-search-strong"></i></button>
+                                    </div>
                                 </form>
                             </div>
                             <div class="middel_right_info">
@@ -216,9 +206,9 @@
                         <div class="main_menu header_position">
                             <nav>
                                 <ul>
-                                    <li><a href="index-1.html">home<i class="fa fa-angle-down"></i></a>
+                                    <li><a href="index.html">home<i class="fa fa-angle-down"></i></a>
                                         <ul class="sub_menu">
-                                            <li><a href="index-1.html">Home 1</a></li>
+                                            <li><a href="index.html">Home 1</a></li>
                                             <li><a href="index-2.html">Home 2</a></li>
                                             <li><a href="index-3.html">Home 3</a></li>
                                             <li><a href="index-4.html">Home 4</a></li>
@@ -359,21 +349,11 @@
                             </ul>
                         </div>
                         <div class="search-container">
-                            <form id="car-parts-search-form">
-                                <select id="brand-select">
-                                    <option value="">Select Brand</option>
-                                    <!-- Brands will be populated here -->
-                                </select>
-                                <select id="model-select" disabled>
-                                    <option value="">Select Model</option>
-                                    <!-- Models will be populated here -->
-                                </select>
-                                <select id="engine-select" disabled>
-                                    <option value="">Select Engine/Modification</option>
-                                    <!-- Engines will be populated here -->
-                                </select>
-                                <input type="text" id="part-name" placeholder="Name of the part" disabled>
-                                <button type="submit" id="search-button" disabled>Search</button>
+                            <form action="#">
+                                <div class="search_box">
+                                    <input placeholder="Search entire store here ..." type="text">
+                                    <button type="submit"><i class="ion-ios-search-strong"></i></button>
+                                </div>
                             </form>
                         </div>
                         <div id="menu" class="text-left ">
@@ -381,7 +361,7 @@
                                 <li class="menu-item-has-children">
                                     <a href="#">Home</a>
                                     <ul class="sub-menu">
-                                        <li><a href="index-1.html">Home 1</a></li>
+                                        <li><a href="index.html">Home 1</a></li>
                                         <li><a href="index-2.html">Home 2</a></li>
                                         <li><a href="index-3.html">Home 3</a></li>
                                         <li><a href="index-4.html">Home 4</a></li>
@@ -3281,7 +3261,7 @@
                     <div class="col-lg-4 col-md-6">
                         <div class="widgets_container">
                             <h3>Newsletter Subscribe</h3>
-                            <p>We'll never share your email address with a third-party.</p>
+                            <p>We’ll never share your email address with a third-party.</p>
                             <div class="subscribe_form">
                                 <form id="mc-form" class="mc-form footer-newsletter">
                                     <input id="mc-email" type="email" autocomplete="off" placeholder="Enter you email address here..." />
@@ -3501,101 +3481,7 @@
 <!-- Main JS -->
 <script src="/js/main.js"></script>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const brandSelect = document.getElementById('brand-select');
-    const modelSelect = document.getElementById('model-select');
-    const engineSelect = document.getElementById('engine-select');
-    const partNameInput = document.getElementById('part-name');
-    const searchButton = document.getElementById('search-button');
 
-    // Fetch and populate brands
-    fetch('/carMakers/search')
-        .then(response => response.json())
-        .then(data => {
-            data.forEach(brand => {
-                const option = document.createElement('option');
-                option.value = brand.id;
-                option.textContent = brand.name;
-                brandSelect.appendChild(option);
-            });
-        });
-
-    // Event listener for brand selection
-    brandSelect.addEventListener('change', function() {
-        modelSelect.disabled = true;
-        engineSelect.disabled = true;
-        partNameInput.disabled = true;
-        searchButton.disabled = true;
-        modelSelect.innerHTML = '<option value="">Select Model</option>';
-        engineSelect.innerHTML = '<option value="">Select Engine/Modification</option>';
-
-        if (this.value) {
-            fetch(`/carModels/search?carMakerId=${this.value}`)
-                .then(response => response.json())
-                .then(data => {
-                    data.forEach(model => {
-                        const option = document.createElement('option');
-                        option.value = model.id;
-                        option.textContent = model.name;
-                        modelSelect.appendChild(option);
-                    });
-                    modelSelect.disabled = false;
-                });
-        }
-    });
-
-    // Event listener for model selection
-    modelSelect.addEventListener('change', function() {
-        engineSelect.disabled = true;
-        partNameInput.disabled = true;
-        searchButton.disabled = true;
-        engineSelect.innerHTML = '<option value="">Select Engine/Modification</option>';
-
-        if (this.value) {
-            fetch(`/carVersions/search?carModelId=${this.value}`)
-                .then(response => response.json())
-                .then(data => {
-                    data.forEach(engine => {
-                        const option = document.createElement('option');
-                        option.value = engine.id;
-                        option.textContent = engine.name;
-                        engineSelect.appendChild(option);
-                    });
-                    engineSelect.disabled = false;
-                });
-        }
-    });
-
-    // Event listener for engine selection
-    engineSelect.addEventListener('change', function() {
-        if (this.value) {
-            partNameInput.disabled = false;
-            searchButton.disabled = false;
-        } else {
-            partNameInput.disabled = true;
-            searchButton.disabled = true;
-        }
-    });
-
-    // Handle form submission
-    document.getElementById('car-parts-search-form').addEventListener('submit', function(event) {
-        event.preventDefault();
-        const brandId = brandSelect.value;
-        const modelId = modelSelect.value;
-        const engineId = engineSelect.value;
-        const partName = partNameInput.value;
-
-        // Perform search with selected criteria
-        fetch(`/partss?brandId=${brandId}&modelId=${modelId}&engineId=${engineId}&partName=${partName}`)
-            .then(response => response.json())
-            .then(data => {
-                // Display parts
-                console.log(data);
-            });
-    });
-});
-</script>
 
 </body>
 
