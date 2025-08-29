@@ -41,6 +41,12 @@ public class Product {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
+    @Column(name = "old_price", precision = 10, scale = 2)
+    private BigDecimal oldPrice;
+
+    @Column(name = "discount")
+    private Integer discount = 0;
+
     @Size(max = 100)
     @Column(name = "part_number")
     private String partNumber;
@@ -146,6 +152,22 @@ public class Product {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public BigDecimal getOldPrice() {
+        return oldPrice;
+    }
+
+    public void setOldPrice(BigDecimal oldPrice) {
+        this.oldPrice = oldPrice;
+    }
+
+    public Integer getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Integer discount) {
+        this.discount = discount;
     }
 
     public String getPartNumber() {

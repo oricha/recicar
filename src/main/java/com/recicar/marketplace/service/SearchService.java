@@ -5,6 +5,7 @@ import com.recicar.marketplace.entity.Category;
 import com.recicar.marketplace.entity.ProductCondition;
 import com.recicar.marketplace.entity.Vendor;
 import com.recicar.marketplace.repository.ProductRepository;
+import com.recicar.marketplace.repository.VehicleCompatibilityRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Service for handling product search operations with validation and business logic
@@ -23,9 +25,11 @@ import java.util.Objects;
 public class SearchService {
 
     private final ProductRepository productRepository;
+    private final VehicleCompatibilityRepository vehicleCompatibilityRepository;
 
-    public SearchService(ProductRepository productRepository) {
+    public SearchService(ProductRepository productRepository, VehicleCompatibilityRepository vehicleCompatibilityRepository) {
         this.productRepository = productRepository;
+        this.vehicleCompatibilityRepository = vehicleCompatibilityRepository;
     }
 
     /**
@@ -77,13 +81,14 @@ public class SearchService {
      * Search products by vehicle compatibility with validation
      */
     @Transactional(readOnly = true)
-    public Page<Product> searchByVehicleCompatibility(String make, String model, Integer year, Pageable pageable) {
-        validateVehicleParameters(make, model, year);
+    public Page<Product> searchByVehicleCompatibility(String make, String model, String engine, Integer year, Pageable pageable) {
+        validateVehicleParameters(make, model, engine, year);
         
         String sanitizedMake = sanitizeSearchTerm(make);
         String sanitizedModel = sanitizeSearchTerm(model);
+        String sanitizedEngine = sanitizeSearchTerm(engine);
         
-        return productRepository.findByVehicleCompatibility(sanitizedMake, sanitizedModel, year, pageable);
+        return productRepository.findByVehicleCompatibility(sanitizedMake, sanitizedModel, sanitizedEngine, year, pageable);
     }
 
     /**
@@ -143,13 +148,17 @@ public class SearchService {
     /**
      * Validate vehicle parameters
      */
-    private void validateVehicleParameters(String make, String model, Integer year) {
+    private void validateVehicleParameters(String make, String model, String engine, Integer year) {
         if (make == null || make.trim().isEmpty()) {
             throw new IllegalArgumentException("Vehicle make is required");
         }
         
         if (model == null || model.trim().isEmpty()) {
             throw new IllegalArgumentException("Vehicle model is required");
+        }
+
+        if (engine == null || engine.trim().isEmpty()) {
+            throw new IllegalArgumentException("Vehicle engine is required");
         }
         
         if (year == null) {
@@ -167,6 +176,10 @@ public class SearchService {
         
         if (model.trim().length() < 2) {
             throw new IllegalArgumentException("Vehicle model must be at least 2 characters long");
+        }
+
+        if (engine.trim().length() < 2) {
+            throw new IllegalArgumentException("Vehicle engine must be at least 2 characters long");
         }
     }
 
@@ -251,6 +264,61 @@ public class SearchService {
         
         return new SearchStatistics(totalResults, inStockResults, outOfStockResults);
     }
+
+    /**
+     * Get distinct car makes.
+     */
+    @Transactional(readOnly = true)
+    public List<String> getDistinctMakes() {
+        return vehicleCompatibilityRepository.findDistinctMakes();
+    }
+
+    /**
+     * Get distinct car models for a given make.
+     */
+    @Transactional(readOnly = true)
+    public List<String> getModelsByMake(String make) {
+        if (make == null || make.trim().isEmpty()) {
+            throw new IllegalArgumentException("Make cannot be empty");
+        }
+        return vehicleCompatibilityRepository.findDistinctModelsByMake(make);
+    }
+
+    /**
+     * Get distinct engine types for a given make and model.
+     */
+    @Transactional(readOnly = true)
+    public List<String> getEnginesByMakeAndModel(String make, String model) {
+        if (make == null || make.trim().isEmpty() || model == null || model.trim().isEmpty()) {
+            throw new IllegalArgumentException("Make and model cannot be empty");
+        }
+        return vehicleCompatibilityRepository.findDistinctEnginesByMakeAndModel(make, model);
+    }
+
+    /**
+     * Get distinct year ranges for a given make, model, and engine.
+     */
+    @Transactional(readOnly = true)
+    public List<String> getYearsByMakeModelAndEngine(String make, String model, String engine) {
+        if (make == null || make.trim().isEmpty() || model == null || model.trim().isEmpty() || engine == null || engine.trim().isEmpty()) {
+            throw new IllegalArgumentException("Make, model, and engine cannot be empty");
+        }
+        List<Object[]> yearRanges = vehicleCompatibilityRepository.findDistinctYearRangesByMakeModelAndEngine(make, model, engine);
+        return yearRanges.stream()
+                .map(range -> {
+                    Integer yearFrom = (Integer) range[0];
+                    Integer yearTo = (Integer) range[1];
+                    if (yearFrom.equals(yearTo)) {
+                        return String.valueOf(yearFrom);
+                    } else {
+                        return yearFrom + "-" + yearTo;
+                    }
+                })
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    
 
     /**
      * Inner class to hold search statistics

@@ -250,14 +250,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<Product> findByVehicleCompatibility(String make, String model, Integer year, Pageable pageable) {
-        return productRepository.findByVehicleCompatibility(make, model, year, pageable);
+    public Page<Product> findByVehicleCompatibility(String make, String model, String engine, Integer year, Pageable pageable) {
+        return productRepository.findByVehicleCompatibility(make, model, engine, year, pageable);
     }
 
     @Override
-    public Page<Product> findByVehicleCompatibility(String make, String model, Integer year, int page) {
+    public Page<Product> findByVehicleCompatibility(String make, String model, String engine, Integer year, int page) {
         Pageable pageable = PageRequest.of(page, 12, Sort.by(Sort.Direction.DESC, "createdAt"));
-        return findByVehicleCompatibility(make, model, year, pageable);
+        return findByVehicleCompatibility(make, model, engine, year, pageable);
     }
 
     @Override

@@ -177,18 +177,20 @@ class SearchControllerUnitTest {
     void searchByVehicle_WithValidParameters_ShouldReturnResults() throws Exception {
         // Arrange
         Page<Product> productPage = new PageImpl<>(List.of(testProduct), PageRequest.of(0, 12), 1);
-        when(productService.findByVehicleCompatibility(anyString(), anyString(), any(Integer.class), any(PageRequest.class)))
+        when(productService.findByVehicleCompatibility(anyString(), anyString(), anyString(), any(Integer.class), any(PageRequest.class)))
                 .thenReturn(productPage);
 
         // Act & Assert
         mockMvc.perform(get("/products/vehicle")
                         .param("make", "Toyota")
                         .param("model", "Camry")
+                        .param("engine", "Gasoline") // Added engine parameter
                         .param("year", "2020"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("products/vehicle-compatibility"))
                 .andExpect(model().attribute("vehicleMake", "Toyota"))
                 .andExpect(model().attribute("vehicleModel", "Camry"))
+                .andExpect(model().attribute("vehicleEngine", "Gasoline")) // Assert engine
                 .andExpect(model().attribute("vehicleYear", 2020))
                 .andExpect(model().attributeExists("products"));
     }
@@ -202,7 +204,7 @@ class SearchControllerUnitTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("products/vehicle-compatibility"))
                 .andExpect(model().attributeExists("errorMessage"))
-                .andExpect(model().attribute("errorMessage", "Vehicle make, model, and year are required"));
+                .andExpect(model().attribute("errorMessage", "Vehicle make, model, engine, and year are required"));
     }
 
     @Test
@@ -211,6 +213,7 @@ class SearchControllerUnitTest {
         mockMvc.perform(get("/products/vehicle")
                         .param("make", "Toyota")
                         .param("model", "Camry")
+                        .param("engine", "Gasoline") // Added valid engine
                         .param("year", "1800"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("products/vehicle-compatibility"))
@@ -224,11 +227,12 @@ class SearchControllerUnitTest {
         mockMvc.perform(get("/products/vehicle")
                         .param("make", "T")
                         .param("model", "Camry")
+                        .param("engine", "Gasoline") // Added valid engine
                         .param("year", "2020"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("products/vehicle-compatibility"))
                 .andExpect(model().attributeExists("errorMessage"))
-                .andExpect(model().attribute("errorMessage", "Vehicle make and model must be at least 2 characters long"));
+                .andExpect(model().attribute("errorMessage", "Vehicle make, model, and engine must be at least 2 characters long"));
     }
 
     @Test

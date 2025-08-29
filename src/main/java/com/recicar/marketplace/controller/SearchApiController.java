@@ -1,6 +1,9 @@
 package com.recicar.marketplace.controller;
 
+import com.recicar.marketplace.entity.Product;
 import com.recicar.marketplace.service.SearchService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +20,89 @@ public class SearchApiController {
 
     public SearchApiController(SearchService searchService) {
         this.searchService = searchService;
+    }
+
+    /**
+     * Get distinct car makes.
+     */
+    @GetMapping("/vehicles/makes")
+    public ResponseEntity<List<String>> getVehicleMakes() {
+        try {
+            List<String> makes = searchService.getDistinctMakes();
+            return ResponseEntity.ok(makes);
+        } catch (Exception e) {
+            // Log the error
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    /**
+     * Get distinct car models for a given make.
+     */
+    @GetMapping("/vehicles/models")
+    public ResponseEntity<List<String>> getVehicleModels(@RequestParam String make) {
+        try {
+            List<String> models = searchService.getModelsByMake(make);
+            return ResponseEntity.ok(models);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(List.of(e.getMessage()));
+        } catch (Exception e) {
+            // Log the error
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    /**
+     * Get distinct engine types for a given make and model.
+     */
+    @GetMapping("/vehicles/engines")
+    public ResponseEntity<List<String>> getVehicleEngines(@RequestParam String make, @RequestParam String model) {
+        try {
+            List<String> engines = searchService.getEnginesByMakeAndModel(make, model);
+            return ResponseEntity.ok(engines);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(List.of(e.getMessage()));
+        } catch (Exception e) {
+            // Log the error
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    /**
+     * Get distinct year ranges for a given make, model, and engine.
+     */
+    @GetMapping("/vehicles/years")
+    public ResponseEntity<List<String>> getVehicleYears(@RequestParam String make, @RequestParam String model, @RequestParam String engine) {
+        try {
+            List<String> years = searchService.getYearsByMakeModelAndEngine(make, model, engine);
+            return ResponseEntity.ok(years);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(List.of(e.getMessage()));
+        } catch (Exception e) {
+            // Log the error
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    /**
+     * Search products by vehicle compatibility.
+     */
+    @GetMapping("/products")
+    public ResponseEntity<Page<Product>> searchProductsByVehicle(
+            @RequestParam String make,
+            @RequestParam String model,
+            @RequestParam String engine,
+            @RequestParam Integer year,
+            Pageable pageable) {
+        try {
+            Page<Product> products = searchService.searchByVehicleCompatibility(make, model, engine, year, pageable);
+            return ResponseEntity.ok(products);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            // Log the error
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     /**

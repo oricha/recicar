@@ -17,6 +17,17 @@ public class PagesController {
         this.categoryService = categoryService;
     }
 
+    @GetMapping("/index-0")
+    public String index0(Model model) {
+         // Get featured products (latest 8 products)
+        var featuredProducts = productService.findActiveProducts(0);
+        model.addAttribute("featuredProducts", featuredProducts.getContent());
+        
+        // Get categories for navigation
+        model.addAttribute("categories", categoryService.findRootCategories());
+        return "home-0";
+    }
+
     @GetMapping("/index-1")
     public String index1(Model model) {
          // Get featured products (latest 8 products)
@@ -36,7 +47,7 @@ public class PagesController {
         
         // Get categories for navigation
         model.addAttribute("categories", categoryService.findRootCategories());
-        return "home/index-2";
+        return "index-2";
     }
 
     @GetMapping("/index-3")
@@ -92,6 +103,11 @@ public class PagesController {
         // Get categories for navigation
         model.addAttribute("categories", categoryService.findRootCategories());
         return "home/index-7";
+    }
+
+    @GetMapping("/contact")
+    public String index8(Model model) {
+        return "page/contact";
     }
 
 }
