@@ -98,9 +98,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
      */
     @Query("SELECT DISTINCT p FROM Product p JOIN p.compatibilities vc WHERE " +
            "p.active = true AND LOWER(vc.make) = LOWER(:make) AND LOWER(vc.model) = LOWER(:model) " +
-           "AND :year BETWEEN vc.yearFrom AND vc.yearTo")
+           "AND LOWER(vc.engine) = LOWER(:engine) AND :year BETWEEN vc.yearFrom AND vc.yearTo")
     Page<Product> findByVehicleCompatibility(@Param("make") String make, 
                                            @Param("model") String model, 
+                                           @Param("engine") String engine,
                                            @Param("year") Integer year, 
                                            Pageable pageable);
 

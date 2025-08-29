@@ -208,20 +208,21 @@ class SearchServiceTest {
         // Arrange
         String make = "Toyota";
         String model = "Camry";
+        String engine = "Gasoline";
         Integer year = 2020;
         Pageable pageable = PageRequest.of(0, 10);
         Page<Product> expectedPage = new PageImpl<>(List.of(testProduct), pageable, 1);
         
-        when(productRepository.findByVehicleCompatibility(anyString(), anyString(), anyInt(), any(Pageable.class)))
+        when(productRepository.findByVehicleCompatibility(anyString(), anyString(), anyString(), anyInt(), any(Pageable.class)))
                 .thenReturn(expectedPage);
 
         // Act
-        Page<Product> result = searchService.searchByVehicleCompatibility(make, model, year, pageable);
+        Page<Product> result = searchService.searchByVehicleCompatibility(make, model, engine, year, pageable);
 
         // Assert
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
-        verify(productRepository).findByVehicleCompatibility(make, model, year, pageable);
+        verify(productRepository).findByVehicleCompatibility(make, model, engine, year, pageable);
     }
 
     @Test
@@ -229,15 +230,16 @@ class SearchServiceTest {
         // Arrange
         String make = null;
         String model = "Camry";
+        String engine = "Gasoline";
         Integer year = 2020;
         Pageable pageable = PageRequest.of(0, 10);
 
         // Act & Assert
         assertThrows(IllegalArgumentException.class, () -> {
-            searchService.searchByVehicleCompatibility(make, model, year, pageable);
+            searchService.searchByVehicleCompatibility(make, model, engine, year, pageable);
         });
         
-        verify(productRepository, never()).findByVehicleCompatibility(anyString(), anyString(), anyInt(), any(Pageable.class));
+        verify(productRepository, never()).findByVehicleCompatibility(anyString(), anyString(), anyString(), anyInt(), any(Pageable.class));
     }
 
     @Test
@@ -245,15 +247,16 @@ class SearchServiceTest {
         // Arrange
         String make = "Toyota";
         String model = "";
+        String engine = "Gasoline";
         Integer year = 2020;
         Pageable pageable = PageRequest.of(0, 10);
 
         // Act & Assert
         assertThrows(IllegalArgumentException.class, () -> {
-            searchService.searchByVehicleCompatibility(make, model, year, pageable);
+            searchService.searchByVehicleCompatibility(make, model, engine, year, pageable);
         });
         
-        verify(productRepository, never()).findByVehicleCompatibility(anyString(), anyString(), anyInt(), any(Pageable.class));
+        verify(productRepository, never()).findByVehicleCompatibility(anyString(), anyString(), anyString(), anyInt(), any(Pageable.class));
     }
 
     @Test
@@ -261,15 +264,16 @@ class SearchServiceTest {
         // Arrange
         String make = "Toyota";
         String model = "Camry";
+        String engine = "Gasoline";
         Integer year = 1800; // Invalid year
         Pageable pageable = PageRequest.of(0, 10);
 
         // Act & Assert
         assertThrows(IllegalArgumentException.class, () -> {
-            searchService.searchByVehicleCompatibility(make, model, year, pageable);
+            searchService.searchByVehicleCompatibility(make, model, engine, year, pageable);
         });
         
-        verify(productRepository, never()).findByVehicleCompatibility(anyString(), anyString(), anyInt(), any(Pageable.class));
+        verify(productRepository, never()).findByVehicleCompatibility(anyString(), anyString(), anyString(), anyInt(), any(Pageable.class));
     }
 
     @Test

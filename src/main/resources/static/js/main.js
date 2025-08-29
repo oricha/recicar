@@ -685,9 +685,14 @@
             e.preventDefault();
             if ($this.siblings('ul:visible').length){
                 $this.siblings('ul').slideUp('slow');
-            }else {
-                $this.closest('li').siblings('li').find('ul:visible').slideUp('slow');
-                $this.siblings('ul').slideDown('slow');
+            }
+            else {
+                $this.addClass('open');
+                $this.children('ul').slideDown('slow');
+                $this.siblings('li').children('ul').slideUp('slow');
+                $this.siblings('li').removeClass('open');
+                $this.siblings('li').find('li').removeClass('open');
+                $this.siblings('li').find('ul').slideUp('slow');
             }
         }
         if( $this.is('a') || $this.is('span') || $this.attr('clas').match(/\b(menu-expand)\b/) ){
@@ -768,3 +773,115 @@
     
     
 })(jQuery);	
+
+    // Car Part Search Logic
+    $(document).ready(function() {
+        const carMakeSelect = $('#car-make');
+        const carModelSelect = $('#car-model');
+        const carEngineSelect = $('#car-engine');
+        const carYearSelect = $('#car-year');
+        const carSearchForm = $('#car-search-form');
+
+        // Function to populate dropdowns
+        function populateDropdown(selectElement, data, defaultOptionText) {
+            selectElement.empty();
+            selectElement.append(`<option value="">${defaultOptionText}</option>`);
+            data.forEach(item => {
+                selectElement.append(`<option value="${item}">${item}</option>`);
+            });
+            selectElement.prop('disabled', false);
+        }
+
+        // Fetch Makes on page load
+        $.ajax({
+            url: '/api/search/vehicles/makes',
+            method: 'GET',
+            success: function(data) {
+                populateDropdown(carMakeSelect, data, 'Elija una marca');
+            },
+            error: function(error) {
+                console.error('Error fetching car makes:', error);
+                carMakeSelect.prop('disabled', true);
+            }
+        });
+
+        // Fetch Models when Make changes
+        carMakeSelect.on('change', function() {
+            const selectedMake = $(this).val();
+            carModelSelect.prop('disabled', true).empty().append('<option value="">Elija un modelo</option>');
+            carEngineSelect.prop('disabled', true).empty().append('<option value="">Elija un tipo de motor</option>');
+            carYearSelect.prop('disabled', true).empty().append('<option value="">Elija un año</option>');
+
+            if (selectedMake) {
+                $.ajax({
+                    url: `/api/search/vehicles/models?make=${selectedMake}`,
+                    method: 'GET',
+                    success: function(data) {
+                        populateDropdown(carModelSelect, data, 'Elija un modelo');
+                    },
+                    error: function(error) {
+                        console.error('Error fetching car models:', error);
+                    }
+                });
+            }
+        });
+
+        // Fetch Engines when Model changes
+        carModelSelect.on('change', function() {
+            const selectedMake = carMakeSelect.val();
+            const selectedModel = $(this).val();
+            carEngineSelect.prop('disabled', true).empty().append('<option value="">Elija un tipo de motor</option>');
+            carYearSelect.prop('disabled', true).empty().append('<option value="">Elija un año</option>');
+
+            if (selectedMake && selectedModel) {
+                $.ajax({
+                    url: `/api/search/vehicles/engines?make=${selectedMake}&model=${selectedModel}`,
+                    method: 'GET',
+                    success: function(data) {
+                        populateDropdown(carEngineSelect, data, 'Elija un tipo de motor');
+                    },
+                    error: function(error) {
+                        console.error('Error fetching car engines:', error);
+                    }
+                });
+            }
+        });
+
+        // Fetch Years when Engine changes
+        carEngineSelect.on('change', function() {
+            const selectedMake = carMakeSelect.val();
+            const selectedModel = carModelSelect.val();
+            const selectedEngine = $(this).val();
+            carYearSelect.prop('disabled', true).empty().append('<option value="">Elija un año</option>');
+
+            if (selectedMake && selectedModel && selectedEngine) {
+                $.ajax({
+                    url: `/api/search/vehicles/years?make=${selectedMake}&model=${selectedModel}&engine=${selectedEngine}`,
+                    method: 'GET',
+                    success: function(data) {
+                        populateDropdown(carYearSelect, data, 'Elija un año');
+                    },
+                    error: function(error) {
+                        console.error('Error fetching car years:', error);
+                    }
+                });
+            }
+        });
+
+        // Handle form submission
+        carSearchForm.on('submit', function(event) {
+            event.preventDefault();
+
+            const make = carMakeSelect.val();
+            const model = carModelSelect.val();
+            const engine = carEngineSelect.val();
+            const year = carYearSelect.val();
+
+            if (make && model && engine && year) {
+                // Redirect to shop-right-sidebar-list.html with query parameters
+                window.location.href = `/shop-right-sidebar-list.html?make=${make}&model=${model}&engine=${engine}&year=${year}`;
+            } else {
+                alert('Por favor, seleccione Marca, Modelo, Motor y Año para buscar.');
+            }
+        });
+    });

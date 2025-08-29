@@ -93,7 +93,7 @@ public interface ProductService {
     /**
      * Find products compatible with specific vehicle
      */
-    Page<Product> findByVehicleCompatibility(String make, String model, Integer year, Pageable pageable);
+    Page<Product> findByVehicleCompatibility(String make, String model, String engine, Integer year, Pageable pageable);
 
     /**
      * Find products by part number
@@ -108,7 +108,7 @@ public interface ProductService {
     /**
      * Find products by vehicle compatibility with default pagination
      */
-    Page<Product> findByVehicleCompatibility(String make, String model, Integer year, int page);
+    Page<Product> findByVehicleCompatibility(String make, String model, String engine, Integer year, int page);
 
 
 

@@ -310,6 +310,7 @@ public class ProductController {
     public String findByVehicle(@RequestParam(required = false) String licensePlate,
                                @RequestParam(required = false) String make,
                                @RequestParam(required = false) String model,
+                               @RequestParam(required = false) String engine,
                                @RequestParam(required = false) Integer year,
                                @RequestParam(defaultValue = "0") int page,
                                Model modelAttr) {
@@ -336,8 +337,9 @@ public class ProductController {
         // Validate vehicle parameters
         if (make == null || make.trim().isEmpty() || 
             model == null || model.trim().isEmpty() || 
+            engine == null || engine.trim().isEmpty() ||
             year == null) {
-            modelAttr.addAttribute("errorMessage", "Vehicle make, model, and year are required");
+            modelAttr.addAttribute("errorMessage", "Vehicle make, model, engine, and year are required");
             modelAttr.addAttribute("products", Page.empty());
             modelAttr.addAttribute("currentPage", 0);
             modelAttr.addAttribute("totalPages", 0);
@@ -348,9 +350,10 @@ public class ProductController {
         // Sanitize and validate inputs
         String sanitizedMake = make.trim();
         String sanitizedModel = model.trim();
+        String sanitizedEngine = engine.trim();
         
-        if (sanitizedMake.length() < 2 || sanitizedModel.length() < 2) {
-            modelAttr.addAttribute("errorMessage", "Vehicle make and model must be at least 2 characters long");
+        if (sanitizedMake.length() < 2 || sanitizedModel.length() < 2 || sanitizedEngine.length() < 2) {
+            modelAttr.addAttribute("errorMessage", "Vehicle make, model, and engine must be at least 2 characters long");
             modelAttr.addAttribute("products", Page.empty());
             modelAttr.addAttribute("currentPage", 0);
             modelAttr.addAttribute("totalPages", 0);
@@ -368,12 +371,13 @@ public class ProductController {
         }
         
         try {
-            Page<Product> products = productService.findByVehicleCompatibility(sanitizedMake, sanitizedModel, year, 
+            Page<Product> products = productService.findByVehicleCompatibility(sanitizedMake, sanitizedModel, sanitizedEngine, year, 
                     org.springframework.data.domain.PageRequest.of(page, 12));
             
             modelAttr.addAttribute("products", products);
             modelAttr.addAttribute("vehicleMake", sanitizedMake);
             modelAttr.addAttribute("vehicleModel", sanitizedModel);
+            modelAttr.addAttribute("vehicleEngine", sanitizedEngine);
             modelAttr.addAttribute("vehicleYear", year);
             
             // Pagination info
