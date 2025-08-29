@@ -20,7 +20,7 @@ public class HomeController {
     @GetMapping("/")
     public String home(Model model) {
         // Get featured products (latest 8 products)
-        var featuredProducts = productService.findActiveProducts(0);
+        var featuredProducts = productService.findActiveProducts(0, 12);
         model.addAttribute("featuredProducts", featuredProducts.getContent());
         
         // Get categories for navigation

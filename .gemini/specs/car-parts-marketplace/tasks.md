@@ -247,3 +247,20 @@
   - [x] Set up automated backups and disaster recovery
   - [x] Create deployment documentation and runbooks
   - _Requirements: 10.3, 10.6_
+
+- [x] 25: Car Part Search
+ - [x] Implement a car part search feature. This involves modifying the `search_forms` menu in `home-0.html`.
+ - [x] When the dropdown in `search_forms` is selected, all available car brands should be listed.
+ - [x] Upon selection of a car brand, the models corresponding to that brand should be dynamically listed.
+ - [x] Once both brand and model are selected, the engine/year options relevant to the selected brand and model should be listed.
+ - [x] When all fields (brand, model, engine/year) are selected and the search button is clicked, the items should be displayed on the `/resources/templates/shop-right-sidebar-list.html` web page.
+
+- [] Task 26: Product Details
+ - [ ] Implement a product details feature.
+ - [ ] When a user clicks on any product listed in the "Our Product" section on the home page (`home-0.html`), they should be Given the ID of the clicked product, it must search for the product by ID in a controller and return the product values ​​on the web.`product-details.html` page.
+ - [ ]The `product-details.html` page should display all relevant attributes of the selected product/car part.
+
+- [x]Task 27: Product List
+ - [x]Implement a product listing page with pagination.
+ - [x]When a user visits the URL `/list`, the products should be displayed on the `/templates/shop-right-sidebar-list.html` page.
+ - [x]The product list should include pagination, displaying twelve products per page.

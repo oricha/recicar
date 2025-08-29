@@ -22,7 +22,7 @@ public interface ProductService {
     /**
      * Get all active products with default pagination (12 per page, sorted by creation date)
      */
-    Page<Product> findActiveProducts(int page);
+    Page<Product> findActiveProducts(int page, int size);
 
     /**
      * Find product by ID

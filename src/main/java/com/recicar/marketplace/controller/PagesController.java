@@ -20,7 +20,7 @@ public class PagesController {
     @GetMapping("/index-0")
     public String index0(Model model) {
          // Get featured products (latest 8 products)
-        var featuredProducts = productService.findActiveProducts(0);
+        var featuredProducts = productService.findActiveProducts(0, 12);
         model.addAttribute("featuredProducts", featuredProducts.getContent());
         
         // Get categories for navigation
@@ -31,7 +31,7 @@ public class PagesController {
     @GetMapping("/index-1")
     public String index1(Model model) {
          // Get featured products (latest 8 products)
-        var featuredProducts = productService.findActiveProducts(0);
+        var featuredProducts = productService.findActiveProducts(0, 12);
         model.addAttribute("featuredProducts", featuredProducts.getContent());
         
         // Get categories for navigation
@@ -42,7 +42,7 @@ public class PagesController {
     @GetMapping("/index-2")
     public String index2(Model model) {
          // Get featured products (latest 8 products)
-        var featuredProducts = productService.findActiveProducts(0);
+        var featuredProducts = productService.findActiveProducts(0, 12);
         model.addAttribute("featuredProducts", featuredProducts.getContent());
         
         // Get categories for navigation
@@ -53,7 +53,7 @@ public class PagesController {
     @GetMapping("/index-3")
     public String index3(Model model) {
          // Get featured products (latest 8 products)
-        var featuredProducts = productService.findActiveProducts(0);
+        var featuredProducts = productService.findActiveProducts(0, 12);
         model.addAttribute("featuredProducts", featuredProducts.getContent());
         
         // Get categories for navigation
@@ -64,7 +64,7 @@ public class PagesController {
     @GetMapping("/index-4")
     public String index4(Model model) {
          // Get featured products (latest 8 products)
-        var featuredProducts = productService.findActiveProducts(0);
+        var featuredProducts = productService.findActiveProducts(0, 12);
         model.addAttribute("featuredProducts", featuredProducts.getContent());
         
         // Get categories for navigation
@@ -75,7 +75,7 @@ public class PagesController {
     @GetMapping("/index-5")
     public String index5(Model model) {
          // Get featured products (latest 8 products)
-        var featuredProducts = productService.findActiveProducts(0);
+        var featuredProducts = productService.findActiveProducts(0, 12);
         model.addAttribute("featuredProducts", featuredProducts.getContent());
         
         // Get categories for navigation
@@ -86,7 +86,7 @@ public class PagesController {
     @GetMapping("/index-6")
     public String index6(Model model) {
          // Get featured products (latest 8 products)
-        var featuredProducts = productService.findActiveProducts(0);
+        var featuredProducts = productService.findActiveProducts(0, 12);
         model.addAttribute("featuredProducts", featuredProducts.getContent());
         
         // Get categories for navigation
@@ -97,7 +97,7 @@ public class PagesController {
     @GetMapping("/index-7")
     public String index7(Model model) {
          // Get featured products (latest 8 products)
-        var featuredProducts = productService.findActiveProducts(0);
+        var featuredProducts = productService.findActiveProducts(0, 12);
         model.addAttribute("featuredProducts", featuredProducts.getContent());
         
         // Get categories for navigation
