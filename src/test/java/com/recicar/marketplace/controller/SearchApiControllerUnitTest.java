@@ -6,6 +6,7 @@ import com.recicar.marketplace.entity.ProductCondition;
 import com.recicar.marketplace.entity.Vendor;
 import com.recicar.marketplace.service.CategoryService;
 import com.recicar.marketplace.service.ProductService;
+import com.recicar.marketplace.controller.SearchApiController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,7 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
-class SearchControllerUnitTest {
+class SearchApiControllerUnitTest {
 
     @Mock
     private ProductService productService;
@@ -38,7 +39,7 @@ class SearchControllerUnitTest {
     private CategoryService categoryService;
 
     @InjectMocks
-    private ProductController productController;
+    private SearchApiController searchApiController;
 
     private MockMvc mockMvc;
 
@@ -48,7 +49,7 @@ class SearchControllerUnitTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(productController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(searchApiController).build();
         
         // Create test data without database
         testCategory = new Category();
@@ -78,7 +79,7 @@ class SearchControllerUnitTest {
 
     @Test
     void contextLoads() {
-        assertNotNull(productController);
+        assertNotNull(searchApiController);
         assertNotNull(mockMvc);
     }
 

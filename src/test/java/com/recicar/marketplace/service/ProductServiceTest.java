@@ -86,7 +86,7 @@ class ProductServiceTest {
         when(productRepository.findByActiveTrue(pageable)).thenReturn(expectedPage);
 
         // When
-        Page<Product> result = productService.findActiveProducts(0);
+        Page<Product> result = productService.findActiveProducts(0, 12);
 
         // Then
         assertThat(result).isNotNull();
