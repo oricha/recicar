@@ -26,6 +26,71 @@
     
     <!-- Additional head content -->
     <th:block th:fragment="head-extra"></th:block>
+    
+    <!-- Custom Mega Menu Styles -->
+    <style>
+        .mega_menu_inner {
+            display: flex;
+            justify-content: space-between;
+            gap: 30px;
+            padding: 20px 0;
+        }
+        
+        .mega_menu_column {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .mega_menu_column h4 {
+            color: #333;
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #ffd54c;
+            font-family: "Lato", sans-serif;
+        }
+        
+        .mega_menu_column ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .mega_menu_column ul li {
+            margin-bottom: 8px;
+        }
+        
+        .mega_menu_column ul li a {
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+            line-height: 1.4;
+            display: block;
+            padding: 4px 0;
+            transition: color 0.3s ease;
+            font-weight: 400;
+            text-transform: capitalize;
+        }
+        
+        .mega_menu_column ul li a:hover {
+            color: #ffd54c;
+            padding-left: 5px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .mega_menu_inner {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .mega_menu_column {
+                min-width: auto;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -124,11 +189,53 @@
                                     <li class="mega_items">
                                         <a th:href="@{/products}">shop<i class="fa fa-angle-down"></i></a>
                                         <div class="mega_menu">
-                                            <ul class="mega_menu_inner">
-                                                <li th:each="category : ${categories}" th:if="${!categories.empty}">
-                                                    <a th:href="@{/products/category/{id}(id=${category.id})}" th:text="${category.name}">Category</a>
-                                                </li>
-                                            </ul>
+                                            <div class="mega_menu_inner">
+                                                <!-- Column 1: Main Categories -->
+                                                <div class="mega_menu_column">
+                                                    <h4>MAIN CATEGORIES</h4>
+                                                    <ul>
+                                                        <li th:each="category : ${categories}" th:if="${!categories.empty}">
+                                                            <a th:href="@{/products/category/{id}(id=${category.id})}" th:text="${category.name}">Category</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                
+                                                <!-- Column 2: Popular Parts -->
+                                                <div class="mega_menu_column">
+                                                    <h4>POPULAR PARTS</h4>
+                                                    <ul>
+                                                        <li><a href="/products/search?q=brake+pads">Brake Pads</a></li>
+                                                        <li><a href="/products/search?q=oil+filter">Oil Filters</a></li>
+                                                        <li><a href="/products/search?q=air+filter">Air Filters</a></li>
+                                                        <li><a href="/products/search?q=spark+plugs">Spark Plugs</a></li>
+                                                        <li><a href="/products/search?q=batteries">Batteries</a></li>
+                                                    </ul>
+                                                </div>
+                                                
+                                                <!-- Column 3: Vehicle Types -->
+                                                <div class="mega_menu_column">
+                                                    <h4>VEHICLE TYPES</h4>
+                                                    <ul>
+                                                        <li><a href="/products/search?q=sedan">Sedan</a></li>
+                                                        <li><a href="/products/search?q=suv">SUV</a></li>
+                                                        <li><a href="/products/search?q=truck">Truck</a></li>
+                                                        <li><a href="/products/search?q=hatchback">Hatchback</a></li>
+                                                        <li><a href="/products/search?q=coupe">Coupe</a></li>
+                                                    </ul>
+                                                </div>
+                                                
+                                                <!-- Column 4: Special Offers -->
+                                                <div class="mega_menu_column">
+                                                    <h4>SPECIAL OFFERS</h4>
+                                                    <ul>
+                                                        <li><a href="/products/search?q=discount">Discounted Items</a></li>
+                                                        <li><a href="/products/search?q=new+arrival">New Arrivals</a></li>
+                                                        <li><a href="/products/search?q=best+seller">Best Sellers</a></li>
+                                                        <li><a href="/products/search?q=clearance">Clearance Sale</a></li>
+                                                        <li><a href="/products/search?q=bundle">Part Bundles</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
                                         </div>
                                     </li>
                                     <li><a th:href="@{/about}">about Us</a></li>
