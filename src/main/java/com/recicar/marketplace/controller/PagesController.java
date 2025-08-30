@@ -25,7 +25,7 @@ public class PagesController {
         
         // Get categories for navigation
         model.addAttribute("categories", categoryService.findRootCategories());
-        return "home-0";
+        return "home";
     }
 
     @GetMapping("/index-1")
