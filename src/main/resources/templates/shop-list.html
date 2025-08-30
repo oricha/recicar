@@ -465,10 +465,142 @@
     <!--breadcrumbs area end-->
 
     <!--shop  area start-->
-    <div class="shop_area">
+    <div class="shop_area shop_reverse">
         <div class="container">
             <div class="row">
+                <div class="col-lg-3 col-md-12">
+                   <!--sidebar widget start-->
+                    <aside class="sidebar_widget">
+                        <div class="widget_inner">
+                            <div class="widget_list widget_filter">
+                                <h2>Filter by price</h2>
+                                <form action="#">
+                                    <div id="slider-range"></div>
+                                    <button type="submit">Filter</button>
+                                    <input type="text" name="text" id="amount" />
 
+                                </form>
+                            </div>
+                            <div class="widget_list widget_categories">
+                                <h2>categories</h2>
+                                <ul>
+                                    <li>
+                                        <input type="checkbox">
+                                        <a href="#">Categories1 (6)</a>
+                                        <span class="checkmark"></span>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox">
+                                        <a href="#">Categories2(10)</a>
+                                        <span class="checkmark"></span>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox">
+                                        <a href="#">Categories3 (4)</a>
+                                        <span class="checkmark"></span>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox">
+                                        <a href="#">Categories4(10)</a>
+                                        <span class="checkmark"></span>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox">
+                                        <a href="#">Categories5(8)</a>
+                                        <span class="checkmark"></span>
+                                    </li>
+
+                                </ul>
+                            </div>
+
+                            <div class="widget_list widget_categories">
+                                <h2>Manufacturer</h2>
+                                <ul>
+                                    <li>
+                                        <input type="checkbox">
+                                        <a href="#">Brake Parts(6)</a>
+                                        <span class="checkmark"></span>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox">
+                                        <a href="#">Accessories (10)</a>
+                                        <span class="checkmark"></span>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox">
+                                        <a href="#">Engine Parts (4)</a>
+                                        <span class="checkmark"></span>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox">
+                                        <a href="#">hermes(10)</a>
+                                        <span class="checkmark"></span>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox">
+                                        <a href="#">louis vuitton(8)</a>
+                                        <span class="checkmark"></span>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox">
+                                        <a href="#">Tommy Hilfiger(7)</a>
+                                        <span class="checkmark"></span>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox">
+                                        <a href="#">House Plants(6)</a>
+                                        <span class="checkmark"></span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="widget_list widget_categories">
+                                <h2>Select By Color</h2>
+                                <ul>
+                                    <li>
+                                        <input type="checkbox">
+                                        <a href="#">Black (6)</a>
+                                        <span class="checkmark"></span>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox">
+                                        <a href="#"> Blue (8)</a>
+                                        <span class="checkmark"></span>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox">
+                                        <a href="#">Brown (10)</a>
+                                        <span class="checkmark"></span>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox">
+                                        <a href="#"> Green (6)</a>
+                                        <span class="checkmark"></span>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox">
+                                        <a href="#">Pink (4)</a>
+                                        <span class="checkmark"></span>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox">
+                                        <a href="#">White (2)</a>
+                                        <span class="checkmark"></span>
+
+                                    </li>
+                                    <li>
+                                        <input type="checkbox">
+                                        <a href="#">Yellow (3)</a>
+                                        <span class="checkmark"></span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="shop_sidebar_banner">
+                            <a href="#"><img src="assets/img/bg/banner9.jpg" alt=""></a>
+                        </div>
+                    </aside>
+                    <!--sidebar widget end-->
+                </div>
                 <div class="col-lg-9 col-md-12">
                     <!--shop wrapper start-->
                     <!--shop toolbar start-->
@@ -481,11 +613,11 @@
                     <div class="shop_toolbar_wrapper">
                         <div class="shop_toolbar_btn">
 
-                            <button data-role="grid_3" type="button" class=" btn-grid-3" data-toggle="tooltip" title="3"></button>
+                            <button data-role="grid_3" type="button" class="active btn-grid-3" data-toggle="tooltip" title="3"></button>
 
                             <button data-role="grid_4" type="button" class=" btn-grid-4" data-toggle="tooltip" title="4"></button>
 
-                            <button data-role="grid_list" type="button" class="active btn-list" data-toggle="tooltip" title="List"></button>
+                            <button data-role="grid_list" type="button" class="btn-list" data-toggle="tooltip" title="List"></button>
                         </div>
                         <div class=" niceselect_option">
 
@@ -509,8 +641,8 @@
                     </div>
                     <!--shop toolbar end-->
 
-                    <div class="row shop_wrapper grid_list" th:if="${!products.isEmpty()}">
-                        <div class="col-12" th:each="product : ${products}">
+                    <div class="row shop_wrapper" th:if="${!products.isEmpty()}">
+                        <div class="col-lg-4 col-md-6 col-sm-6" th:each="product : ${products}">
                             <div class="single_product">
                                 <div class="product_name grid_name">
                                     <h3><a th:href="@{/product-details(id=${product.id})}" th:text="${product.name}">JBL Flip 3 Splasroof Portable Bluetooth 2</a></h3>
@@ -520,7 +652,7 @@
                                     <a class="primary_img" th:href="@{/product-details(id=${product.id})}"><img th:src="${product.primaryImage != null ? product.primaryImage.url : '/img/product/product10.jpg'}" alt=""></a>
                                     <a class="secondary_img" th:href="@{/product-details(id=${product.id})}"><img th:src="${product.images.size() > 1 ? product.images[1].url : '/img/product/product11.jpg'}" alt=""></a>
                                     <div class="label_product">
-                                        <span class="label_sale" th:if="${product.discount > 0}" th:text="${'-' + product.discount + '%'}">-47%</span>
+                                        <span class="label_sale" th:if="${product.discount > 0}" th:text="${#numbers.formatPercent(product.discount, 1, 0)}">-47%</span>
                                     </div>
                                     <div class="action_links">
                                         <ul>
@@ -606,3 +738,263 @@
                             </ul>
                         </div>
                     </div>
+                    <!--shop toolbar end-->
+                    <!--shop wrapper end-->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--shop  area end-->
+
+    <!--footer area start-->
+    <footer class="footer_widgets">
+        <div class="footer_top">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-2 col-md-6 col-sm-6">
+                        <div class="widgets_container">
+                            <h3>Information</h3>
+                            <div class="footer_menu">
+                                <ul>
+                                    <li><a href="about">About Us</a></li>
+                                    <li><a href="#">Delivery Information</a></li>
+                                    <li><a href="privacy-policy">Privacy Policy</a></li>
+                                    <li><a href="#">Terms & Conditions</a></li>
+                                    <li><a href="contact">Contact Us</a></li>
+                                    <li><a href="#">Returns</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6 col-sm-6">
+                        <div class="widgets_container">
+                            <h3>Extras</h3>
+                            <div class="footer_menu">
+                                <ul>
+                                    <li><a href="#">Brands</a></li>
+                                    <li><a href="#">Gift Certificates</a></li>
+                                    <li><a href="#">Affiliate</a></li>
+                                    <li><a href="#">Specials</a></li>
+                                    <li><a href="#">Site Map</a></li>
+                                    <li><a href="my-account">My Account</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="widgets_container">
+                            <h3>Newsletter</h3>
+                            <p>You may unsubscribe at any moment. For that purpose, please find our contact info in the legal notice.</p>
+                            <div class="subscribe_form">
+                                <form id="mc-form" class="mc-form footer-newsletter">
+                                    <input id="mc-email" type="email" autocomplete="off" placeholder="Your email address" />
+                                    <button id="mc-submit">Subscribe</button>
+                                </form>
+                                <!-- mailchimp-alerts Start -->
+                                <div class="mailchimp-alerts text-centre">
+                                    <div class="mailchimp-submitting"></div><!-- mailchimp-submitting end -->
+                                    <div class="mailchimp-success"></div><!-- mailchimp-success end -->
+                                    <div class="mailchimp-error"></div><!-- mailchimp-error end -->
+                                </div><!-- mailchimp-alerts end -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="widgets_container">
+                            <h3>CONTACT INFO</h3>
+                            <div class="footer_contact">
+                                <div class="footer_contact_inner">
+                                    <div class="contact_icone">
+                                        <img src="img/icon/icon-phone.png" alt="">
+                                    </div>
+                                    <div class="contact_text">
+                                        <p>Hotline Free 24/24: <br> <strong>0123456789</strong></p>
+                                    </div>
+                                </div>
+                                <p>Your address goes here. <br> demo@example.com</p>
+                            </div>
+
+                            <div class="footer_social">
+                                <ul>
+                                    <li><a class="facebook" href="#"><i class="fa fa-facebook"></i></a></li>
+                                    <li><a class="twitter" href="#"><i class="fa fa-twitter"></i></a></li>
+                                    <li><a class="instagram" href="#"><i class="fa fa-instagram"></i></a></li>
+                                    <li><a class="linkedin" href="#"><i class="fa fa-linkedin"></i></a></li>
+                                    <li><a class="rss" href="#"><i class="fa fa-rss"></i></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer_bottom">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-6 col-md-6">
+                        <div class="copyright_area">
+                            <p>Copyright &copy; 2021 <a href="#">Autima</a>. All rights reserved. </p>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6">
+                        <div class="footer_payment text-right">
+                            <a href="#"><img src="img/paypal.jpg" alt=""></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!--footer area end-->
+
+    <!-- modal area start-->
+    <div class="modal fade" id="modal_box" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <div class="modal_body">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-5 col-md-5 col-sm-12">
+                                <div class="modal_tab">
+                                    <div class="tab-content product-details-large">
+                                        <div class="tab-pane fade show active" id="tab1" role="tabpanel">
+                                            <div class="modal_tab_img">
+                                                <a href="#"><img src="img/product/productbig1.jpg" alt=""></a>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade" id="tab2" role="tabpanel">
+                                            <div class="modal_tab_img">
+                                                <a href="#"><img src="img/product/productbig2.jpg" alt=""></a>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade" id="tab3" role="tabpanel">
+                                            <div class="modal_tab_img">
+                                                <a href="#"><img src="img/product/productbig3.jpg" alt=""></a>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade" id="tab4" role="tabpanel">
+                                            <div class="modal_tab_img">
+                                                <a href="#"><img src="img/product/productbig4.jpg" alt=""></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal_tab_button">
+                                        <ul class="nav product_navactive owl-carousel" role="tablist">
+                                            <li>
+                                                <a class="nav-link active" data-bs-toggle="tab" href="#tab1" role="tab" aria-controls="tab1" aria-selected="false"><img src="img/product/product1.jpg" alt=""></a>
+                                            </li>
+                                            <li>
+                                                <a class="nav-link" data-bs-toggle="tab" href="#tab2" role="tab" aria-controls="tab2" aria-selected="false"><img src="img/product/product2.jpg" alt=""></a>
+                                            </li>
+                                            <li>
+                                                <a class="nav-link" data-bs-toggle="tab" href="#tab3" role="tab" aria-controls="tab3" aria-selected="false"><img src="img/product/product3.jpg" alt=""></a>
+                                            </li>
+                                            <li>
+                                                <a class="nav-link" data-bs-toggle="tab" href="#tab4" role="tab" aria-controls="tab4" aria-selected="false"><img src="img/product/product4.jpg" alt=""></a>
+                                            </li>
+
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-7 col-md-7 col-sm-12">
+                                <div class="modal_right">
+                                    <div class="modal_title mb-10">
+                                        <h2>Donec Ac Tempus</h2>
+                                    </div>
+                                    <div class="modal_price mb-10">
+                                        <span class="new_price">$64.99</span>
+                                        <span class="old_price">$78.99</span>
+                                    </div>
+                                    <div class="modal_description mb-15">
+                                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia iste laborum ad impedit pariatur esse optio tempora sint ullam autem deleniti nam in quos qui nemo ipsum numquam, reiciendis maiores quidem aperiam, rerum vel recusandae </p>
+                                    </div>
+                                    <div class="variants_selects">
+                                        <div class="variants_size">
+                                            <h2>size</h2>
+                                            <select class="select_option">
+                                                <option selected value="1">s</option>
+                                                <option value="1">m</option>
+                                                <option value="1">l</option>
+                                                <option value="1">xl</option>
+                                                <option value="1">xxl</option>
+                                            </select>
+                                        </div>
+                                        <div class="variants_color">
+                                            <h2>color</h2>
+                                            <select class="select_option">
+                                                <option selected value="1">purple</option>
+                                                <option value="1">violet</option>
+                                                <option value="1">black</option>
+                                                <option value="1">pink</option>
+                                                <option value="1">orange</option>
+                                            </select>
+                                        </div>
+                                        <div class="modal_add_to_cart">
+                                            <form action="#">
+                                                <input min="1" max="100" step="2" value="1" type="number">
+                                                <button type="submit">add to cart</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <div class="modal_social">
+                                        <h2>Share this product</h2>
+                                        <ul>
+                                            <li class="facebook"><a href="#"><i class="fa fa-facebook"></i></a></li>
+                                            <li class="twitter"><a href="#"><i class="fa fa-twitter"></i></a></li>
+                                            <li class="pinterest"><a href="#"><i class="fa fa-pinterest"></i></a></li>
+                                            <li class="google-plus"><a href="#"><i class="fa fa-google-plus"></i></a></li>
+                                            <li class="linkedin"><a href="#"><i class="fa fa-linkedin"></i></a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- modal area end-->
+
+
+    <!-- JS
+============================================ -->
+    <!--jquery min js-->
+    <script src="js/vendor/jquery-3.4.1.min.js"></script>
+    <!--popper min js-->
+    <script src="js/popper.js"></script>
+    <!--bootstrap min js-->
+    <script src="js/bootstrap.min.js"></script>
+    <!--owl carousel min js-->
+    <script src="js/owl.carousel.min.js"></script>
+    <!--slick min js-->
+    <script src="js/slick.min.js"></script>
+    <!--magnific popup min js-->
+    <script src="js/jquery.magnific-popup.min.js"></script>
+    <!--counterup min js-->
+    <script src="js/jquery.counterup.min.js"></script>
+    <!--jquery countdown min js-->
+    <script src="js/jquery.countdown.js"></script>
+    <!--jquery ui min js-->
+    <script src="js/jquery.ui.js"></script>
+    <!--jquery elevatezoom min js-->
+    <script src="js/jquery.elevatezoom.js"></script>
+    <!--isotope packaged min js-->
+    <script src="js/isotope.pkgd.min.js"></script>
+    <!--slinky menu js-->
+    <script src="js/slinky.menu.js"></script>
+    <!-- Plugins JS -->
+    <script src="js/plugins.js"></script>
+    
+    <!-- Main JS -->
+    <script src="js/main.js"></script>
+    
+
+
+</body>
+
+</html>
