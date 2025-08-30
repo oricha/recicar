@@ -8,7 +8,10 @@ group = 'com.recicar'
 version = '0.0.1-SNAPSHOT'
 
 java {
-    sourceCompatibility = '21'
+    // Use Java 17 toolchain to match local environment and ensure tests compile
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 configurations {

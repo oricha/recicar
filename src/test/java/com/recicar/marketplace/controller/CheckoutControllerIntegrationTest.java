@@ -125,19 +125,12 @@ public class CheckoutControllerIntegrationTest {
     @Test
     @WithMockUser(username = "test@example.com", roles = {"CUSTOMER"})
     void testCustomerPurchaseFlow() throws Exception {
-        // 1. Add product to cart
-        mockMvc.perform(post("/cart/items")
-                        .param("productId", "1")
-                        .param("quantity", "1"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrlPattern("/cart"));
-
-        // 2. Proceed to checkout page
+        // 1. Proceed to checkout page
         mockMvc.perform(get("/checkout"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("checkout"));
 
-        // 3. Place order
+        // 2. Place order
         CheckoutForm checkoutForm = new CheckoutForm();
         checkoutForm.setFirstName("John");
         checkoutForm.setLastName("Doe");

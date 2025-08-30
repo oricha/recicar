@@ -1,285 +1,95 @@
 package com.recicar.marketplace.controller;
 
 import com.recicar.marketplace.entity.Product;
-import com.recicar.marketplace.service.SearchService;
+import com.recicar.marketplace.service.CategoryService;
+import com.recicar.marketplace.service.ProductService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-/**
- * REST API controller for search-related operations
- */
-@RestController
-@RequestMapping("/api/search")
+@Controller
+@RequestMapping("/products")
+@RequiredArgsConstructor
 public class SearchApiController {
 
-    private final SearchService searchService;
+    private final ProductService productService;
+    private final CategoryService categoryService;
 
-    public SearchApiController(SearchService searchService) {
-        this.searchService = searchService;
+    @GetMapping("/search")
+    public String searchProducts(@RequestParam("q") String query, @RequestParam(defaultValue = "0") int page, Model model) {
+        if (query.isEmpty()) {
+            return "redirect:/products";
+        }
+        if (query.length() < 2) {
+            model.addAttribute("errorMessage", "Search term must be at least 2 characters long");
+            model.addAttribute("categories", categoryService.findAllActive());
+            return "products/search-results";
+        }
+        Page<Product> productPage = productService.searchProducts(query, PageRequest.of(page, 12));
+        model.addAttribute("products", productPage.getContent());
+        model.addAttribute("page", productPage);
+        model.addAttribute("searchQuery", query);
+        model.addAttribute("totalElements", productPage.getTotalElements());
+        model.addAttribute("categories", categoryService.findAllActive());
+        return "products/search-results";
     }
 
-    /**
-     * Get distinct car makes.
-     */
-    @GetMapping("/vehicles/makes")
-    public ResponseEntity<List<String>> getVehicleMakes() {
-        try {
-            List<String> makes = searchService.getDistinctMakes();
-            return ResponseEntity.ok(makes);
-        } catch (Exception e) {
-            // Log the error
-            return ResponseEntity.internalServerError().build();
+    @GetMapping("/part/{partNumber}")
+    public String searchByPartNumber(@PathVariable String partNumber, Model model) {
+        if (partNumber.length() < 2) {
+            model.addAttribute("errorMessage", "Part number must be at least 2 characters long");
+            return "products/part-search";
         }
+        List<Product> products = productService.findByPartNumber(partNumber);
+        model.addAttribute("products", products);
+        model.addAttribute("partNumber", partNumber);
+        model.addAttribute("searchType", "Part Number");
+        return "products/part-search";
     }
 
-    /**
-     * Get distinct car models for a given make.
-     */
-    @GetMapping("/vehicles/models")
-    public ResponseEntity<List<String>> getVehicleModels(@RequestParam String make) {
-        try {
-            List<String> models = searchService.getModelsByMake(make);
-            return ResponseEntity.ok(models);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(List.of(e.getMessage()));
-        } catch (Exception e) {
-            // Log the error
-            return ResponseEntity.internalServerError().build();
+    @GetMapping("/oem/{oemNumber}")
+    public String searchByOemNumber(@PathVariable String oemNumber, Model model) {
+        if (oemNumber.length() < 2) {
+            model.addAttribute("errorMessage", "OEM number must be at least 2 characters long");
+            return "products/part-search";
         }
+        List<Product> products = productService.findByOemNumber(oemNumber);
+        model.addAttribute("products", products);
+        model.addAttribute("oemNumber", oemNumber);
+        model.addAttribute("searchType", "OEM Number");
+        return "products/part-search";
     }
 
-    /**
-     * Get distinct engine types for a given make and model.
-     */
-    @GetMapping("/vehicles/engines")
-    public ResponseEntity<List<String>> getVehicleEngines(@RequestParam String make, @RequestParam String model) {
-        try {
-            List<String> engines = searchService.getEnginesByMakeAndModel(make, model);
-            return ResponseEntity.ok(engines);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(List.of(e.getMessage()));
-        } catch (Exception e) {
-            // Log the error
-            return ResponseEntity.internalServerError().build();
+    @GetMapping("/vehicle")
+    public String searchByVehicle(@RequestParam(required = false) String make, @RequestParam(required = false) String model, @RequestParam(required = false) String engine, @RequestParam(required = false) Integer year, @RequestParam(defaultValue = "0") int page, Model m) {
+        if (make == null || model == null || engine == null || year == null) {
+            m.addAttribute("errorMessage", "Vehicle make, model, engine, and year are required");
+            return "products/vehicle-compatibility";
         }
-    }
-
-    /**
-     * Get distinct year ranges for a given make, model, and engine.
-     */
-    @GetMapping("/vehicles/years")
-    public ResponseEntity<List<String>> getVehicleYears(@RequestParam String make, @RequestParam String model, @RequestParam String engine) {
-        try {
-            List<String> years = searchService.getYearsByMakeModelAndEngine(make, model, engine);
-            return ResponseEntity.ok(years);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(List.of(e.getMessage()));
-        } catch (Exception e) {
-            // Log the error
-            return ResponseEntity.internalServerError().build();
+        if (make.length() < 2 || model.length() < 2 || engine.length() < 2) {
+            m.addAttribute("errorMessage", "Vehicle make, model, and engine must be at least 2 characters long");
+            return "products/vehicle-compatibility";
         }
-    }
-
-    /**
-     * Search products by vehicle compatibility.
-     */
-    @GetMapping("/products")
-    public ResponseEntity<Page<Product>> searchProductsByVehicle(
-            @RequestParam String make,
-            @RequestParam String model,
-            @RequestParam String engine,
-            @RequestParam Integer year,
-            Pageable pageable) {
-        try {
-            Page<Product> products = searchService.searchByVehicleCompatibility(make, model, engine, year, pageable);
-            return ResponseEntity.ok(products);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        } catch (Exception e) {
-            // Log the error
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    /**
-     * Get search suggestions for autocomplete
-     */
-    @GetMapping("/suggestions")
-    public ResponseEntity<List<String>> getSearchSuggestions(@RequestParam String q) {
-        try {
-            List<String> suggestions = searchService.getSearchSuggestions(q);
-            return ResponseEntity.ok(suggestions);
-        } catch (Exception e) {
-            // Log the error for debugging
-            // logger.error("Error getting search suggestions: {}", e.getMessage(), e);
-            return ResponseEntity.ok(List.of()); // Return empty list on error
-        }
-    }
-
-    /**
-     * Get search statistics for analytics
-     */
-    @GetMapping("/statistics")
-    public ResponseEntity<SearchService.SearchStatistics> getSearchStatistics(@RequestParam String q) {
-        try {
-            SearchService.SearchStatistics statistics = searchService.getSearchStatistics(q);
-            return ResponseEntity.ok(statistics);
-        } catch (Exception e) {
-            // Log the error for debugging
-            // logger.error("Error getting search statistics: {}", e.getMessage(), e);
-            return ResponseEntity.ok(new SearchService.SearchStatistics(0, 0, 0)); // Return zero stats on error
-        }
-    }
-
-    /**
-     * Quick search for header search bar
-     */
-    @GetMapping("/quick")
-    public ResponseEntity<List<QuickSearchResult>> quickSearch(@RequestParam String q, @RequestParam(defaultValue = "5") int limit) {
-        try {
-            if (q == null || q.trim().isEmpty() || q.trim().length() < 2) {
-                return ResponseEntity.ok(List.of());
-            }
-            
-            // For now, return empty list - this can be enhanced with actual quick search results
-            // In a real implementation, you might want to return product names, categories, etc.
-            return ResponseEntity.ok(List.of());
-        } catch (Exception e) {
-            // Log the error for debugging
-            // logger.error("Error during quick search: {}", e.getMessage(), e);
-            return ResponseEntity.ok(List.of());
-        }
-    }
-
-    /**
-     * Get popular search terms
-     */
-    @GetMapping("/popular")
-    public ResponseEntity<List<String>> getPopularSearches() {
-        try {
-            // For now, return some common search terms
-            // In a real implementation, this would come from analytics data
-            List<String> popularSearches = List.of(
-                "brake pads",
-                "oil filter",
-                "headlight",
-                "tire",
-                "battery",
-                "spark plug",
-                "air filter",
-                "windshield wiper"
-            );
-            return ResponseEntity.ok(popularSearches);
-        } catch (Exception e) {
-            // Log the error for debugging
-            // logger.error("Error getting popular searches: {}", e.getMessage(), e);
-            return ResponseEntity.ok(List.of());
-        }
-    }
-
-    /**
-     * Get search filters metadata
-     */
-    @GetMapping("/filters")
-    public ResponseEntity<SearchFiltersMetadata> getSearchFiltersMetadata() {
-        try {
-            // This could return available filter options, ranges, etc.
-            SearchFiltersMetadata metadata = new SearchFiltersMetadata();
-            return ResponseEntity.ok(metadata);
-        } catch (Exception e) {
-            // Log the error for debugging
-            // logger.error("Error getting search filters metadata: {}", e.getMessage(), e);
-            return ResponseEntity.ok(new SearchFiltersMetadata());
-        }
-    }
-
-    /**
-     * Inner class for quick search results
-     */
-    public static class QuickSearchResult {
-        private String type; // "product", "category", "part_number"
-        private String value;
-        private String displayText;
-        private String url;
-
-        public QuickSearchResult() {}
-
-        public QuickSearchResult(String type, String value, String displayText, String url) {
-            this.type = type;
-            this.value = value;
-            this.displayText = displayText;
-            this.url = url;
+        if (year < 1900 || year > 2030) {
+            m.addAttribute("errorMessage", "Vehicle year must be between 1900 and 2030");
+            return "products/vehicle-compatibility";
         }
 
-        // Getters and Setters
-        public String getType() { return type; }
-        public void setType(String type) { this.type = type; }
-        
-        public String getValue() { return value; }
-        public void setValue(String value) { this.value = value; }
-        
-        public String getDisplayText() { return displayText; }
-        public void setDisplayText(String displayText) { this.displayText = displayText; }
-        
-        public String getUrl() { return url; }
-        public void setUrl(String url) { this.url = url; }
-    }
-
-    /**
-     * Inner class for search filters metadata
-     */
-    public static class SearchFiltersMetadata {
-        private List<String> categories;
-        private List<String> conditions;
-        private PriceRange priceRange;
-        private List<String> vendors;
-
-        public SearchFiltersMetadata() {
-            // Initialize with default values
-            this.categories = List.of();
-            this.conditions = List.of();
-            this.priceRange = new PriceRange(0.0, 10000.0);
-            this.vendors = List.of();
-        }
-
-        // Getters and Setters
-        public List<String> getCategories() { return categories; }
-        public void setCategories(List<String> categories) { this.categories = categories; }
-        
-        public List<String> getConditions() { return conditions; }
-        public void setConditions(List<String> conditions) { this.conditions = conditions; }
-        
-        public PriceRange getPriceRange() { return priceRange; }
-        public void setPriceRange(PriceRange priceRange) { this.priceRange = priceRange; }
-        
-        public List<String> getVendors() { return vendors; }
-        public void setVendors(List<String> vendors) { this.vendors = vendors; }
-
-        /**
-         * Inner class for price range
-         */
-        public static class PriceRange {
-            private Double min;
-            private Double max;
-
-            public PriceRange() {}
-
-            public PriceRange(Double min, Double max) {
-                this.min = min;
-                this.max = max;
-            }
-
-            // Getters and Setters
-            public Double getMin() { return min; }
-            public void setMin(Double min) { this.min = min; }
-            
-            public Double getMax() { return max; }
-            public void setMax(Double max) { this.max = max; }
-        }
+        Page<Product> productPage = productService.findByVehicleCompatibility(make, model, engine, year, PageRequest.of(page, 12));
+        m.addAttribute("products", productPage.getContent());
+        m.addAttribute("page", productPage);
+        m.addAttribute("vehicleMake", make);
+        m.addAttribute("vehicleModel", model);
+        m.addAttribute("vehicleEngine", engine);
+        m.addAttribute("vehicleYear", year);
+        return "products/vehicle-compatibility";
     }
 }
-

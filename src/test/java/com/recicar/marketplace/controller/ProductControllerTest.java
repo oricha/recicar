@@ -1,7 +1,7 @@
 package com.recicar.marketplace.controller;
 
 import com.recicar.marketplace.entity.Product;
-import com.recicar.marketplace.repository.ProductRepository;
+import com.recicar.marketplace.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,13 +16,14 @@ import java.util.Optional;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ProductControllerTest {
 
     @Mock
-    private ProductRepository productRepository;
+    private ProductService productService;
 
     @InjectMocks
     private ProductController productController;
@@ -31,8 +32,14 @@ public class ProductControllerTest {
 
     @BeforeEach
     void setUp() {
+        // Use a proper ViewResolver that supports "redirect:" and "forward:" prefixes
+        org.springframework.web.servlet.view.InternalResourceViewResolver viewResolver =
+                new org.springframework.web.servlet.view.InternalResourceViewResolver();
+        viewResolver.setPrefix("");
+        viewResolver.setSuffix(".html");
+
         mockMvc = MockMvcBuilders.standaloneSetup(productController)
-                .setViewResolvers((viewName, locale) -> new org.springframework.web.servlet.view.InternalResourceView(viewName + ".html"))
+                .setViewResolvers(viewResolver)
                 .build();
     }
 
@@ -44,7 +51,7 @@ public class ProductControllerTest {
         product.setName("Test Product");
         product.setPrice(BigDecimal.TEN);
 
-        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+        when(productService.findById(1L)).thenReturn(Optional.of(product));
 
         // When & Then
         mockMvc.perform(get("/product-details").param("id", "1"))
@@ -57,11 +64,12 @@ public class ProductControllerTest {
     @Test
     void productDetails_shouldReturnErrorPage_whenProductDoesNotExist() throws Exception {
         // Given
-        when(productRepository.findById(1L)).thenReturn(Optional.empty());
+        when(productService.findById(1L)).thenReturn(Optional.empty());
 
         // When & Then
         mockMvc.perform(get("/product-details").param("id", "1"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("error"));
+                .andDo(print())
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/"));
     }
 }

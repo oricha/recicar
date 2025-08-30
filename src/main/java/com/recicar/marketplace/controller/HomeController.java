@@ -21,13 +21,12 @@ public class HomeController {
     public String home(Model model) {
         // Get featured products (latest 8 products)
         var featuredProducts = productService.findActiveProducts(0, 12);
-        model.addAttribute("featuredProducts", featuredProducts.getContent());
+        model.addAttribute("products", featuredProducts.getContent());
         
         // Get categories for navigation
         model.addAttribute("categories", categoryService.findRootCategories());
         
-        return "home";
+        return "index";
     }
-
     
 }
