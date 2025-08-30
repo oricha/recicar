@@ -26,7 +26,7 @@ public class HomeController {
         // Get categories for navigation
         model.addAttribute("categories", categoryService.findRootCategories());
         
-        return "home-0";
+        return "home";
     }
 
     
