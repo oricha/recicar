@@ -249,7 +249,7 @@ class SearchApiControllerUnitTest {
                         .param("q", "nonexistentproduct"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("products/search-results"))
-                .andExpect(model().attribute("totalElements", 0));
+                .andExpect(model().attribute("totalElements", 0L));
     }
 
     @Test

@@ -1,266 +1,31 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <th:block th:fragment="head-extra">
-        <title th:text="'Search Results for \"' + ${searchQuery != null ? searchQuery : 'search'} + '\" - Car Parts Marketplace'">Search Results</title>
-    </th:block>
+    <meta charset="UTF-8">
+    <title>Search Results</title>
 </head>
 <body>
-    <div th:fragment="content">
-        <!-- Search Header -->
-        <section class="bg-primary text-white py-4">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-md-8">
-                        <h1 class="h3 mb-2">
-                            <i class="fas fa-search"></i> Search Results
-                        </h1>
-                        <p class="mb-0">
-                            Found <span th:text="${totalElements != null ? totalElements : 0}">0</span> results for 
-                            "<strong th:text="${searchQuery != null ? searchQuery : 'search'}">search term</strong>"
-                        </p>
-                    </div>
-                    <div class="col-md-4 text-md-end">
-                        <a th:href="@{/}" class="btn btn-outline-light">
-                            <i class="fas fa-arrow-left"></i> Back to Home
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </section>
+<h1>Search Results</h1>
 
-        <!-- Search Form -->
-        <section class="py-4 bg-light">
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-lg-10">
-                        <form th:action="@{/products/search}" method="get" class="card shadow-sm">
-                            <div class="card-body">
-                                <div class="row g-3 align-items-end">
-                                    <div class="col-md-6">
-                                        <label for="searchQuery" class="form-label">Search Term</label>
-                                        <input type="text" class="form-control" id="searchQuery" 
-                                               name="q" th:value="${searchQuery != null ? searchQuery : ''}" 
-                                               placeholder="Enter part name, number, or vehicle..."
-                                               required>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label for="sortBy" class="form-label">Sort By</label>
-                                        <select class="form-select" id="sortBy" name="sortBy">
-                                            <option value="created" th:selected="${currentSortBy == 'created'}">Date Added</option>
-                                            <option value="name" th:selected="${currentSortBy == 'name'}">Name</option>
-                                            <option value="price" th:selected="${currentSortBy == 'price'}">Price</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label for="sortDir" class="form-label">Order</label>
-                                        <select class="form-select" id="sortDir" name="sortDir">
-                                            <option value="desc" th:selected="${currentSortDir == 'desc'}">Descending</option>
-                                            <option value="asc" th:selected="${currentSortDir == 'asc'}">Ascending</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <button type="submit" class="btn btn-primary w-100">
-                                            <i class="fas fa-search"></i> Search
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </section>
+<div th:if="${errorMessage}">
+    <p th:text="${errorMessage}"></p>
+</div>
 
-        <!-- Search Results -->
-        <section class="py-5">
-            <div class="container">
-                <!-- Error Messages -->
-                <div th:if="${errorMessage}" class="row mb-4">
-                    <div class="col">
-                        <div class="alert alert-danger" role="alert">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <span th:text="${errorMessage}">Error message</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Results Header -->
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <h2>Search Results</h2>
-                        <p class="text-muted mb-0">
-                            Showing <span th:text="${#numbers.formatDecimal(products.numberOfElements, 0, 0)}">0</span> of 
-                            <span th:text="${totalElements}">0</span> results
-                        </p>
-                    </div>
-                    <div class="col-md-6 text-md-end">
-                        <div class="btn-group" role="group">
-                            <a th:href="@{/products/search(q=${searchQuery != null ? searchQuery : ''}, page=${currentPage != null ? currentPage : 0}, sortBy=created, sortDir=desc)}" 
-                               class="btn btn-outline-secondary" th:classappend="${currentSortBy == 'created' and currentSortDir == 'desc'} ? 'active'">
-                                <i class="fas fa-clock"></i> Latest
-                            </a>
-                            <a th:href="@{/products/search(q=${searchQuery}, page=${currentPage}, sortBy=name, sortDir=asc)}" 
-                               class="btn btn-outline-secondary" th:classappend="${currentSortBy == 'name' and currentSortDir == 'asc'} ? 'active'">
-                                <i class="fas fa-sort-alpha-down"></i> A-Z
-                            </a>
-                            <a th:href="@{/products/search(q=${searchQuery}, page=${currentPage}, sortBy=price, sortDir=asc)}" 
-                               class="btn btn-outline-secondary" th:classappend="${currentSortBy == 'price' and currentSortDir == 'asc'} ? 'active'">
-                                <i class="fas fa-sort-numeric-down"></i> Price Low-High
-                            </a>
-                        </div>
-                    </div>
-                </div>
+<div th:if="${searchQuery}">
+    <p>Showing results for: <span th:text="${searchQuery}"></span></p>
+</div>
 
-                <!-- Results Grid -->
-                <div th:if="${!products.empty}" class="row">
-                    <div class="col-md-6 col-lg-4 mb-4" th:each="product : ${products}">
-                        <div class="card product-card h-100">
-                            <div class="position-relative">
-                                <img th:src="${product.primaryImage != null ? product.primaryImage.imageUrl : '/images/no-image.png'}" 
-                                     class="card-img-top product-image" 
-                                     th:alt="${product.name}">
-                                
-                                <span class="badge position-absolute top-0 end-0 m-2" 
-                                      th:classappend="${product.inStock ? 'bg-success' : 'bg-danger'}"
-                                      th:text="${product.inStock ? 'In Stock' : 'Out of Stock'}">
-                                    Stock Status
-                                </span>
-                            </div>
-                            
-                            <div class="card-body d-flex flex-column">
-                                <h6 class="card-title" th:text="${product.name}">Product Name</h6>
-                                <p class="card-text text-muted small" 
-                                   th:text="${#strings.abbreviate(product.description, 80)}">
-                                    Product description...
-                                </p>
-                                
-                                <div class="mt-auto">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="price fw-bold" th:text="${product.formattedPrice}">€0.00</span>
-                                        <small class="text-muted" th:text="${product.condition.name()}">Condition</small>
-                                    </div>
-                                    
-                                    <div class="d-flex gap-2">
-                                        <a th:href="@{/products/{id}(id=${product.id})}" 
-                                           class="btn btn-primary btn-sm flex-fill">
-                                            <i class="fas fa-eye"></i> View Details
-                                        </a>
-                                        <button class="btn btn-outline-primary btn-sm" 
-                                                th:onclick="'addToCart(' + ${product.id} + ')'"
-                                                th:disabled="${!product.inStock}">
-                                            <i class="fas fa-cart-plus"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<div th:if="${totalElements}">
+    <p><span th:text="${totalElements}"></span> results found.</p>
+</div>
 
-                <!-- No Results -->
-                <div th:if="${products.empty}" class="text-center py-5">
-                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
-                    <h3>No Results Found</h3>
-                    <p class="text-muted mb-4">
-                        We couldn't find any products matching "<strong th:text="${searchQuery}">search term</strong>"
-                    </p>
-                    
-                    <div class="row justify-content-center">
-                        <div class="col-md-8">
-                            <h5>Try these suggestions:</h5>
-                            <ul class="list-unstyled">
-                                <li>• Check your spelling</li>
-                                <li>• Try more general keywords</li>
-                                <li>• Use fewer keywords</li>
-                                <li>• Try different keywords</li>
-                            </ul>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-4">
-                        <a th:href="@{/products}" class="btn btn-primary me-2">
-                            <i class="fas fa-cogs"></i> Browse All Products
-                        </a>
-                        <a th:href="@{/}" class="btn btn-outline-primary">
-                            <i class="fas fa-home"></i> Back to Home
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Pagination -->
-                <div th:if="${totalPages > 1}" class="d-flex justify-content-center mt-5">
-                    <nav aria-label="Search results pagination">
-                        <ul class="pagination">
-                            <!-- Previous page -->
-                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                                <a class="page-link" th:if="${currentPage > 0}" 
-                                   th:href="@{/products/search(q=${searchQuery}, page=${currentPage - 1}, sortBy=${currentSortBy}, sortDir=${currentSortDir})}">
-                                    <i class="fas fa-chevron-left"></i> Previous
-                                </a>
-                                <span class="page-link" th:if="${currentPage == 0}">
-                                    <i class="fas fa-chevron-left"></i> Previous
-                                </span>
-                            </li>
-                            
-                            <!-- Page numbers -->
-                            <li class="page-item" th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
-                                th:classappend="${pageNum == currentPage} ? 'active'">
-                                <a class="page-link" th:href="@{/products/search(q=${searchQuery}, page=${pageNum}, sortBy=${currentSortBy}, sortDir=${currentSortDir})}"
-                                   th:text="${pageNum + 1}">1</a>
-                            </li>
-                            
-                            <!-- Next page -->
-                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                                <a class="page-link" th:if="${currentPage < totalPages - 1}" 
-                                   th:href="@{/products/search(q=${searchQuery}, page=${currentPage + 1}, sortBy=${currentSortBy}, sortDir=${currentSortDir})}">
-                                    Next <i class="fas fa-chevron-right"></i>
-                                </a>
-                                <span class="page-link" th:if="${currentPage == totalPages - 1}">
-                                    Next <i class="fas fa-chevron-right"></i>
-                                </span>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
-            </div>
-        </section>
+<div th:if="${products}">
+    <div th:each="product : ${products}">
+        <h2 th:text="${product.name}"></h2>
+        <p th:text="${product.description}"></p>
+        <p th:text="${product.price}"></p>
     </div>
+</div>
 
-    <th:block th:fragment="scripts-extra">
-        <script>
-            function addToCart(productId) {
-                // TODO: Implement add to cart functionality
-                console.log('Adding product to cart:', productId);
-                // Show success message
-                alert('Product added to cart!');
-            }
-        </script>
-        
-        <style>
-            .product-card {
-                transition: transform 0.2s, box-shadow 0.2s;
-                border: none;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            }
-            .product-card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            }
-            .product-image {
-                height: 200px;
-                object-fit: cover;
-            }
-            .price {
-                color: #0d6efd;
-                font-size: 1.1rem;
-            }
-            .btn-group .btn.active {
-                background-color: #0d6efd;
-                border-color: #0d6efd;
-                color: white;
-            }
-        </style>
-    </th:block>
 </body>
 </html>

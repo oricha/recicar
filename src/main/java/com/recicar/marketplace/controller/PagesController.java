@@ -105,9 +105,19 @@ public class PagesController {
         return "home/index-7";
     }
 
-    @GetMapping("/contact")
-    public String index8(Model model) {
-        return "page/contact";
+    
+    @GetMapping("/about")
+    public String about(Model model) {
+        return "contact";
     }
+
+    @GetMapping("/contact")
+    public String contact(Model model) {
+        return "contact";
+    }
+    // @GetMapping("/login")
+    // public String login(Model model) {
+    //     return "login";
+    // } 
 
 }
