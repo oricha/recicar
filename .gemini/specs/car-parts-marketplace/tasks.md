@@ -255,12 +255,11 @@
  - [x] Once both brand and model are selected, the engine/year options relevant to the selected brand and model should be listed.
  - [x] When all fields (brand, model, engine/year) are selected and the search button is clicked, the items should be displayed on the `/resources/templates/shop-right-sidebar-list.html` web page.
 
-- [] Task 26: Product Details
- - [ ] Implement a product details feature.
- - [ ] When a user clicks on any product listed in the "Our Product" section on the home page (`home-0.html`), they should be Given the ID of the clicked product, it must search for the product by ID in a controller and return the product values ​​on the web.`product-details.html` page.
- - [ ]The `product-details.html` page should display all relevant attributes of the selected product/car part.
-
-- [x]Task 27: Product List
- - [x]Implement a product listing page with pagination.
- - [x]When a user visits the URL `/list`, the products should be displayed on the `/templates/shop-right-sidebar-list.html` page.
- - [x]The product list should include pagination, displaying twelve products per page.
+- [x] 26. Home Hero Redesign: Used Car Parts Search
+ - [x]	Replace the generic slider with a hero section focused on used car parts.
+ - [x]	Add headline + subheadline to build trust and clarity.
+ - [x]Provide 3 search tabs: VRN, Part Number, Make & Model.
+ - [x]	Style with green overlay background, white text, EU-style reg input, and blue CTAs.
+ - [x]	Implement backend wiring: VRN → VehicleApiClient, Part Number → /products/part/{id}, Make & Model → /products/vehicle.
+ - [x]	Ensure accessibility, responsiveness, and performance (WCAG AA, mobile-friendly, optimized assets).
+ - [x].	Exclude search result templates/personalization from scope.

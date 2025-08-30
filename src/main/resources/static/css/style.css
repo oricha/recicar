@@ -10111,3 +10111,32 @@ input:-ms-input-placeholder, textarea:-ms-input-placeholder {
 }
 
 /*# sourceMappingURL=style.css.map */
+
+/* ===== Hero: Used Car Parts ===== */
+.hero_panel.hero--car-parts {
+  background-image: linear-gradient(rgba(0,128,0,0.45), rgba(0,128,0,0.45)), url('/img/bg/hero-mechanic.jpg');
+  background-size: cover;
+  background-position: center;
+  min-height: 340px;
+  display: flex;
+  align-items: center;
+}
+.hero_panel .hero_title { color: #fff; font-weight: 800; line-height: 1.1; }
+.hero_panel .hero_subtitle { color: rgba(255,255,255,0.9); font-size: 16px; margin-bottom: 0; }
+.text-white-80 { color: rgba(255,255,255,0.85) !important; }
+
+.hero_search_tabs .nav-tabs .nav-link { font-weight: 700; }
+.hero_search_tabs .nav-tabs .nav-link.active { border-color: transparent transparent #0d6efd; color: #0d6efd; }
+.hero_search_tabs .tab-content { border: 1px solid #e9ecef; border-top: 0; }
+
+.btn-find-parts { font-weight: 800; text-transform: none; }
+
+/* EU-style VRN input */
+.vrn-plate { border: 2px solid #e0e0e0; border-radius: 6px; overflow: hidden; background: #fff; }
+.vrn-input { border: 0 !important; height: 54px; font-size: 20px; letter-spacing: 1px; }
+.vrn-input::placeholder { color: #9aa0a6; }
+.plate-eu-band { background: #0052B4; color: #FFD400; width: 46px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+.plate-eu-band .eu-stars { font-size: 12px; letter-spacing: 1px; }
+
+.hero_search_icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #9aa0a6; font-size: 20px; }
+.step-label { font-weight: 700; font-size: 12px; color: #6c757d; text-transform: uppercase; }
