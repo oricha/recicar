@@ -108,16 +108,24 @@ public class PagesController {
     
     @GetMapping("/about")
     public String about(Model model) {
-        return "contact";
+        return "about";
     }
 
     @GetMapping("/contact")
     public String contact(Model model) {
         return "contact";
     }
-    // @GetMapping("/login")
-    // public String login(Model model) {
-    //     return "login";
-    // } 
+     @GetMapping("/faq")
+     public String faq(Model model) { return "faq";}
+     @GetMapping("/wishlist" )
+     public String wishlist(Model model) { return "wishlist";}
+    @GetMapping("/my-account.html" )
+    public String myAccount(Model model) { return "my-account";}
+    @GetMapping("/compare" )
+    public String compare(Model model) { return "compare";}
+    @GetMapping("/services" )
+    public String services(Model model) { return "services";}
+    @GetMapping("/blog")
+    public String blog(Model model) {return "blog";}
 
 }
