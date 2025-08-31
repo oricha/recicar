@@ -640,16 +640,16 @@
                             <div class="hero_search_tabs">
                                 <ul class="nav nav-tabs" role="tablist">
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link active" id="tab-vrn" data-bs-toggle="tab" data-bs-target="#pane-vrn" type="button" role="tab" aria-controls="pane-vrn" aria-selected="true">VRN Search</button>
+                                        <button class="nav-link active" id="tab-vrn" data-bs-toggle="tab" data-bs-target="#pane-vrn" type="button" role="tab" aria-controls="pane-vrn" aria-selected="true">Matrícula</button>
                                     </li>
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link" id="tab-part" data-bs-toggle="tab" data-bs-target="#pane-part" type="button" role="tab" aria-controls="pane-part" aria-selected="false">Part Number</button>
+                                        <button class="nav-link" id="tab-part" data-bs-toggle="tab" data-bs-target="#pane-part" type="button" role="tab" aria-controls="pane-part" aria-selected="false">Número de pieza</button>
                                     </li>
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link" id="tab-oem" data-bs-toggle="tab" data-bs-target="#pane-oem" type="button" role="tab" aria-controls="pane-oem" aria-selected="false">OEM Number</button>
+                                        <button class="nav-link" id="tab-oem" data-bs-toggle="tab" data-bs-target="#pane-oem" type="button" role="tab" aria-controls="pane-oem" aria-selected="false">Número de OEM</button>
                                     </li>
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link" id="tab-make" data-bs-toggle="tab" data-bs-target="#pane-make" type="button" role="tab" aria-controls="pane-make" aria-selected="false">Make &amp; Model</button>
+                                        <button class="nav-link" id="tab-make" data-bs-toggle="tab" data-bs-target="#pane-make" type="button" role="tab" aria-controls="pane-make" aria-selected="false">Marca &amp; Modelo</button>
                                     </li>
                                 </ul>
                                 <div class="tab-content p-3 bg-white rounded-bottom">
@@ -657,10 +657,10 @@
                                     <div class="tab-pane fade show active" id="pane-vrn" role="tabpanel" aria-labelledby="tab-vrn">
                                         <form method="get" action="/vrn" class="row g-2 align-items-stretch">
                                             <div class="col-12 col-md-7">
-                                                <label for="vrn" class="form-label d-none">Enter Your Reg</label>
+                                                <label for="vrn" class="form-label d-none">Matricula</label>
                                                 <div class="vrn-plate d-flex">
                                                     <div class="plate-eu-band" aria-hidden="true"><span class="eu-stars">EU</span></div>
-                                                    <input id="vrn" name="reg" type="text" class="form-control vrn-input" placeholder="Enter Your Reg" required>
+                                                    <input id="vrn" name="reg" type="text" class="form-control vrn-input" placeholder="Buscar por matrícula" required>
                                                 </div>
                                             </div>
                                             <div class="col-12 col-md-3">
@@ -673,7 +673,7 @@
                                                 </select>
                                             </div>
                                             <div class="col-12 col-md-2 d-grid">
-                                                <button type="submit" class="btn btn-primary btn-find-parts">Find Parts</button>
+                                                <button type="submit" class="btn btn-primary btn-find-parts">Buscar</button>
                                             </div>
                                         </form>
                                     </div>
@@ -688,7 +688,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-12 col-md-2 d-grid">
-                                                <button type="submit" class="btn btn-primary btn-find-parts">Find Parts</button>
+                                                <button type="submit" class="btn btn-primary btn-find-parts">Buscar</button>
                                             </div>
                                         </form>
                                     </div>
@@ -703,7 +703,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-12 col-md-2 d-grid">
-                                                <button type="submit" class="btn btn-primary btn-find-parts">Find Parts</button>
+                                                <button type="submit" class="btn btn-primary btn-find-parts">Buscar</button>
                                             </div>
                                         </form>
                                     </div>
@@ -746,7 +746,7 @@
                                                 <input type="text" class="form-control" name="partName" placeholder="e.g. Brake Disc" aria-label="Part Name">
                                             </div>
                                             <div class="col-12 mt-2 d-grid d-md-block text-end">
-                                                <button type="submit" class="btn btn-primary btn-find-parts">Find Parts</button>
+                                                <button type="submit" class="btn btn-primary btn-find-parts">Buscar</button>
                                             </div>
                                         </form>
                                     </div>
