@@ -708,24 +708,12 @@
                                         </form>
                                     </div>
 
-                                    <!-- Make & Model Search -->
+                                    <!-- Make / Model / EngineType / PartName Search -->
                                     <div class="tab-pane fade" id="pane-make" role="tabpanel" aria-labelledby="tab-make">
-                                        <form method="get" action="/products/vehicle" class="row g-2 align-items-stretch">
+                                        <form method="get" action="/search/vehicle" class="row g-2 align-items-stretch">
                                             <div class="col-12 col-md-3">
-                                                <label class="form-label step-label">1. Select Year</label>
-                                                <select class="form-select" name="year" required>
-                                                    <option value="" selected>Select Year</option>
-                                                    <option>2018</option>
-                                                    <option>2019</option>
-                                                    <option>2020</option>
-                                                    <option>2021</option>
-                                                    <option>2022</option>
-                                                    <option>2023</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-12 col-md-3">
-                                                <label class="form-label step-label">2. Select Make</label>
-                                                <select class="form-select" name="make" required>
+                                                <label class="form-label step-label">1. Make</label>
+                                                <select class="form-select" name="make" required aria-label="Select Make">
                                                     <option value="" selected>Select Make</option>
                                                     <option>Toyota</option>
                                                     <option>Honda</option>
@@ -734,8 +722,8 @@
                                                 </select>
                                             </div>
                                             <div class="col-12 col-md-3">
-                                                <label class="form-label step-label">3. Select Model</label>
-                                                <select class="form-select" name="model" required>
+                                                <label class="form-label step-label">2. Model</label>
+                                                <select class="form-select" name="model" required aria-label="Select Model">
                                                     <option value="" selected>Select Model</option>
                                                     <option>Camry</option>
                                                     <option>Civic</option>
@@ -744,14 +732,18 @@
                                                 </select>
                                             </div>
                                             <div class="col-12 col-md-3">
-                                                <label class="form-label step-label">4. Search or Select Part Type</label>
-                                                <select class="form-select" name="engine" required>
-                                                    <option value="" selected>Select Part Type</option>
-                                                    <option value="Engine">Engine</option>
-                                                    <option value="Brakes">Brakes</option>
-                                                    <option value="Suspension">Suspension</option>
-                                                    <option value="Electrical">Electrical</option>
+                                                <label class="form-label step-label">3. Engine Type</label>
+                                                <select class="form-select" name="engineType" required aria-label="Select Engine Type">
+                                                    <option value="" selected>Select Engine Type</option>
+                                                    <option>Petrol</option>
+                                                    <option>Diesel</option>
+                                                    <option>Hybrid</option>
+                                                    <option>Electric</option>
                                                 </select>
+                                            </div>
+                                            <div class="col-12 col-md-3">
+                                                <label class="form-label step-label">4. Part Name</label>
+                                                <input type="text" class="form-control" name="partName" placeholder="e.g. Brake Disc" aria-label="Part Name">
                                             </div>
                                             <div class="col-12 mt-2 d-grid d-md-block text-end">
                                                 <button type="submit" class="btn btn-primary btn-find-parts">Find Parts</button>

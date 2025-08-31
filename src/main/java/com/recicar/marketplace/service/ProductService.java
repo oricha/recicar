@@ -110,6 +110,11 @@ public interface ProductService {
      */
     Page<Product> findByVehicleCompatibility(String make, String model, String engine, Integer year, int page);
 
+    /**
+     * Find products by make, model, engine type and optional part name
+     */
+    org.springframework.data.domain.Page<Product> findByMakeModelEngineAndPartName(String make, String model, String engineType, String partName, org.springframework.data.domain.Pageable pageable);
+
 
 
     /**

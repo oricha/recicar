@@ -271,6 +271,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public Page<Product> findByMakeModelEngineAndPartName(String make, String model, String engineType, String partName, Pageable pageable) {
+        String part = (partName != null && !partName.isBlank()) ? partName.trim() : null;
+        return productRepository.findByMakeModelEngineAndPartName(make, model, engineType, part, pageable);
+    }
+
+    @Override
     public void updateStock(Long productId, Integer quantity) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
