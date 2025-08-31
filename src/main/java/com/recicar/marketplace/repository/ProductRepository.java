@@ -25,6 +25,15 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT p FROM Product p JOIN p.compatibilities c WHERE c.make = :make AND c.model = :model AND c.engine = :engine AND c.yearFrom <= :year AND c.yearTo >= :year")
     Page<Product> findByVehicleCompatibility(@Param("make") String make, @Param("model") String model, @Param("engine") String engine, @Param("year") Integer year, Pageable pageable);
 
+    @Query("SELECT p FROM Product p JOIN p.compatibilities c " +
+           "WHERE c.make = :make AND c.model = :model AND c.engine = :engine " +
+           "AND (:partName IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :partName, '%')))")
+    Page<Product> findByMakeModelEngineAndPartName(@Param("make") String make,
+                                                   @Param("model") String model,
+                                                   @Param("engine") String engine,
+                                                   @Param("partName") String partName,
+                                                   Pageable pageable);
+
     @Query("SELECT p FROM Product p WHERE (:searchTerm IS NULL OR (LOWER(p.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(p.partNumber) LIKE LOWER(CONCAT('%', :searchTerm, '%')))) AND (:category IS NULL OR p.category = :category) AND (:condition IS NULL OR p.condition = :condition) AND (:minPrice IS NULL OR p.price >= :minPrice) AND (:maxPrice IS NULL OR p.price <= :maxPrice) AND (:vendor IS NULL OR p.vendor = :vendor)")
     Page<Product> findWithFilters(@Param("searchTerm") String searchTerm, @Param("category") Category category, @Param("condition") ProductCondition condition, @Param("minPrice") BigDecimal minPrice, @Param("maxPrice") BigDecimal maxPrice, @Param("vendor") Vendor vendor, Pageable pageable);
 
