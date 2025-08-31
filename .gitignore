@@ -118,3 +118,15 @@ Thumbs.db
 .gemini/
 .cursor/
 .kiro/
+.agent/
+.vscode/
+.idea/
+.gradle/
+bin/
+build/
+out/
+target/
+.project
+.classpath
+.factorypath
+.settings/
