@@ -127,5 +127,17 @@ public class PagesController {
     public String services(Model model) { return "services";}
     @GetMapping("/blog")
     public String blog(Model model) {return "blog";}
+    @GetMapping("/coming-soon")
+    public String comingSoon(Model model) { return "coming-soon";}
+    @GetMapping("/privacy-policy")
+    public String privacyPolicy(Model model) { return "privacy-policy";}
+    @GetMapping("/blog-details")
+    public String blogDetails(Model model) { return "blog-details";}
+    @GetMapping("/blog-fullwidth")
+    public String blogFullwidth(Model model) { return "blog-fullwidth";}
+    @GetMapping("/blog-sidebar")
+    public String blogSidebar(Model model) { return "blog-sidebar";}
+    
+
 
 }
