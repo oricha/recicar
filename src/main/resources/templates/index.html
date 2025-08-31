@@ -109,9 +109,9 @@
                     <div class="col-lg-9 col-md-6">
                         <div class="middel_right">
                             <div class="search-container">
-                                <form action="#">
+                                <form action="/search" method="get">
                                     <div class="search_box">
-                                        <input placeholder="Introduzca el número o el nombre de la pieza" type="text">
+                                        <input name="query" placeholder="Introduzca el número o el nombre de la pieza" type="text">
                                         <button type="submit"><i class="ion-ios-search-strong"></i></button>
                                     </div>
                                 </form>
@@ -646,6 +646,9 @@
                                         <button class="nav-link" id="tab-part" data-bs-toggle="tab" data-bs-target="#pane-part" type="button" role="tab" aria-controls="pane-part" aria-selected="false">Part Number</button>
                                     </li>
                                     <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="tab-oem" data-bs-toggle="tab" data-bs-target="#pane-oem" type="button" role="tab" aria-controls="pane-oem" aria-selected="false">OEM Number</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
                                         <button class="nav-link" id="tab-make" data-bs-toggle="tab" data-bs-target="#pane-make" type="button" role="tab" aria-controls="pane-make" aria-selected="false">Make &amp; Model</button>
                                     </li>
                                 </ul>
@@ -677,10 +680,25 @@
 
                                     <!-- Part Number Search -->
                                     <div class="tab-pane fade" id="pane-part" role="tabpanel" aria-labelledby="tab-part">
-                                        <form method="get" action="#" onsubmit="return HeroPartNumberRedirect(event)" class="row g-2 align-items-stretch">
+                                        <form method="get" action="#" onsubmit="return HeroSearchRedirect(event, 'part')" class="row g-2 align-items-stretch">
                                             <div class="col-12 col-md-10">
                                                 <div class="position-relative">
                                                     <input id="partNumberInput" type="text" class="form-control form-control-lg ps-5" placeholder="Search by Part Number" aria-label="Search by Part Number" required>
+                                                    <i class="ion-ios-search-strong hero_search_icon" aria-hidden="true"></i>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-md-2 d-grid">
+                                                <button type="submit" class="btn btn-primary btn-find-parts">Find Parts</button>
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                    <!-- OEM Number Search -->
+                                    <div class="tab-pane fade" id="pane-oem" role="tabpanel" aria-labelledby="tab-oem">
+                                        <form method="get" action="#" onsubmit="return HeroSearchRedirect(event, 'oem')" class="row g-2 align-items-stretch">
+                                            <div class="col-12 col-md-10">
+                                                <div class="position-relative">
+                                                    <input id="oemNumberInput" type="text" class="form-control form-control-lg ps-5" placeholder="Search by OEM Number" aria-label="Search by OEM Number" required>
                                                     <i class="ion-ios-search-strong hero_search_icon" aria-hidden="true"></i>
                                                 </div>
                                             </div>
@@ -753,13 +771,15 @@
 <!--slider area end-->
 
 <script>
-  function HeroPartNumberRedirect(e) {
+  function HeroSearchRedirect(e, searchType) {
     e.preventDefault();
-    var input = document.getElementById('partNumberInput');
+    var inputId = searchType === 'part' ? 'partNumberInput' : 'oemNumberInput';
+    var input = document.getElementById(inputId);
     if (!input || !input.value) { return false; }
-    var pn = encodeURIComponent(input.value.trim());
-    if (!pn) { return false; }
-    window.location.href = '/products/part/' + pn;
+    var value = encodeURIComponent(input.value.trim());
+    if (!value) { return false; }
+    var url = searchType === 'part' ? '/products/part/' : '/products/oem/';
+    window.location.href = url + value;
     return false;
   }
 </script>

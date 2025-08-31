@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Results</title>
+</head>
+<body>
+<h1>Search Results</h1>
+
+<div th:if="${errorMessage}">
+    <p th:text="${errorMessage}"></p>
+</div>
+
+<div th:if="${searchQuery}">
+    <p>Showing results for: <span th:text="${searchQuery}"></span></p>
+</div>
+
+<div th:if="${totalElements}">
+    <p><span th:text="${totalElements}"></span> results found.</p>
+</div>
+
+<div th:if="${products}">
+    <div th:each="product : ${products}">
+        <h2 th:text="${product.name}"></h2>
+        <p th:text="${product.description}"></p>
+        <p th:text="${product.price}"></p>
+    </div>
+</div>
+
+</body>
+</html>
