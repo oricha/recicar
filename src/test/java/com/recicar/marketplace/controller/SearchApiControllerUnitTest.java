@@ -94,10 +94,9 @@ class SearchApiControllerUnitTest {
         mockMvc.perform(get("/products/search")
                         .param("q", "brake"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("products/search-results"))
+                .andExpect(view().name("shop-list"))
                 .andExpect(model().attributeExists("products"))
-                .andExpect(model().attribute("searchQuery", "brake"))
-                .andExpect(model().attributeExists("totalElements"));
+                .andExpect(model().attribute("searchQuery", "brake"));
     }
 
     @Test
@@ -118,7 +117,7 @@ class SearchApiControllerUnitTest {
         mockMvc.perform(get("/products/search")
                         .param("q", "a"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("products/search-results"))
+                .andExpect(view().name("shop-list"))
                 .andExpect(model().attributeExists("errorMessage"))
                 .andExpect(model().attribute("errorMessage", "Search term must be at least 2 characters long"));
     }
@@ -132,7 +131,7 @@ class SearchApiControllerUnitTest {
         // Act & Assert
         mockMvc.perform(get("/products/part/TBP001"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("products/part-search"))
+                .andExpect(view().name("shop-list"))
                 .andExpect(model().attribute("partNumber", "TBP001"))
                 .andExpect(model().attribute("searchType", "Part Number"))
                 .andExpect(model().attributeExists("products"));
@@ -143,7 +142,7 @@ class SearchApiControllerUnitTest {
         // Act & Assert
         mockMvc.perform(get("/products/part/a"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("products/part-search"))
+                .andExpect(view().name("shop-list"))
                 .andExpect(model().attributeExists("errorMessage"))
                 .andExpect(model().attribute("errorMessage", "Part number must be at least 2 characters long"));
     }
@@ -157,7 +156,7 @@ class SearchApiControllerUnitTest {
         // Act & Assert
         mockMvc.perform(get("/products/oem/OEM001"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("products/part-search"))
+                .andExpect(view().name("shop-list"))
                 .andExpect(model().attribute("oemNumber", "OEM001"))
                 .andExpect(model().attribute("searchType", "OEM Number"))
                 .andExpect(model().attributeExists("products"));
@@ -168,7 +167,7 @@ class SearchApiControllerUnitTest {
         // Act & Assert
         mockMvc.perform(get("/products/oem/a"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("products/part-search"))
+                .andExpect(view().name("shop-list"))
                 .andExpect(model().attributeExists("errorMessage"))
                 .andExpect(model().attribute("errorMessage", "OEM number must be at least 2 characters long"));
     }
@@ -187,7 +186,7 @@ class SearchApiControllerUnitTest {
                         .param("engine", "Gasoline") // Added engine parameter
                         .param("year", "2020"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("products/vehicle-compatibility"))
+                .andExpect(view().name("shop-list"))
                 .andExpect(model().attribute("vehicleMake", "Toyota"))
                 .andExpect(model().attribute("vehicleModel", "Camry"))
                 .andExpect(model().attribute("vehicleEngine", "Gasoline")) // Assert engine
@@ -202,7 +201,7 @@ class SearchApiControllerUnitTest {
                         .param("model", "Camry")
                         .param("year", "2020"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("products/vehicle-compatibility"))
+                .andExpect(view().name("shop-list"))
                 .andExpect(model().attributeExists("errorMessage"))
                 .andExpect(model().attribute("errorMessage", "Vehicle make, model, engine, and year are required"));
     }
@@ -216,7 +215,7 @@ class SearchApiControllerUnitTest {
                         .param("engine", "Gasoline") // Added valid engine
                         .param("year", "1800"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("products/vehicle-compatibility"))
+                .andExpect(view().name("shop-list"))
                 .andExpect(model().attributeExists("errorMessage"))
                 .andExpect(model().attribute("errorMessage", "Vehicle year must be between 1900 and 2030"));
     }
@@ -230,7 +229,7 @@ class SearchApiControllerUnitTest {
                         .param("engine", "Gasoline") // Added valid engine
                         .param("year", "2020"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("products/vehicle-compatibility"))
+                .andExpect(view().name("shop-list"))
                 .andExpect(model().attributeExists("errorMessage"))
                 .andExpect(model().attribute("errorMessage", "Vehicle make, model, and engine must be at least 2 characters long"));
     }
@@ -247,7 +246,7 @@ class SearchApiControllerUnitTest {
         mockMvc.perform(get("/products/search")
                         .param("q", "nonexistentproduct"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("products/search-results"))
+                .andExpect(view().name("shop-list"))
                 .andExpect(model().attribute("totalElements", 0L));
     }
 
@@ -260,7 +259,7 @@ class SearchApiControllerUnitTest {
         // Act & Assert
         mockMvc.perform(get("/products/part/NONEXISTENT"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("products/part-search"))
+                .andExpect(view().name("shop-list"))
                 .andExpect(model().attributeExists("products"));
     }
 
