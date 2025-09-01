@@ -1,0 +1,22 @@
+-- Insert 20 more sample products for testing, continuation of V6
+INSERT INTO products (name, description, part_number, oem_number, price, stock_quantity, condition, active, created_at, updated_at, category_id, vendor_id) VALUES
+                    ('Brake Rotor - Rear', 'Ventilated rear brake rotor for improved cooling', 'BR-R002', 'OEM-BR002', 65.50, 20, 'NEW', true, NOW(), NOW(), 1, 1),
+                    ('Cabin Air Filter', 'Activated carbon cabin filter for clean air', 'CAF-002', 'OEM-CAF002', 22.75, 45, 'NEW', true, NOW(), NOW(), 2, 1),
+                    ('Ignition Coil', 'Direct replacement ignition coil for reliable starting', 'IC-002', 'OEM-IC002', 55.00, 18, 'NEW', true, NOW(), NOW(), 3, 1),
+                    ('Tail Light Assembly', 'Complete rear tail light assembly, driver side', 'TLA-002', 'OEM-TLA002', 125.00, 10, 'NEW', true, NOW(), NOW(), 4, 1),
+                    ('Engine Coolant', 'Premixed long-life engine coolant', 'EC-002', 'OEM-EC002', 19.99, 50, 'NEW', true, NOW(), NOW(), 8, 1),
+                    ('Fuel Pump', 'High-pressure fuel pump for efficient fuel delivery', 'FP-002', 'OEM-FP002', 95.00, 12, 'NEW', true, NOW(), NOW(), 9, 1),
+                    ('Alternator', 'OEM-grade alternator for charging system', 'ALT-002', 'OEM-ALT002', 180.00, 8, 'USED', true, NOW(), NOW(), 10, 1),
+                    ('Water Pump', 'Engine water pump with gasket', 'WP-002', 'OEM-WP002', 78.50, 15, 'NEW', true, NOW(), NOW(), 8, 1),
+                    ('Timing Belt Kit', 'Complete timing belt kit with tensioner and pulleys', 'TBK-002', 'OEM-TBK002', 145.00, 10, 'NEW', true, NOW(), NOW(), 8, 1),
+                    ('Muffler Assembly', 'Stainless steel muffler for exhaust system', 'MA-002', 'OEM-MA002', 210.00, 5, 'USED', true, NOW(), NOW(), 11, 1),
+                    ('Oxygen Sensor', 'O2 sensor for engine management system', 'OS-002', 'OEM-OS002', 68.75, 22, 'NEW', true, NOW(), NOW(), 3, 1),
+                    ('Control Arm', 'Front lower control arm, passenger side', 'CA-002', 'OEM-CA002', 85.00, 14, 'USED', true, NOW(), NOW(), 12, 1),
+                    ('CV Axle Assembly', 'Complete CV axle assembly, driver side', 'CVA-002', 'OEM-CVA002', 115.00, 9, 'USED', true, NOW(), NOW(), 12, 1),
+                    ('Radiator', 'Aluminum core radiator for engine cooling', 'RAD-002', 'OEM-RAD002', 170.00, 6, 'NEW', true, NOW(), NOW(), 8, 1),
+                    ('Wheel Bearing Hub Assembly', 'Complete front wheel hub bearing assembly', 'WBHA-002', 'OEM-WBHA002', 59.99, 18, 'NEW', true, NOW(), NOW(), 1, 1),
+                    ('Serpentine Belt', 'Multi-rib serpentine belt for engine accessories', 'SB-002', 'OEM-SB002', 25.50, 30, 'NEW', true, NOW(), NOW(), 8, 1),
+                    ('Power Steering Pump', 'Hydraulic power steering pump', 'PSP-002', 'OEM-PSP002', 130.00, 7, 'USED', true, NOW(), NOW(), 13, 1),
+                    ('A/C Compressor', 'Air conditioning compressor with clutch', 'ACC-002', 'OEM-ACC002', 250.00, 4, 'USED', true, NOW(), NOW(), 14, 1),
+                    ('Window Regulator', 'Front passenger side window regulator', 'WR-002', 'OEM-WR002', 72.00, 11, 'NEW', true, NOW(), NOW(), 15, 1),
+                    ('Fuel Injector', 'Fuel injector for improved atomization', 'FI-002', 'OEM-FI002', 48.99, 28, 'NEW', true, NOW(), NOW(), 9, 1);

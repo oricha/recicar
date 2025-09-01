@@ -1,6 +1,7 @@
 package com.recicar.marketplace.controller;
 
 import com.recicar.marketplace.entity.Product;
+import com.recicar.marketplace.service.CategoryService;
 import com.recicar.marketplace.service.ProductService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ class SearchControllerVehicleSearchTest {
 
     @MockBean
     private ProductService productService;
+    
+    @MockBean
+    private CategoryService categoryService;
 
     @Test
     void searchByMakeModelEngineAndPartName_returnsShopList() throws Exception {

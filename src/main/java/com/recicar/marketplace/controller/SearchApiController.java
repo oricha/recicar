@@ -46,7 +46,7 @@ public class SearchApiController {
     public String searchByPartNumber(@PathVariable String partNumber, Model model) {
         if (partNumber.length() < 2) {
             model.addAttribute("errorMessage", "Part number must be at least 2 characters long");
-            return "products/part-search";
+            return "shop-list";
         }
         List<Product> products = productService.findByPartNumber(partNumber);
         model.addAttribute("products", products);
@@ -72,15 +72,15 @@ public class SearchApiController {
     public String searchByVehicle(@RequestParam(required = false) String make, @RequestParam(required = false) String model, @RequestParam(required = false) String engine, @RequestParam(required = false) Integer year, @RequestParam(defaultValue = "0") int page, Model m) {
         if (make == null || model == null || engine == null || year == null) {
             m.addAttribute("errorMessage", "Vehicle make, model, engine, and year are required");
-            return "products/vehicle-compatibility";
+            return "shop-list";
         }
         if (make.length() < 2 || model.length() < 2 || engine.length() < 2) {
             m.addAttribute("errorMessage", "Vehicle make, model, and engine must be at least 2 characters long");
-            return "products/vehicle-compatibility";
+            return "shop-list";
         }
         if (year < 1900 || year > 2030) {
             m.addAttribute("errorMessage", "Vehicle year must be between 1900 and 2030");
-            return "products/vehicle-compatibility";
+            return "shop-list";
         }
 
         Page<Product> productPage = productService.findByVehicleCompatibility(make, model, engine, year, PageRequest.of(page, 12));
@@ -90,6 +90,6 @@ public class SearchApiController {
         m.addAttribute("vehicleModel", model);
         m.addAttribute("vehicleEngine", engine);
         m.addAttribute("vehicleYear", year);
-        return "products/vehicle-compatibility";
+        return "shop-list";
     }
 }

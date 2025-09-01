@@ -1178,9 +1178,9 @@
                         <h2><span> <strong>Body</strong>Parts</span></h2>
                     </div>
                     <div class="product_carousel small_product product_column3 owl-carousel">
-                        <div class="single_product">
+                        <div class="single_product" th:each="product : ${bodyParts}">
                             <div class="product_content">
-                                <h3><a href="/product-details">Lid Cover Cookware Steel Hybrid</a></h3>
+                                <h3><a th:href="@{/product-details(id=${product.id})}" th:text="${product.name}">Product Name</a></h3>
                                 <div class="product_ratings">
                                     <ul>
                                         <li><a href="#"><i class="ion-star"></i></a></li>
@@ -1191,74 +1191,11 @@
                                     </ul>
                                 </div>
                                 <div class="price_box">
-                                    <span class="current_price">$140.00</span>
-                                    <span class="old_price">$320.00</span>
+                                    <span class="current_price" th:text="${product.formattedPrice}">$0.00</span>
                                 </div>
                             </div>
                             <div class="product_thumb">
-                                <a class="primary_img" href="/product-details"><img src="/img/product/product2.jpg" alt=""></a>
-                            </div>
-                        </div>
-                        <div class="single_product">
-                            <div class="product_content">
-                                <h3><a href="/product-details">JBL Flip 3 Splasroof Portable Bluetooth 2</a></h3>
-                                <div class="product_ratings">
-                                    <ul>
-                                        <li><a href="#"><i class="ion-star"></i></a></li>
-                                        <li><a href="#"><i class="ion-star"></i></a></li>
-                                        <li><a href="#"><i class="ion-star"></i></a></li>
-                                        <li><a href="#"><i class="ion-star"></i></a></li>
-                                        <li><a href="#"><i class="ion-star"></i></a></li>
-                                    </ul>
-                                </div>
-                                <div class="price_box">
-                                    <span class="regular_price">$180.00</span>
-                                </div>
-                            </div>
-                            <div class="product_thumb">
-                                <a class="primary_img" href="/product-details"><img src="/img/product/product12.jpg" alt=""></a>
-                            </div>
-                        </div>
-                        <div class="single_product">
-                            <div class="product_content">
-                                <h3><a href="/product-details">Nonstick Dishwasher On-Ear Headphones 2</a></h3>
-                                <div class="product_ratings">
-                                    <ul>
-                                        <li><a href="#"><i class="ion-star"></i></a></li>
-                                        <li><a href="#"><i class="ion-star"></i></a></li>
-                                        <li><a href="#"><i class="ion-star"></i></a></li>
-                                        <li><a href="#"><i class="ion-star"></i></a></li>
-                                        <li><a href="#"><i class="ion-star"></i></a></li>
-                                    </ul>
-                                </div>
-                                <div class="price_box">
-                                    <span class="current_price">$140.00</span>
-                                    <span class="old_price">$320.00</span>
-                                </div>
-                            </div>
-                            <div class="product_thumb">
-                                <a class="primary_img" href="/product-details"><img src="/img/product/product13.jpg" alt=""></a>
-                            </div>
-                        </div>
-                        <div class="single_product">
-                            <div class="product_content">
-                                <h3><a href="/product-details">Marshall Portable Bluetooth Speaker</a></h3>
-                                <div class="product_ratings">
-                                    <ul>
-                                        <li><a href="#"><i class="ion-star"></i></a></li>
-                                        <li><a href="#"><i class="ion-star"></i></a></li>
-                                        <li><a href="#"><i class="ion-star"></i></a></li>
-                                        <li><a href="#"><i class="ion-star"></i></a></li>
-                                        <li><a href="#"><i class="ion-star"></i></a></li>
-                                    </ul>
-                                </div>
-                                <div class="price_box">
-                                    <span class="current_price">$140.00</span>
-                                    <span class="old_price">$320.00</span>
-                                </div>
-                            </div>
-                            <div class="product_thumb">
-                                <a class="primary_img" href="/product-details"><img src="/img/product/product15.jpg" alt=""></a>
+                                <a class="primary_img" th:href="@{/product-details(id=${product.id})}"><img th:src="${product.primaryImage != null ? product.primaryImage.url : '/img/product/product2.jpg'}" alt=""></a>
                             </div>
                         </div>
                     </div>
@@ -1277,9 +1214,9 @@
                         <h2><span> <strong>Engine</strong>Parts</span></h2>
                     </div>
                     <div class="product_carousel small_product product_column3 owl-carousel">
-                        <div class="single_product">
+                        <div class="single_product" th:each="product : ${engineParts}">
                             <div class="product_content">
-                                <h3><a href="/product-details">Kodak PIXPRO Astro Zoom AZ421 16 MP 2</a></h3>
+                                <h3><a th:href="@{/product-details(id=${product.id})}" th:text="${product.name}">Product Name</a></h3>
                                 <div class="product_ratings">
                                     <ul>
                                         <li><a href="#"><i class="ion-star"></i></a></li>
@@ -1290,73 +1227,11 @@
                                     </ul>
                                 </div>
                                 <div class="price_box">
-                                    <span class="regular_price">$160.00</span>
+                                    <span class="current_price" th:text="${product.formattedPrice}">$0.00</span>
                                 </div>
                             </div>
                             <div class="product_thumb">
-                                <a class="primary_img" href="/product-details"><img src="/img/product/product5.jpg" alt=""></a>
-                            </div>
-                        </div>
-                        <div class="single_product">
-                            <div class="product_content">
-                                <h3><a href="/product-details">Bose SoundLink Micro Bluetooth Speaker 2</a></h3>
-                                <div class="product_ratings">
-                                    <ul>
-                                        <li><a href="#"><i class="ion-star"></i></a></li>
-                                        <li><a href="#"><i class="ion-star"></i></a></li>
-                                        <li><a href="#"><i class="ion-star"></i></a></li>
-                                        <li><a href="#"><i class="ion-star"></i></a></li>
-                                        <li><a href="#"><i class="ion-star"></i></a></li>
-                                    </ul>
-                                </div>
-                                <div class="price_box">
-                                    <span class="current_price">$140.00</span>
-                                    <span class="old_price">$320.00</span>
-                                </div>
-                            </div>
-                            <div class="product_thumb">
-                                <a class="primary_img" href="/product-details"><img src="/img/product/product6.jpg" alt=""></a>
-                            </div>
-                        </div>
-                        <div class="single_product">
-                            <div class="product_content">
-                                <h3><a href="/product-details">Nonstick Dishwasher On-Ear Headphones 2</a></h3>
-                                <div class="product_ratings">
-                                    <ul>
-                                        <li><a href="#"><i class="ion-star"></i></a></li>
-                                        <li><a href="#"><i class="ion-star"></i></a></li>
-                                        <li><a href="#"><i class="ion-star"></i></a></li>
-                                        <li><a href="#"><i class="ion-star"></i></a></li>
-                                        <li><a href="#"><i class="ion-star"></i></a></li>
-                                    </ul>
-                                </div>
-                                <div class="price_box">
-                                    <span class="regular_price">$280.00</span>
-                                </div>
-                            </div>
-                            <div class="product_thumb">
-                                <a class="primary_img" href="/product-details"><img src="/img/product/product7.jpg" alt=""></a>
-                            </div>
-                        </div>
-                        <div class="single_product">
-                            <div class="product_content">
-                                <h3><a href="/product-details">Lid Cover Cookware Steel Hybrid</a></h3>
-                                <div class="product_ratings">
-                                    <ul>
-                                        <li><a href="#"><i class="ion-star"></i></a></li>
-                                        <li><a href="#"><i class="ion-star"></i></a></li>
-                                        <li><a href="#"><i class="ion-star"></i></a></li>
-                                        <li><a href="#"><i class="ion-star"></i></a></li>
-                                        <li><a href="#"><i class="ion-star"></i></a></li>
-                                    </ul>
-                                </div>
-                                <div class="price_box">
-                                    <span class="current_price">$140.00</span>
-                                    <span class="old_price">$320.00</span>
-                                </div>
-                            </div>
-                            <div class="product_thumb">
-                                <a class="primary_img" href="/product-details"><img src="/img/product/product8.jpg" alt=""></a>
+                                <a class="primary_img" th:href="@{/product-details(id=${product.id})}"><img th:src="${product.primaryImage != null ? product.primaryImage.url : '/img/product/product5.jpg'}" alt=""></a>
                             </div>
                         </div>
                     </div>
