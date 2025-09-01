@@ -6,8 +6,7 @@ import com.recicar.marketplace.service.CategoryService;
 import com.recicar.marketplace.service.ProductService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -19,9 +18,8 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-public class SearchControllerTest {
+@WebMvcTest(controllers = SearchController.class)
+class SearchControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -40,7 +38,7 @@ public class SearchControllerTest {
         product.setPartNumber("12345");
 
         when(productService.findByPartNumber("12345")).thenReturn(Collections.singletonList(product));
-        when(categoryService.findAll()).thenReturn(Collections.emptyList());
+        when(categoryService.findRootCategories()).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/search").param("query", "12345"))
                 .andExpect(status().isOk())
@@ -59,7 +57,7 @@ public class SearchControllerTest {
 
         when(productService.findByPartNumber("54321")).thenReturn(Collections.emptyList());
         when(productService.findByOemNumber("54321")).thenReturn(Collections.singletonList(product));
-        when(categoryService.findAll()).thenReturn(Collections.emptyList());
+        when(categoryService.findRootCategories()).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/search").param("query", "54321"))
                 .andExpect(status().isOk())
@@ -78,7 +76,7 @@ public class SearchControllerTest {
         when(productService.findByPartNumber("test")).thenReturn(Collections.emptyList());
         when(productService.findByOemNumber("test")).thenReturn(Collections.emptyList());
         when(productService.searchProducts("test", PageRequest.of(0, 12))).thenReturn(new PageImpl<>(Collections.singletonList(product)));
-        when(categoryService.findAll()).thenReturn(Collections.emptyList());
+        when(categoryService.findRootCategories()).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/search").param("query", "test"))
                 .andExpect(status().isOk())
@@ -93,7 +91,7 @@ public class SearchControllerTest {
         when(productService.findByPartNumber("no-results")).thenReturn(Collections.emptyList());
         when(productService.findByOemNumber("no-results")).thenReturn(Collections.emptyList());
         when(productService.searchProducts("no-results", PageRequest.of(0, 12))).thenReturn(new PageImpl<>(Collections.emptyList()));
-        when(categoryService.findAll()).thenReturn(Collections.emptyList());
+        when(categoryService.findRootCategories()).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/search").param("query", "no-results"))
                 .andExpect(status().isOk())

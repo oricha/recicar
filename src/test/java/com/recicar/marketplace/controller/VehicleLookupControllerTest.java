@@ -1,6 +1,7 @@
 package com.recicar.marketplace.controller;
 
 import com.recicar.marketplace.repository.VehicleCompatibilityRepository;
+import com.recicar.marketplace.service.CategoryService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -22,6 +23,9 @@ class VehicleLookupControllerTest {
 
     @MockBean
     private VehicleCompatibilityRepository vehicleCompatibilityRepository;
+    
+    @MockBean
+    private CategoryService categoryService;
 
     @Test
     void getMakes_returnsList() throws Exception {

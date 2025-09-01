@@ -46,19 +46,7 @@ A comprehensive web application that connects customers with junkyards and auto 
    - Application: http://localhost:8080
    - Health Check: http://localhost:8080/actuator/health
 
-### Default Admin User
 
-The application automatically creates an admin user on first startup:
-- **Email**: `admin@recicar.com`
-- **Password**: Check `DataInitializer.java` for the default password (change in production!)
-
-## 🗄️ Database Management
-
-The application uses Flyway for database migrations. Migrations are automatically applied on startup.
-
-- **Database URL**: `jdbc:postgresql://localhost:5432/marketplace_dev`
-- **Username**: `marketplace_user`
-- **Password**: Set via environment variables (see `.env.example`)
 
 ## 📁 Project Structure
 
@@ -92,13 +80,6 @@ The project includes Docker Compose configuration for local development:
 - Redis cache
 - Automatic database initialization
 
-## 📝 API Documentation
-
-REST API endpoints available at `/api/*`:
-- `/api/search/*` - Search operations
-- `/api/products/*` - Product operations
-- `/api/categories/*` - Category operations
-
 ## 🤝 Contributing
 
 1. Fork the repository
@@ -114,3 +95,4 @@ This project is licensed under the MIT License.
 ## 🆘 Support
 
 For support and questions, please open an issue in the GitHub repository.
+You can write to me at linkedin.com/in/oricha or email me at oricha@gmmail.com
