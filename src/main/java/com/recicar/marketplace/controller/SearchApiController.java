@@ -31,7 +31,7 @@ public class SearchApiController {
         if (query.length() < 2) {
             model.addAttribute("errorMessage", "Search term must be at least 2 characters long");
             model.addAttribute("categories", categoryService.findAllActive());
-            return "products/search-results";
+            return "shop-list";
         }
         Page<Product> productPage = productService.searchProducts(query, PageRequest.of(page, 12));
         model.addAttribute("products", productPage.getContent());
@@ -39,7 +39,7 @@ public class SearchApiController {
         model.addAttribute("searchQuery", query);
         model.addAttribute("totalElements", productPage.getTotalElements());
         model.addAttribute("categories", categoryService.findAllActive());
-        return "products/search-results";
+        return "shop-list";
     }
 
     @GetMapping("/part/{partNumber}")
@@ -52,20 +52,20 @@ public class SearchApiController {
         model.addAttribute("products", products);
         model.addAttribute("partNumber", partNumber);
         model.addAttribute("searchType", "Part Number");
-        return "products/part-search";
+        return "shop-list";
     }
 
     @GetMapping("/oem/{oemNumber}")
     public String searchByOemNumber(@PathVariable String oemNumber, Model model) {
         if (oemNumber.length() < 2) {
             model.addAttribute("errorMessage", "OEM number must be at least 2 characters long");
-            return "products/part-search";
+            return "shop-list";
         }
         List<Product> products = productService.findByOemNumber(oemNumber);
         model.addAttribute("products", products);
         model.addAttribute("oemNumber", oemNumber);
         model.addAttribute("searchType", "OEM Number");
-        return "products/part-search";
+        return "shop-list";
     }
 
     @GetMapping("/vehicle")
