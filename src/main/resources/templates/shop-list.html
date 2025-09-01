@@ -598,6 +598,20 @@
                     <!--sidebar widget end-->
                 </div>
                 <div class="col-lg-9 col-md-12">
+                    <div class="mb-3" th:if="${errorMessage != null}">
+                        <div class="alert alert-warning" role="alert" th:text="${errorMessage}">There was a problem with your search.</div>
+                    </div>
+                    <div class="mb-3" th:if="${searchQuery != null || vehicleMake != null}">
+                        <div class="alert alert-info" role="status">
+                            <span th:if="${searchQuery != null}">Results for “<span th:text="${searchQuery}">query</span>”. </span>
+                            <span th:if="${vehicleMake != null}">
+                                Vehicle: <strong th:text="${vehicleMake}">Make</strong>
+                                <span th:if="${vehicleModel != null}"> / <strong th:text="${vehicleModel}">Model</strong></span>
+                                <span th:if="${vehicleEngine != null}"> / <strong th:text="${vehicleEngine}">Modification</strong></span>
+                            </span>
+                            <span th:if="${partName != null}"> | Part: <strong th:text="${partName}">Part</strong></span>
+                        </div>
+                    </div>
                     <!--shop wrapper start-->
                     <!--shop toolbar start-->
                     <div class="shop_banner">
