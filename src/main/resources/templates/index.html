@@ -702,42 +702,30 @@
                                         </form>
                                     </div>
 
-                                    <!-- Make / Model / EngineType / PartName Search -->
+                                    <!-- Make / Model / Modification / PartName Search -->
                                     <div class="tab-pane fade" id="pane-make" role="tabpanel" aria-labelledby="tab-make">
-                                        <form method="get" action="/search/vehicle" class="row g-2 align-items-stretch">
+                                        <form id="vehicle-search-form" method="get" action="/search/vehicle" class="row g-2 align-items-stretch">
                                             <div class="col-12 col-md-3">
-                                                <label class="form-label step-label">1. Make</label>
-                                                <select class="form-select" name="make" required aria-label="Select Make">
+                                                <label for="vehicle-make" class="form-label step-label">1. Make</label>
+                                                <select class="form-select" id="vehicle-make" name="make" required aria-label="Select Make" disabled>
                                                     <option value="" selected>Select Make</option>
-                                                    <option>Toyota</option>
-                                                    <option>Honda</option>
-                                                    <option>Ford</option>
-                                                    <option>BMW</option>
                                                 </select>
                                             </div>
                                             <div class="col-12 col-md-3">
-                                                <label class="form-label step-label">2. Model</label>
-                                                <select class="form-select" name="model" required aria-label="Select Model">
+                                                <label for="vehicle-model" class="form-label step-label">2. Model</label>
+                                                <select class="form-select" id="vehicle-model" name="model" required aria-label="Select Model" disabled>
                                                     <option value="" selected>Select Model</option>
-                                                    <option>Camry</option>
-                                                    <option>Civic</option>
-                                                    <option>Focus</option>
-                                                    <option>3 Series</option>
                                                 </select>
                                             </div>
                                             <div class="col-12 col-md-3">
-                                                <label class="form-label step-label">3. Engine Type</label>
-                                                <select class="form-select" name="engineType" required aria-label="Select Engine Type">
-                                                    <option value="" selected>Select Engine Type</option>
-                                                    <option>Petrol</option>
-                                                    <option>Diesel</option>
-                                                    <option>Hybrid</option>
-                                                    <option>Electric</option>
+                                                <label for="vehicle-mod" class="form-label step-label">3. Modification</label>
+                                                <select class="form-select" id="vehicle-mod" name="engineType" required aria-label="Select Modification" disabled>
+                                                    <option value="" selected>Select Modification</option>
                                                 </select>
                                             </div>
                                             <div class="col-12 col-md-3">
-                                                <label class="form-label step-label">4. Part Name</label>
-                                                <input type="text" class="form-control" name="partName" placeholder="e.g. Brake Disc" aria-label="Part Name">
+                                                <label for="vehicle-partname" class="form-label step-label">4. Part Name (optional)</label>
+                                                <input id="vehicle-partname" type="text" class="form-control" name="partName" placeholder="e.g. Brake Disc" aria-label="Part Name">
                                             </div>
                                             <div class="col-12 mt-2 d-grid d-md-block text-end">
                                                 <button type="submit" class="btn btn-primary btn-find-parts">Buscar</button>
@@ -757,7 +745,57 @@
 <!--slider area end-->
 
 <script>
-  // Hero forms post directly to /search via SearchController.
+  // Dynamic Make/Model/Modification population for the hero search
+  document.addEventListener('DOMContentLoaded', function () {
+    var makeSelect = document.getElementById('vehicle-make');
+    var modelSelect = document.getElementById('vehicle-model');
+    var engineSelect = document.getElementById('vehicle-mod');
+    if (!makeSelect || !modelSelect || !engineSelect) return;
+
+    function setOptions(select, items, placeholder) {
+      select.innerHTML = '';
+      var opt = document.createElement('option');
+      opt.value = '';
+      opt.selected = true;
+      opt.textContent = placeholder;
+      select.appendChild(opt);
+      (items || []).forEach(function (item) {
+        var o = document.createElement('option');
+        o.value = item;
+        o.textContent = item;
+        select.appendChild(o);
+      });
+      select.disabled = false;
+    }
+
+    // Load makes
+    fetch('/api/search/vehicles/makes')
+      .then(function (r) { return r.json(); })
+      .then(function (data) { setOptions(makeSelect, data, 'Select Make'); })
+      .catch(function () { makeSelect.disabled = true; });
+
+    makeSelect.addEventListener('change', function () {
+      var make = makeSelect.value;
+      setOptions(modelSelect, [], 'Select Model'); modelSelect.disabled = true;
+      setOptions(engineSelect, [], 'Select Modification'); engineSelect.disabled = true;
+      if (!make) return;
+      fetch('/api/search/vehicles/models?make=' + encodeURIComponent(make))
+        .then(function (r) { return r.json(); })
+        .then(function (data) { setOptions(modelSelect, data, 'Select Model'); })
+        .catch(function () { modelSelect.disabled = true; });
+    });
+
+    modelSelect.addEventListener('change', function () {
+      var make = makeSelect.value;
+      var model = modelSelect.value;
+      setOptions(engineSelect, [], 'Select Modification'); engineSelect.disabled = true;
+      if (!make || !model) return;
+      fetch('/api/search/vehicles/engines?make=' + encodeURIComponent(make) + '&model=' + encodeURIComponent(model))
+        .then(function (r) { return r.json(); })
+        .then(function (data) { setOptions(engineSelect, data, 'Select Modification'); })
+        .catch(function () { engineSelect.disabled = true; });
+    });
+  });
 </script>
 
     <!--shipping area start-->
