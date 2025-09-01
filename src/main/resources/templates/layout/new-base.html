@@ -155,7 +155,7 @@
                             <div class="search-container">
                                 <form th:action="@{/search}" method="get">
                                     <div class="search_box">
-                                        <input placeholder="Introduzca el número o el nombre de la pieza" type="text" name="q" th:value="${searchQuery}">
+                                        <input placeholder="Introduzca el número o el nombre de la pieza" type="text" name="query" th:value="${searchQuery}">
                                         <button type="submit"><i class="ion-ios-search-strong"></i></button>
                                     </div>
                                 </form>
@@ -204,11 +204,11 @@
                                                 <div class="mega_menu_column">
                                                     <h4>POPULAR PARTS</h4>
                                                     <ul>
-                                                        <li><a href="/products/search?q=brake+pads">Brake Pads</a></li>
-                                                        <li><a href="/products/search?q=oil+filter">Oil Filters</a></li>
-                                                        <li><a href="/products/search?q=air+filter">Air Filters</a></li>
-                                                        <li><a href="/products/search?q=spark+plugs">Spark Plugs</a></li>
-                                                        <li><a href="/products/search?q=batteries">Batteries</a></li>
+                                                        <li><a href="/search?query=brake+pads">Brake Pads</a></li>
+                                                        <li><a href="/search?query=oil+filter">Oil Filters</a></li>
+                                                        <li><a href="/search?query=air+filter">Air Filters</a></li>
+                                                        <li><a href="/search?query=spark+plugs">Spark Plugs</a></li>
+                                                        <li><a href="/search?query=batteries">Batteries</a></li>
                                                     </ul>
                                                 </div>
                                                 
@@ -216,11 +216,11 @@
                                                 <div class="mega_menu_column">
                                                     <h4>VEHICLE TYPES</h4>
                                                     <ul>
-                                                        <li><a href="/products/search?q=sedan">Sedan</a></li>
-                                                        <li><a href="/products/search?q=suv">SUV</a></li>
-                                                        <li><a href="/products/search?q=truck">Truck</a></li>
-                                                        <li><a href="/products/search?q=hatchback">Hatchback</a></li>
-                                                        <li><a href="/products/search?q=coupe">Coupe</a></li>
+                                                        <li><a href="/search?query=sedan">Sedan</a></li>
+                                                        <li><a href="/search?query=suv">SUV</a></li>
+                                                        <li><a href="/search?query=truck">Truck</a></li>
+                                                        <li><a href="/search?query=hatchback">Hatchback</a></li>
+                                                        <li><a href="/search?query=coupe">Coupe</a></li>
                                                     </ul>
                                                 </div>
                                                 
@@ -228,11 +228,11 @@
                                                 <div class="mega_menu_column">
                                                     <h4>SPECIAL OFFERS</h4>
                                                     <ul>
-                                                        <li><a href="/products/search?q=discount">Discounted Items</a></li>
-                                                        <li><a href="/products/search?q=new+arrival">New Arrivals</a></li>
-                                                        <li><a href="/products/search?q=best+seller">Best Sellers</a></li>
-                                                        <li><a href="/products/search?q=clearance">Clearance Sale</a></li>
-                                                        <li><a href="/products/search?q=bundle">Part Bundles</a></li>
+                                                        <li><a href="/search?query=discount">Discounted Items</a></li>
+                                                        <li><a href="/search?query=new+arrival">New Arrivals</a></li>
+                                                        <li><a href="/search?query=best+seller">Best Sellers</a></li>
+                                                        <li><a href="/search?query=clearance">Clearance Sale</a></li>
+                                                        <li><a href="/search?query=bundle">Part Bundles</a></li>
                                                     </ul>
                                                 </div>
                                             </div>
