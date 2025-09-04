@@ -1,6 +1,7 @@
 package com.recicar.marketplace.controller;
 
 import com.recicar.marketplace.dto.UserRegistrationDto;
+import com.recicar.marketplace.dto.LoginForm;
 import com.recicar.marketplace.entity.User;
 import com.recicar.marketplace.service.UserService;
 import jakarta.validation.Valid;
@@ -26,6 +27,8 @@ public class AuthController {
     public String showLoginForm(@RequestParam(value = "error", required = false) String error,
                                @RequestParam(value = "logout", required = false) String logout,
                                Model model) {
+        model.addAttribute("loginForm", new LoginForm());
+        model.addAttribute("registrationForm", new UserRegistrationDto());
         if (error != null) {
             model.addAttribute("error", "Invalid email or password.");
         }
@@ -37,12 +40,12 @@ public class AuthController {
 
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
-        model.addAttribute("user", new UserRegistrationDto());
+        model.addAttribute("registrationForm", new UserRegistrationDto());
         return "auth/register";
     }
 
     @PostMapping("/register")
-    public String registerUser(@Valid @ModelAttribute("user") UserRegistrationDto registrationDto,
+    public String registerUser(@Valid @ModelAttribute("registrationForm") UserRegistrationDto registrationDto,
                               BindingResult result,
                               Model model,
                               RedirectAttributes redirectAttributes) {
@@ -66,8 +69,8 @@ public class AuthController {
 
         try {
             User user = userService.registerUser(registrationDto);
-            redirectAttributes.addFlashAttribute("success", 
-                "Registration successful! Please check your email to verify your account.");
+            redirectAttributes.addFlashAttribute("message",
+                "Registration successful! You can now sign in.");
             return "redirect:/login";
         } catch (Exception e) {
             model.addAttribute("error", "Registration failed. Please try again.");
