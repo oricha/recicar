@@ -123,9 +123,8 @@
                                     <span class="wishlist_quantity">3</span>
                                 </div>
                                 <div class="mini_cart_wrapper">
-                                    <a href="javascript:void(0)"><span class="lnr lnr-cart"></span>My Cart </a>
-                                    <span class="cart_quantity">2</span>
-                                    
+                                    <a href="/cart"><span class="lnr lnr-cart"></span>My Cart </a>
+                                    <span class="cart_quantity" id="cart-count">0</span>
                                 </div>
                             </div>
 
@@ -718,9 +717,9 @@
                                                 </select>
                                             </div>
                                             <div class="col-12 col-md-3">
-                                                <label for="vehicle-mod" class="form-label step-label">3. Modification</label>
-                                                <select class="form-select" id="vehicle-mod" name="engineType" required aria-label="Select Modification" disabled>
-                                                    <option value="" selected>Select Modification</option>
+                                                <label for="vehicle-trim" class="form-label step-label">3. Trim/Engine</label>
+                                                <select class="form-select" id="vehicle-trim" name="engineType" required aria-label="Select Trim/Engine" disabled>
+                                                    <option value="" selected>Select Trim/Engine</option>
                                                 </select>
                                             </div>
                                             <div class="col-12 col-md-3">
@@ -747,55 +746,123 @@
 <script>
   // Dynamic Make/Model/Modification population for the hero search
   document.addEventListener('DOMContentLoaded', function () {
-    var makeSelect = document.getElementById('vehicle-make');
-    var modelSelect = document.getElementById('vehicle-model');
-    var engineSelect = document.getElementById('vehicle-mod');
-    if (!makeSelect || !modelSelect || !engineSelect) return;
+    const makeSelect = document.getElementById('vehicle-make');
+    const modelSelect = document.getElementById('vehicle-model');
+    const trimSelect = document.getElementById('vehicle-trim');
+    const form = document.getElementById('vehicle-search-form');
 
-    function setOptions(select, items, placeholder) {
-      select.innerHTML = '';
-      var opt = document.createElement('option');
-      opt.value = '';
-      opt.selected = true;
-      opt.textContent = placeholder;
-      select.appendChild(opt);
-      (items || []).forEach(function (item) {
-        var o = document.createElement('option');
-        o.value = item;
-        o.textContent = item;
-        select.appendChild(o);
-      });
-      select.disabled = false;
-    }
+    // Function to populate a select dropdown
+    const populateSelect = (select, data, defaultOption) => {
+        select.innerHTML = `<option value="">${defaultOption}</option>`;
+        data.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.id;
+            option.textContent = item.name;
+            select.appendChild(option);
+        });
+        select.disabled = false;
+    };
 
-    // Load makes
-    fetch('/api/search/vehicles/makes')
-      .then(function (r) { return r.json(); })
-      .then(function (data) { setOptions(makeSelect, data, 'Select Make'); })
-      .catch(function () { makeSelect.disabled = true; });
+    // Track first-time bootstrap to auto-select model and trim
+    const bootstrap = { model: true, trim: true };
 
-    makeSelect.addEventListener('change', function () {
-      var make = makeSelect.value;
-      setOptions(modelSelect, [], 'Select Model'); modelSelect.disabled = true;
-      setOptions(engineSelect, [], 'Select Modification'); engineSelect.disabled = true;
-      if (!make) return;
-      fetch('/api/search/vehicles/models?make=' + encodeURIComponent(make))
-        .then(function (r) { return r.json(); })
-        .then(function (data) { setOptions(modelSelect, data, 'Select Model'); })
-        .catch(function () { modelSelect.disabled = true; });
+    // Load makes on page load
+    fetch('/api/car-data/makes')
+        .then(response => response.json())
+        .then(data => {
+            populateSelect(makeSelect, data, 'Select Make');
+            // Prefer BMW if available; otherwise pick first real option
+            if (data && data.length > 0) {
+                const bmw = data.find(m => (m.name || '').toUpperCase() === 'BMW');
+                if (bmw) {
+                    makeSelect.value = String(bmw.id);
+                } else {
+                    makeSelect.selectedIndex = 1; // first real option
+                }
+                // Trigger loading models for the preselected make
+                makeSelect.dispatchEvent(new Event('change'));
+            }
+        })
+        .catch(error => console.error('Error fetching makes:', error));
+
+    // Load models when a make is selected
+    makeSelect.addEventListener('change', () => {
+        const selectedMakeId = makeSelect.value;
+        modelSelect.innerHTML = '<option value="">Select Model</option>';
+        trimSelect.innerHTML = '<option value="">Select Trim/Engine</option>';
+        modelSelect.disabled = true;
+        trimSelect.disabled = true;
+
+        if (selectedMakeId) {
+            fetch(`/api/car-data/models?makeId=${selectedMakeId}`)
+                .then(response => response.json())
+                .then(data => {
+                    populateSelect(modelSelect, data, 'Select Model');
+                    // During initial bootstrap, preselect first model and auto-load trims
+                    if (bootstrap.model && data && data.length > 0) {
+                        modelSelect.selectedIndex = 1; // first real option
+                        modelSelect.dispatchEvent(new Event('change'));
+                        bootstrap.model = false;
+                    }
+                })
+                .catch(error => console.error('Error fetching models:', error));
+        }
     });
 
-    modelSelect.addEventListener('change', function () {
-      var make = makeSelect.value;
-      var model = modelSelect.value;
-      setOptions(engineSelect, [], 'Select Modification'); engineSelect.disabled = true;
-      if (!make || !model) return;
-      fetch('/api/search/vehicles/engines?make=' + encodeURIComponent(make) + '&model=' + encodeURIComponent(model))
-        .then(function (r) { return r.json(); })
-        .then(function (data) { setOptions(engineSelect, data, 'Select Modification'); })
-        .catch(function () { engineSelect.disabled = true; });
+    // Load trims when a model is selected
+    modelSelect.addEventListener('change', () => {
+        const selectedModelId = modelSelect.value;
+        trimSelect.innerHTML = '<option value="">Select Trim/Engine</option>';
+        trimSelect.disabled = true;
+
+        if (selectedModelId) {
+            fetch(`/api/car-data/trims?modelId=${selectedModelId}`)
+                .then(response => response.json())
+                .then(data => {
+                    populateSelect(trimSelect, data, 'Select Trim/Engine');
+                    // During initial bootstrap, preselect first trim
+                    if (bootstrap.trim && data && data.length > 0) {
+                        trimSelect.selectedIndex = 1; // first real option
+                        bootstrap.trim = false;
+                    }
+                })
+                .catch(error => console.error('Error fetching trims:', error));
+        }
     });
-  });
+
+    // Submit names (not IDs) to match SearchController params
+    form.addEventListener('submit', (e) => {
+        // If any select is disabled or empty, let HTML5 validation handle it
+        const makeOption = makeSelect.options[makeSelect.selectedIndex];
+        const modelOption = modelSelect.options[modelSelect.selectedIndex];
+        const trimOption = trimSelect.options[trimSelect.selectedIndex];
+
+        // Replace select name parameters with their display names
+        // to match SearchController expecting strings (make, model, engineType)
+        const hiddenMake = document.createElement('input');
+        hiddenMake.type = 'hidden';
+        hiddenMake.name = 'make';
+        hiddenMake.value = makeOption ? makeOption.textContent : '';
+        form.appendChild(hiddenMake);
+
+        const hiddenModel = document.createElement('input');
+        hiddenModel.type = 'hidden';
+        hiddenModel.name = 'model';
+        hiddenModel.value = modelOption ? modelOption.textContent : '';
+        form.appendChild(hiddenModel);
+
+        const hiddenEngine = document.createElement('input');
+        hiddenEngine.type = 'hidden';
+        hiddenEngine.name = 'engineType';
+        hiddenEngine.value = trimOption ? trimOption.textContent : '';
+        form.appendChild(hiddenEngine);
+
+        // Remove names from selects so their numeric IDs are not submitted
+        makeSelect.removeAttribute('name');
+        modelSelect.removeAttribute('name');
+        trimSelect.removeAttribute('name');
+    });
+});
 </script>
 
     <!--shipping area start-->

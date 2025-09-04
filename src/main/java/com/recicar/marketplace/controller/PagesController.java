@@ -118,7 +118,12 @@ public class PagesController {
      @GetMapping("/faq")
      public String faq(Model model) { return "faq";}
      @GetMapping("/wishlist" )
-     public String wishlist(Model model) { return "wishlist";}
+     public String wishlist(Model model) {
+         // For now, use active products as placeholder for wishlist items
+         var productPage = productService.findActiveProducts(0, 12);
+         model.addAttribute("wishlistProducts", productPage.getContent());
+         return "wishlist";
+     }
     @GetMapping("/my-account.html" )
     public String myAccount(Model model) { return "my-account";}
     @GetMapping("/compare" )

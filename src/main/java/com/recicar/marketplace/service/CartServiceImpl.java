@@ -129,7 +129,7 @@ public class CartServiceImpl implements CartService {
                             .orElseThrow(() -> new RuntimeException("User not found"));
                     Cart newCart = new Cart();
                     newCart.setUser(user);
-                    newCart.setItems(Collections.emptyList());
+                    newCart.setItems(new java.util.ArrayList<>());
                     return cartRepository.save(newCart);
                 });
     }
