@@ -121,8 +121,8 @@
                                     <span class="wishlist_quantity">3</span>
                                 </div>
                                 <div class="mini_cart_wrapper">
-                                    <a href="javascript:void(0)"><span class="lnr lnr-cart"></span>My Cart </a>
-                                    <span class="cart_quantity">2</span>
+                                    <a href="/cart"><span class="lnr lnr-cart"></span>My Cart </a>
+                                    <span class="cart_quantity" id="cart-count">0</span>
                                 </div>
                             </div>
 
@@ -482,43 +482,37 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td class="product_remove"><a href="#"><i class="fa fa-trash-o"></i></a></td>
-                                            <td class="product_thumb"><a href="#"><img src="assets/img/s-product/product.jpg" alt=""></a></td>
-                                            <td class="product_name"><a href="#">Handbag fringilla</a></td>
-                                            <td class="product-price">£65.00</td>
-                                            <td class="product_quantity"><label>Quantity</label> <input min="1" max="100" value="1" type="number"></td>
-                                            <td class="product_total">£130.00</td>
-
-
+                                        <tr th:if="${cart == null || #lists.isEmpty(cart.items)}">
+                                            <td colspan="6" class="text-center">Your cart is empty.</td>
                                         </tr>
-
-                                        <tr>
-                                            <td class="product_remove"><a href="#"><i class="fa fa-trash-o"></i></a></td>
-                                            <td class="product_thumb"><a href="#"><img src="assets/img/s-product/product2.jpg" alt=""></a></td>
-                                            <td class="product_name"><a href="#">Handbags justo</a></td>
-                                            <td class="product-price">£90.00</td>
-                                            <td class="product_quantity"><label>Quantity</label> <input min="1" max="100" value="1" type="number"></td>
-                                            <td class="product_total">£180.00</td>
-
-
+                                        <tr th:each="item, iterStat : ${cart.items}">
+                                            <td class="product_remove">
+                                                <a th:href="@{/cart/remove/{id}(id=${item.id})}"><i class="fa fa-trash-o"></i></a>
+                                            </td>
+                                            <td class="product_thumb">
+                                                <a th:href="@{/product-details(id=${item.productId})}">
+                                                    <img th:src="${item.imageUrl != null ? item.imageUrl : '/assets/img/product/product1.jpg'}" alt="">
+                                                </a>
+                                            </td>
+                                            <td class="product_name">
+                                                <a th:href="@{/product-details(id=${item.productId})}" th:text="${item.productName}">Product</a>
+                                            </td>
+                                            <td class="product-price" th:text="${#numbers.formatCurrency(item.price)}">€0.00</td>
+                                            <td class="product_quantity">
+                                                <form th:action="@{/cart/update}" method="post" class="d-flex align-items-center gap-2">
+                                                    <input type="hidden" name="items[0].id" th:value="${item.id}">
+                                                    <label class="me-2">Quantity</label>
+                                                    <input name="items[0].quantity" min="1" max="100" th:value="${item.quantity}" type="number">
+                                                    <button type="submit" class="btn btn-sm btn-outline-primary ms-2">Update</button>
+                                                </form>
+                                            </td>
+                                            <td class="product_total" th:text="${#numbers.formatCurrency(item.price.multiply(T(java.math.BigDecimal).valueOf(item.quantity)))}">€0.00</td>
                                         </tr>
-                                        <tr>
-                                            <td class="product_remove"><a href="#"><i class="fa fa-trash-o"></i></a></td>
-                                            <td class="product_thumb"><a href="#"><img src="assets/img/s-product/product5.jpg" alt=""></a></td>
-                                            <td class="product_name"><a href="#">Handbag elit</a></td>
-                                            <td class="product-price">£80.00</td>
-                                            <td class="product_quantity"><label>Quantity</label> <input min="1" max="100" value="1" type="number"></td>
-                                            <td class="product_total">£160.00</td>
-
-
-                                        </tr>
-
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="cart_submit">
-                                <button type="submit">update cart</button>
+                            <div class="cart_submit" th:if="${cart != null && !#lists.isEmpty(cart.items)}">
+                                <a class="btn btn-outline-danger" th:href="@{/cart/clear}">Clear cart</a>
                             </div>
                         </div>
                     </div>
@@ -542,7 +536,7 @@
                                 <div class="coupon_inner">
                                     <div class="cart_subtotal">
                                         <p>Subtotal</p>
-                                        <p class="cart_amount">£215.00</p>
+                                        <p class="cart_amount" th:text="${#numbers.formatCurrency(cart.subtotal)}">€0.00</p>
                                     </div>
                                     <div class="cart_subtotal ">
                                         <p>Shipping</p>
@@ -555,7 +549,7 @@
                                         <p class="cart_amount">£215.00</p>
                                     </div>
                                     <div class="checkout_btn">
-                                        <a href="#">Proceed to Checkout</a>
+                                        <a th:href="@{/checkout}">Proceed to Checkout</a>
                                     </div>
                                 </div>
                             </div>

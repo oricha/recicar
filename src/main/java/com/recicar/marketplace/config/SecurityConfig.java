@@ -63,14 +63,42 @@ public class SecurityConfig {
                 .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).maxAgeInSeconds(31536000))
             )
             .authorizeHttpRequests(authz -> authz
-                // Allow all requests without authentication
+                .requestMatchers(
+                        "/", 
+                        "/assets/**", 
+                        "/static/**", 
+                        "/img/**", 
+                        "/css/**", 
+                        "/js/**", 
+                        "/api/**", 
+                        "/login", 
+                        "/register", 
+                        "/forgot-password", 
+                        "/products/**", 
+                        "/shop**", 
+                        "/product-details**"
+                ).permitAll()
                 .anyRequest().permitAll()
             )
-            .formLogin(form -> form.disable())
-            .logout(logout -> logout.disable())
-            .sessionManagement(session -> session.disable())
-            .rememberMe(remember -> remember.disable())
-            .csrf(csrf -> csrf.disable());
+            .formLogin(form -> form
+                .loginPage("/login")
+                .loginProcessingUrl("/login")
+                .usernameParameter("email")
+                .passwordParameter("password")
+                .successHandler(customAuthenticationSuccessHandler())
+                .failureUrl("/login?error")
+                .permitAll()
+            )
+            .logout(logout -> logout
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                .logoutSuccessUrl("/login?logout")
+                .deleteCookies("JSESSIONID")
+                .invalidateHttpSession(true)
+                .permitAll()
+            )
+            // Keeping CSRF disabled for now to avoid adding tokens to all forms
+            .csrf(csrf -> csrf.disable())
+            .authenticationProvider(authenticationProvider());
 
         return http.build();
     }

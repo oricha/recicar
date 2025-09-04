@@ -15,16 +15,24 @@ import java.util.Map;
 public class CartApiController {
 
     private final CartService cartService;
+    private final com.recicar.marketplace.repository.UserRepository userRepository;
 
-    public CartApiController(CartService cartService) {
+    public CartApiController(CartService cartService, com.recicar.marketplace.repository.UserRepository userRepository) {
         this.cartService = cartService;
+        this.userRepository = userRepository;
     }
 
     @GetMapping("/count")
     public Map<String, Integer> getCount(@AuthenticationPrincipal UserDetails userDetails) {
-        Long userId = 1L; // TODO: derive from userDetails
-        CartDto cart = cartService.getCart(userId);
-        int count = cart.getItems() == null ? 0 : cart.getItems().stream().mapToInt(i -> i.getQuantity()).sum();
+        Integer count = 0;
+        if (userDetails != null) {
+            String email = userDetails.getUsername();
+            var userOpt = userRepository.findByEmailIgnoreCase(email);
+            if (userOpt.isPresent()) {
+                CartDto cart = cartService.getCart(userOpt.get().getId());
+                count = cart.getItems() == null ? 0 : cart.getItems().stream().mapToInt(i -> i.getQuantity()).sum();
+            }
+        }
         Map<String, Integer> result = new HashMap<>();
         result.put("count", count);
         return result;
@@ -34,9 +42,15 @@ public class CartApiController {
     public ResponseEntity<CartDto> addItem(@AuthenticationPrincipal UserDetails userDetails,
                                            @RequestParam Long productId,
                                            @RequestParam(defaultValue = "1") int quantity) {
-        Long userId = 1L; // TODO: derive from userDetails
-        CartDto cart = cartService.addItemToCart(userId, productId, quantity);
+        if (userDetails == null) {
+            return ResponseEntity.status(401).build();
+        }
+        String email = userDetails.getUsername();
+        var userOpt = userRepository.findByEmailIgnoreCase(email);
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(401).build();
+        }
+        CartDto cart = cartService.addItemToCart(userOpt.get().getId(), productId, quantity);
         return ResponseEntity.ok(cart);
     }
 }
-
