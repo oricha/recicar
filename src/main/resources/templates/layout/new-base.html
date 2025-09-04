@@ -379,6 +379,17 @@
     <script src="/assets/js/slinky.menu.js"></script>
     <script src="/assets/js/plugins.js"></script>
     <script src="/assets/js/main.js"></script>
+    <script>
+    // Global mini-cart counter initialization
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/api/cart/count')
+            .then(r => r.json())
+            .then(data => {
+                const count = (data && typeof data.count === 'number') ? data.count : 0;
+                document.querySelectorAll('.cart_quantity, #cart-count').forEach(el => el.textContent = count);
+            }).catch(() => {});
+    });
+    </script>
     
     <!-- Additional scripts -->
     <th:block th:fragment="scripts-extra"></th:block>

@@ -122,8 +122,8 @@
                                     <span class="wishlist_quantity">3</span>
                                 </div>
                                 <div class="mini_cart_wrapper">
-                                    <a href="javascript:void(0)"><span class="lnr lnr-cart"></span>My Cart </a>
-                                    <span class="cart_quantity">2</span>
+                                    <a href="/cart"><span class="lnr lnr-cart"></span>My Cart </a>
+                                    <span class="cart_quantity" id="cart-count">0</span>
                                 </div>
                             </div>
 
@@ -483,38 +483,20 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
+                                        <tr th:each="p : ${wishlistProducts}">
                                             <td class="product_remove"><a href="#">X</a></td>
-                                            <td class="product_thumb"><a href="#"><img src="assets/img/s-product/product.jpg" alt=""></a></td>
-                                            <td class="product_name"><a href="#">Handbag fringilla</a></td>
-                                            <td class="product-price">£65.00</td>
-                                            <td class="product_quantity">In Stock</td>
-                                            <td class="product_total"><a href="#">Add To Cart</a></td>
-
-
+                                            <td class="product_thumb">
+                                                <a th:href="@{/product-details(id=${p.id})}">
+                                                    <img th:src="${p.primaryImage != null ? p.primaryImage.imageUrl : '/assets/img/product/product1.jpg'}" alt="">
+                                                </a>
+                                            </td>
+                                            <td class="product_name"><a th:href="@{/product-details(id=${p.id})}" th:text="${p.name}">Product Name</a></td>
+                                            <td class="product-price" th:text="${p.formattedPrice}">€0.00</td>
+                                            <td class="product_quantity">
+                                                <span th:text="${p.inStock} ? 'In Stock' : 'Out of Stock'">In Stock</span>
+                                            </td>
+                                            <td class="product_total"><a href="#" class="js-add-to-cart" th:attr="data-product-id=${p.id}">Add To Cart</a></td>
                                         </tr>
-
-                                        <tr>
-                                            <td class="product_remove"><a href="#">X</a></td>
-                                            <td class="product_thumb"><a href="#"><img src="assets/img/s-product/product2.jpg" alt=""></a></td>
-                                            <td class="product_name"><a href="#">Handbags justo</a></td>
-                                            <td class="product-price">£90.00</td>
-                                            <td class="product_quantity">In Stock</td>
-                                            <td class="product_total"><a href="#">Add To Cart</a></td>
-
-
-                                        </tr>
-                                        <tr>
-                                            <td class="product_remove"><a href="#">X</a></td>
-                                            <td class="product_thumb"><a href="#"><img src="assets/img/s-product/product5.jpg" alt=""></a></td>
-                                            <td class="product_name"><a href="#">Handbag elit</a></td>
-                                            <td class="product-price">£80.00</td>
-                                            <td class="product_quantity">In Stock</td>
-                                            <td class="product_total"><a href="#">Add To Cart</a></td>
-
-
-                                        </tr>
-
                                     </tbody>
                                 </table>
                             </div>
@@ -686,8 +668,41 @@
 <!-- Plugins JS -->
 <script src="assets/js/plugins.js"></script>
 
-<!-- Main JS -->
-<script src="assets/js/main.js"></script>
+    <!-- Main JS -->
+    <script src="assets/js/main.js"></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize cart count
+        fetch('/api/cart/count')
+            .then(r => r.json())
+            .then(data => {
+                const count = (data && typeof data.count === 'number') ? data.count : 0;
+                document.querySelectorAll('.cart_quantity, #cart-count').forEach(el => el.textContent = count);
+            }).catch(() => {});
+
+        // Delegate add-to-cart clicks
+        document.querySelectorAll('.js-add-to-cart').forEach(el => {
+            el.addEventListener('click', function(e) {
+                e.preventDefault();
+                const productId = this.getAttribute('data-product-id');
+                if (!productId) return;
+                const body = new URLSearchParams({ productId: productId, quantity: '1' });
+                fetch('/api/cart/items', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body
+                }).then(r => r.json())
+                  .then(cart => {
+                    const total = (cart.items || []).reduce((sum, it) => sum + (it.quantity || 0), 0);
+                    document.querySelectorAll('.cart_quantity, #cart-count').forEach(el => el.textContent = total);
+                    this.textContent = 'Added!';
+                    setTimeout(() => { this.textContent = 'Add To Cart'; }, 1200);
+                  }).catch(err => console.error('Add to cart failed', err));
+            });
+        });
+    });
+    </script>
 
 
 
