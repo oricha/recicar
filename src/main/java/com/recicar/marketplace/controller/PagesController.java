@@ -142,6 +142,10 @@ public class PagesController {
     public String blogFullwidth(Model model) { return "blog-fullwidth";}
     @GetMapping("/blog-sidebar")
     public String blogSidebar(Model model) { return "blog-sidebar";}
+    @GetMapping("/my-account")
+    public String account(Model model) { return "my-account";}
+    @GetMapping("/404")
+    public String error404(Model model) { return "404";}
     
 
 
