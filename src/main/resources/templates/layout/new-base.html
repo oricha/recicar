@@ -131,84 +131,9 @@
         </div>
     </main>
 
-    <!--footer area start-->
-    <footer class="footer_widgets">
-        <div class="container">
-            <div class="footer_top">
-                <div class="row">
-                    <div class="col-lg-4 col-md-6">
-                        <div class="widgets_container contact_us">
-                            <div class="footer_logo">
-                                <a th:href="@{/}"><img src="/static/img/logo/logo.png" alt="Car Parts Marketplace"></a>
-                            </div>
-                            <div class="footer_contact">
-                                <p>Your trusted marketplace for genuine and aftermarket auto parts. Browse thousands of parts from verified sellers.</p>
-                                <p><span>Address</span> Carrer de Pujades 58 , Sant Martí, 08005 Barcelona</p>
-                                <p><span>Need Help?</span>Call: <a href="tel:1-800-555-0123">1-800-555-0123</a></p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-2 col-md-6 col-sm-6">
-                        <div class="widgets_container widget_menu">
-                            <h3>Information</h3>
-                            <div class="footer_menu">
-                                <ul>
-                                    <li><a th:href="@{/about}">About Us</a></li>
-                                    <li><a href="#">Delivery Information</a></li>
-                                    <li><a href="#">Privacy Policy</a></li>
-                                    <li><a href="#">Terms & Conditions</a></li>
-                                    <li><a href="#">Returns</a></li>
-                                    <li><a href="#">Gift Certificates</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-2 col-md-6 col-sm-6">
-                        <div class="widgets_container widget_menu">
-                            <h3>Extras</h3>
-                            <div class="footer_menu">
-                                <ul>
-                                    <li><a href="#">Returns</a></li>
-                                    <li><a th:href="@{/orders}">Order History</a></li>
-                                    <li><a th:href="@{/wishlist}">Wish List</a></li>
-                                    <li><a href="#">Newsletter</a></li>
-                                    <li><a href="#">Affiliate</a></li>
-                                    <li><a href="#">Specials</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6">
-                        <div class="widgets_container">
-                            <h3>Newsletter Subscribe</h3>
-                            <p>We'll never share your email address with a third-party.</p>
-                            <div class="subscribe_form">
-                                <form id="mc-form" class="mc-form footer-newsletter">
-                                    <input id="mc-email" type="email" autocomplete="off" placeholder="Enter you email address here..." />
-                                    <button id="mc-submit">Subscribe</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="footer_bottom">
-                <div class="row">
-                    <div class="col-lg-6 col-md-6">
-                        <div class="copyright_area">
-                            <p>Copyright &copy; 2024 <a th:href="@{/}">Car Parts Marketplace</a> All Right Reserved.</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 col-md-6">
-                        <div class="footer_payment text-right">
-                            <a href="#"><img src="/static/img/icon/payment.png" alt="Payment Methods"></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
-    <!--footer area end-->
+<!--footer area start-->
+<th:block th:replace="fragments/_footer :: footer"></th:block>
+<!--footer area end-->
 
     <!-- JS -->
     <script src="/assets/js/vendor/jquery-3.4.1.min.js"></script>
