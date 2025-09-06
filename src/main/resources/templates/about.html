@@ -76,15 +76,8 @@
                                         <li><a href="/wishlist">Lista Deseos</a></li>
                                     </ul>
                                 </li>
-                                <li class="language"><a href="#"><img src="assets/img/logo/language.png" alt="">es-es<i class="ion-ios-arrow-down"></i></a>
-                                    <ul class="dropdown_language">
-                                        <li><a href="#"><img src="assets/img/logo/language.png" alt=""> Español</a></li>
-                                        <li><a href="#"><img src="assets/img/logo/language2.png" alt=""> Inglés</a></li>
                                     </ul>
                                 </li>
-                                <li class="currency"><a href="#">€ EUR<i class="ion-ios-arrow-down"></i></a>
-                                    <ul class="dropdown_currency">
-                                        <li><a href="#">EUR – Euro</a></li>
                                         <li><a href="#">GBP – Libra Esterlina</a></li>
                                         <li><a href="#">USD – Dólar Americano</a></li>
                                     </ul>
@@ -392,120 +385,13 @@
     </div>
     <!--testimonials section end-->
 
-    <!--call to action start-->
-    <section class="call_to_action">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <div class="call_action_inner">
-                        <div class="call_text">
-                            <h3>Tenemos <span>Recomendaciones</span> para Ti</h3>
-                            <p>Obtén 30% de descuento cuando gastes €150 o más con el código ReciCar11</p>
-                        </div>
-                        <div class="discover_now">
-                            <a href="#">descubre ahora</a>
-                        </div>
-                        <div class="link_follow">
-                            <ul>
-                                <li><a href="#"><i class="ion-social-facebook"></i></a></li>
-                                <li><a href="#"><i class="ion-social-twitter"></i></a></li>
-                                <li><a href="#"><i class="ion-social-googleplus"></i></a></li>
-                                <li><a href="#"><i class="ion-social-youtube"></i></a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!--call to action end-->
+<!--call to action start-->
+<th:block th:replace="fragments/_calltoaction :: calltoaction"></th:block>
+<!--call to action end-->
 
-    <!--footer area start-->
-    <footer class="footer_widgets">
-        <div class="container">
-            <div class="footer_top">
-                <div class="row">
-                    <div class="col-lg-4 col-md-6">
-                        <div class="widgets_container contact_us">
-                            <div class="footer_logo">
-                                <a href="#"><img src="assets/img/logo/logo.png" alt=""></a>
-                            </div>
-                            <div class="footer_contact">
-                                <p>Somos un equipo de diseñadores y desarrolladores que
-                                    creamos soluciones de alta calidad para el comercio electrónico...</p>
-                                <p><span>Dirección</span> Calle Mayor 123, Madrid, España 28001</p>
-                                <p><span>¿Necesitas Ayuda?</span>Llama: <a href="tel:+34-900-123-456">+34 900 123 456</a></p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-2 col-md-6 col-sm-6">
-                        <div class="widgets_container widget_menu">
-                            <h3>Información</h3>
-                            <div class="footer_menu">
-                                <ul>
-                                    <li><a href="/about">Acerca de Nosotros</a></li>
-                                    <li><a href="#">Información de Entrega</a></li>
-                                    <li><a href="/privacy-policy">política de privacidad</a></li>
-                                    <li><a href="/coming-soon">Próximamente</a></li>
-                                    <li><a href="#">Términos y Condiciones</a></li>
-                                    <li><a href="#">Devoluciones</a></li>
-                                    <li><a href="#">Certificados de Regalo</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-2 col-md-6 col-sm-6">
-                        <div class="widgets_container widget_menu">
-                            <h3>Extras</h3>
-                            <div class="footer_menu">
-                                <ul>
-                                    <li><a href="#">Devoluciones</a></li>
-                                    <li><a href="#">Historial de Pedidos</a></li>
-                                    <li><a href="/wishlist">Lista Deseos</a></li>
-                                    <li><a href="#">Boletín</a></li>
-                                    <li><a href="#">Afiliado</a></li>
-                                    <li><a href="#">Ofertas Especiales</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6">
-                        <div class="widgets_container">
-                            <h3>Suscripción al Boletín</h3>
-                            <p>Nunca compartiremos tu dirección de correo electrónico con terceros.</p>
-                            <div class="subscribe_form">
-                                <form id="mc-form" class="mc-form footer-newsletter">
-                                    <input id="mc-email" type="email" autocomplete="off" placeholder="Ingresa tu dirección de correo aquí..." />
-                                    <button id="mc-submit">Suscribirse</button>
-                                </form>
-                                <!-- mailchimp-alerts Start -->
-                                <div class="mailchimp-alerts text-centre">
-                                    <div class="mailchimp-submitting"></div><!-- mailchimp-submitting end -->
-                                    <div class="mailchimp-success"></div><!-- mailchimp-success end -->
-                                    <div class="mailchimp-error"></div><!-- mailchimp-error end -->
-                                </div><!-- mailchimp-alerts end -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="footer_bottom">
-                <div class="row">
-                    <div class="col-lg-6 col-md-6">
-                        <div class="copyright_area">
-                            <p>Copyright &copy; 2024 <a href="#">ReciCar</a> Todos los Derechos Reservados.</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 col-md-6">
-                        <div class="footer_payment text-right">
-                            <a href="#"><img src="assets/img/icon/payment.png" alt=""></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
-    <!--footer area end-->
+<!--footer area start-->
+<th:block th:replace="fragments/_footer :: footer"></th:block>
+<!--footer area end-->
 
 <!-- JS
 ============================================ -->
