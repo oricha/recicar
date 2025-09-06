@@ -1,12 +1,32 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/new-base :: html}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <th:block th:fragment="head-extra">
-        <title>Products - Car Parts Marketplace</title>
-    </th:block>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Products - Car Parts Marketplace</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="/assets/img/favicon.ico">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/css/owl.carousel.min.css">
+    <link rel="stylesheet" href="/assets/css/slick.css">
+    <link rel="stylesheet" href="/assets/css/magnific-popup.css">
+    <link rel="stylesheet" href="/assets/css/font.awesome.css">
+    <link rel="stylesheet" href="/assets/css/ionicons.min.css">
+    <link rel="stylesheet" href="/assets/css/animate.css">
+    <link rel="stylesheet" href="/assets/css/jquery-ui.min.css">
+    <link rel="stylesheet" href="/assets/css/slinky.menu.css">
+    <link rel="stylesheet" href="/assets/css/plugins.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
-    <div th:fragment="content">
+    <!--header area start-->
+    <th:block th:replace="fragments/_header :: header"></th:block>
+    <!--header area end-->
+
         <!-- Products Section -->
         <section class="products_area py-5">
             <div class="container">
@@ -225,9 +245,7 @@
                 </div>
             </div>
         </section>
-    </div>
-
-    <th:block th:fragment="scripts-extra">
+    <!-- Page-specific styles and scripts -->
         <style>
             .products_area {
                 background: #f8f9fa;
@@ -597,6 +615,32 @@
                 alert('Product added to wishlist!');
             }
         </script>
-    </th:block>
+
+    <!-- JS -->
+    <script src="/assets/js/vendor/jquery-3.4.1.min.js"></script>
+    <script src="/assets/js/popper.js"></script>
+    <script src="/assets/js/bootstrap.min.js"></script>
+    <script src="/assets/js/owl.carousel.min.js"></script>
+    <script src="/assets/js/slick.min.js"></script>
+    <script src="/assets/js/jquery.magnific-popup.min.js"></script>
+    <script src="/assets/js/jquery.countdown.js"></script>
+    <script src="/assets/js/jquery.ui.js"></script>
+    <script src="/assets/js/jquery.elevatezoom.js"></script>
+    <script src="/assets/js/isotope.pkgd.min.js"></script>
+    <script src="/assets/js/slinky.menu.js"></script>
+    <script src="/assets/js/plugins.js"></script>
+    <script src="/assets/js/main.js"></script>
+
+    <script>
+    // Initialize mini-cart counter
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/api/cart/count')
+            .then(r => r.json())
+            .then(data => {
+                const count = (data && typeof data.count === 'number') ? data.count : 0;
+                document.querySelectorAll('.cart_quantity, #cart-count').forEach(el => el.textContent = count);
+            }).catch(() => {});
+    });
+    </script>
 </body>
 </html>
