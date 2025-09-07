@@ -147,7 +147,5 @@ public class PagesController {
     @GetMapping("/404")
     public String error404(Model model) { return "404";}
 
-    
-
 
 }
