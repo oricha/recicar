@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" lang="en">
+<html xmlns:th="http://www.thymeleaf.org" class="no-js" lang="en">
 
 <head>
     <meta charset="utf-8">
@@ -49,156 +49,9 @@
     <!--header area end-->
 
 
-    <!--Offcanvas menu area start-->
-    <div class="off_canvars_overlay"></div>
-    <div class="Offcanvas_menu canvas_padding">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <div class="canvas_open">
-                        <span>MENU</span>
-                        <a href="javascript:void(0)"><i class="ion-navicon"></i></a>
-                    </div>
-                    <div class="Offcanvas_menu_wrapper">
-
-                        <div class="canvas_close">
-                            <a href="#"><i class="ion-android-close"></i></a>
-                        </div>
-
-
-                        <div class="top_right text-end">
-                            <ul>
-                                <li class="top_links"><a href="#"><i class="ion-android-person"></i> My Account<i class="ion-ios-arrow-down"></i></a>
-                                    <ul class="dropdown_links">
-                                        <li><a href="checkout.html">Checkout </a></li>
-                                        <li><a href="my-account.html">My Account </a></li>
-                                        <li><a href="cart.html">Shopping Cart</a></li>
-                                        <li><a href="wishlist.html">Wishlist</a></li>
-                                    </ul>
-                                </li>
-                                <li class="language"><a href="#"><img src="assets/img/logo/language.png" alt="">en-gb<i class="ion-ios-arrow-down"></i></a>
-                                    <ul class="dropdown_language">
-                                        <li><a href="#"><img src="assets/img/logo/language.png" alt=""> English</a></li>
-                                        <li><a href="#"><img src="assets/img/logo/language2.png" alt=""> Germany</a></li>
-                                    </ul>
-                                </li>
-                                <li class="currency"><a href="#">$ USD<i class="ion-ios-arrow-down"></i></a>
-                                    <ul class="dropdown_currency">
-                                        <li><a href="#">EUR – Euro</a></li>
-                                        <li><a href="#">GBP – British Pound</a></li>
-                                        <li><a href="#">INR – India Rupee</a></li>
-                                    </ul>
-                                </li>
-
-
-                            </ul>
-                        </div>
-                        <div class="Offcanvas_follow">
-                            <label>Follow Us:</label>
-                            <ul class="follow_link">
-                                <li><a href="#"><i class="ion-social-facebook"></i></a></li>
-                                <li><a href="#"><i class="ion-social-twitter"></i></a></li>
-                                <li><a href="#"><i class="ion-social-googleplus"></i></a></li>
-                                <li><a href="#"><i class="ion-social-youtube"></i></a></li>
-                            </ul>
-                        </div>
-                        <div class="search-container">
-                            <form action="#">
-                                <div class="search_box">
-                                    <input placeholder="Search entire store here ..." type="text">
-                                    <button type="submit"><i class="ion-ios-search-strong"></i></button>
-                                </div>
-                            </form>
-                        </div>
-                        <div id="menu" class="text-left ">
-                            <ul class="offcanvas_main_menu">
-                                <li class="menu-item-has-children">
-                                    <a href="#">Home</a>
-                                    <ul class="sub-menu">
-                                        <li><a href="index.html">Home 1</a></li>
-                                        <li><a href="index-2.html">Home 2</a></li>
-                                        <li><a href="index-3.html">Home 3</a></li>
-                                        <li><a href="index-4.html">Home 4</a></li>
-                                        <li><a href="index-5.html">Home 5</a></li>
-                                        <li><a href="index-6.html">Home 6</a></li>
-                                        <li><a href="index-7.html">Home 7</a></li>
-                                    </ul>
-                                </li>
-                                <li class="menu-item-has-children">
-                                    <a href="#">Shop</a>
-                                    <ul class="sub-menu">
-                                        <li class="menu-item-has-children">
-                                            <a href="#">Shop Layouts</a>
-                                            <ul class="sub-menu">
-                                                <li><a href="shop.html">shop</a></li>
-                                                <li><a href="shop-fullwidth.html">Full Width</a></li>
-                                                <li><a href="shop-fullwidth-list.html">Full Width list</a></li>
-                                                <li><a href="shop-right-sidebar.html">Right Sidebar </a></li>
-                                                <li><a href="shop-right-sidebar-list.html"> Right Sidebar list</a></li>
-                                                <li><a href="shop-list.html">List View</a></li>
-                                            </ul>
-                                        </li>
-                                        <li class="menu-item-has-children">
-                                            <a href="#">other Pages</a>
-                                            <ul class="sub-menu">
-                                                <li><a href="cart.html">cart</a></li>
-                                                <li><a href="wishlist.html">Wishlist</a></li>
-                                                <li><a href="checkout.html">Checkout</a></li>
-                                                <li><a href="my-account.html">my account</a></li>
-                                                <li><a href="404.html">Error 404</a></li>
-                                            </ul>
-                                        </li>
-                                        <li class="menu-item-has-children">
-                                            <a href="#">Product Types</a>
-                                            <ul class="sub-menu">
-                                                <li><a href="product-details.html">product details</a></li>
-                                                <li><a href="product-sidebar.html">product sidebar</a></li>
-                                                <li><a href="product-grouped.html">product grouped</a></li>
-                                                <li><a href="variable-product.html">product variable</a></li>
-                                            </ul>
-                                        </li>
-                                    </ul>
-                                </li>
-                                <li class="menu-item-has-children">
-                                    <a href="#">blog</a>
-                                    <ul class="sub-menu">
-                                        <li><a href="blog.html">blog</a></li>
-                                        <li><a href="blog-details.html">blog details</a></li>
-                                        <li><a href="blog-fullwidth.html">blog fullwidth</a></li>
-                                        <li><a href="blog-sidebar.html">blog sidebar</a></li>
-                                    </ul>
-
-                                </li>
-                                <li class="menu-item-has-children">
-                                    <a href="#">pages </a>
-                                    <ul class="sub-menu">
-                                        <li><a href="about.html">About Us</a></li>
-                                        <li><a href="services.html">services</a></li>
-                                        <li><a href="faq.html">Frequently Questions</a></li>
-                                        <li><a href="login.html">login</a></li>
-                                        <li><a href="compare.html">compare</a></li>
-                                        <li><a href="privacy-policy.html">privacy policy</a></li>
-                                        <li><a href="coming-soon.html">Coming Soon</a></li>
-                                    </ul>
-                                </li>
-                                <li class="menu-item-has-children">
-                                    <a href="my-account.html">my account</a>
-                                </li>
-                                <li class="menu-item-has-children">
-                                    <a href="about.html">About Us</a>
-                                </li>
-                                <li class="menu-item-has-children">
-                                    <a href="contact.html"> Contact Us</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-    <!--Offcanvas menu area end-->
+<!--Offcanvas menu area start-->
+<th:block th:replace="fragments/_offcanvasmenu :: offcanvasmenu"></th:block>
+<!--Offcanvas menu area end-->
 
     <!--breadcrumbs area start-->
     <div class="breadcrumbs_area">
@@ -503,120 +356,13 @@
     </div>
     <!--blog section area end-->
 
-    <!--call to action start-->
-    <section class="call_to_action">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <div class="call_action_inner">
-                        <div class="call_text">
-                            <h3>We Have <span>Recommendations</span> for You</h3>
-                            <p>Take 30% off when you spend $150 or more with code Autima11</p>
-                        </div>
-                        <div class="discover_now">
-                            <a href="#">discover now</a>
-                        </div>
-                        <div class="link_follow">
-                            <ul>
-                                <li><a href="#"><i class="ion-social-facebook"></i></a></li>
-                                <li><a href="#"><i class="ion-social-twitter"></i></a></li>
-                                <li><a href="#"><i class="ion-social-googleplus"></i></a></li>
-                                <li><a href="#"><i class="ion-social-youtube"></i></a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!--call to action end-->
+<!--call to action start-->
+<th:block th:replace="fragments/_calltoaction :: calltoaction"></th:block>
+<!--call to action end-->
 
-    <!--footer area start-->
-    <footer class="footer_widgets">
-        <div class="container">
-            <div class="footer_top">
-                <div class="row">
-                    <div class="col-lg-4 col-md-6">
-                        <div class="widgets_container contact_us">
-                            <div class="footer_logo">
-                                <a href="#"><img src="assets/img/logo/logo.png" alt=""></a>
-                            </div>
-                            <div class="footer_contact">
-                                <p>We are a team of designers and developers that
-                                    create high quality Magento, Prestashop, Opencart...</p>
-                                <p><span>Address</span> 4710-4890 Breckinridge St, UK Burlington, VT 05401</p>
-                                <p><span>Need Help?</span>Call: <a href="tel:1-800-345-6789">1-800-345-6789</a></p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-2 col-md-6 col-sm-6">
-                        <div class="widgets_container widget_menu">
-                            <h3>Information</h3>
-                            <div class="footer_menu">
-                                <ul>
-                                    <li><a href="about.html">About Us</a></li>
-                                    <li><a href="#">Delivery Information</a></li>
-                                    <li><a href="privacy-policy.html">privacy policy</a></li>
-                                    <li><a href="coming-soon.html">Coming Soon</a></li>
-                                    <li><a href="#">Terms & Conditions</a></li>
-                                    <li><a href="#">Returns</a></li>
-                                    <li><a href="#">Gift Certificates</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-2 col-md-6 col-sm-6">
-                        <div class="widgets_container widget_menu">
-                            <h3>Extras</h3>
-                            <div class="footer_menu">
-                                <ul>
-                                    <li><a href="#">Returns</a></li>
-                                    <li><a href="#">Order History</a></li>
-                                    <li><a href="wishlist.html">Wish List</a></li>
-                                    <li><a href="#">Newsletter</a></li>
-                                    <li><a href="#">Affiliate</a></li>
-                                    <li><a href="#">Specials</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6">
-                        <div class="widgets_container">
-                            <h3>Newsletter Subscribe</h3>
-                            <p>We’ll never share your email address with a third-party.</p>
-                            <div class="subscribe_form">
-                                <form id="mc-form" class="mc-form footer-newsletter">
-                                    <input id="mc-email" type="email" autocomplete="off" placeholder="Enter you email address here..." />
-                                    <button id="mc-submit">Subscribe</button>
-                                </form>
-                                <!-- mailchimp-alerts Start -->
-                                <div class="mailchimp-alerts text-centre">
-                                    <div class="mailchimp-submitting"></div><!-- mailchimp-submitting end -->
-                                    <div class="mailchimp-success"></div><!-- mailchimp-success end -->
-                                    <div class="mailchimp-error"></div><!-- mailchimp-error end -->
-                                </div><!-- mailchimp-alerts end -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="footer_bottom">
-                <div class="row">
-                    <div class="col-lg-6 col-md-6">
-                        <div class="copyright_area">
-                            <p>Copyright &copy; 2021 <a href="#">Autima</a> All Right Reserved.</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 col-md-6">
-                        <div class="footer_payment text-right">
-                            <a href="#"><img src="assets/img/icon/payment.png" alt=""></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
-    <!--footer area end-->
+<!--footer area start-->
+<th:block th:replace="fragments/_footer :: footer"></th:block>
+<!--footer area end-->
 
 
 
