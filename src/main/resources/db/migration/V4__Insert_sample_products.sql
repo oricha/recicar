@@ -1,6 +1,6 @@
 -- Insert a sample vendor first
 INSERT INTO vendors (user_id, business_name, tax_id, description, status, commission_rate, created_at, updated_at) 
-VALUES (1, 'AutoParts Pro', 'TAX123456', 'Premium auto parts supplier', 'VERIFIED', 0.1000, NOW(), NOW())
+VALUES (1, 'AutoParts Pro', 'TAX123456', 'Premium auto parts supplier', 'APPROVED', 0.1000, NOW(), NOW())
 ON CONFLICT (tax_id) DO NOTHING;
 
 -- Insert sample products for testing

@@ -183,4 +183,11 @@ public class UserService {
 
         return userRepository.save(admin);
     }
+
+    public void dataInitializer(Long userId,  String newPassword) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
 }

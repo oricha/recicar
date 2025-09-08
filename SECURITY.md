@@ -73,21 +73,8 @@ DATABASE_PASSWORD=your_secure_password_here
 REDIS_HOST=localhost
 REDIS_PORT=6379
 REDIS_PASSWORD=your_redis_password_here
-ADMIN_EMAIL=admin@yourdomain.com
-ADMIN_PASSWORD=your_secure_admin_password
+ADMIN_EMAIL=admin@recicar.com
+ADMIN_PASSWORD=user123
 JWT_SECRET=your_jwt_secret_here
 ```
 
-## 🆘 Security Issues
-
-If you find security vulnerabilities:
-1. **DO NOT** create public issues
-2. **Email** security@yourdomain.com
-3. **Use** private security advisories
-4. **Follow** responsible disclosure
-
-## 📚 Additional Resources
-
-- [OWASP Top 10](https://owasp.org/www-project-top-ten/)
-- [Spring Security Reference](https://docs.spring.io/spring-security/reference/)
-- [Docker Security Best Practices](https://docs.docker.com/engine/security/)

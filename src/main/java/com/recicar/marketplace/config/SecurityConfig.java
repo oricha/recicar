@@ -82,7 +82,8 @@ public class SecurityConfig {
             )
             .formLogin(form -> form
                 .loginPage("/login")
-                .loginProcessingUrl("/login")
+                // Let the controller handle POST /login; keep a non-used processing URL to avoid filter interception
+                .loginProcessingUrl("/spring-security-login")
                 .usernameParameter("email")
                 .passwordParameter("password")
                 .successHandler(customAuthenticationSuccessHandler())
