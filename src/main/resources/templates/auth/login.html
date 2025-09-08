@@ -66,10 +66,10 @@
                             <ul>
                                 <li class="top_links"><a href="#"><i class="ion-android-person"></i> Mi cuenta<i class="ion-ios-arrow-down"></i></a>
                                     <ul class="dropdown_links">
-                                        <li><a href="checkout.html">Finalizar compra </a></li>
-                                        <li><a href="my-account.html">Mi cuenta </a></li>
-                                        <li><a href="cart.html">Carrito</a></li>
-                                        <li><a href="wishlist.html">Lista de deseos</a></li>
+                                        <li><a href="/checkout">Finalizar compra </a></li>
+                                        <li><a href="/my-account">Mi cuenta </a></li>
+                                        <li><a href="/cart">Carrito</a></li>
+                                        <li><a href="/wishlist">Lista de deseos</a></li>
                                     </ul>
                                 </li>
                             </ul>
@@ -86,7 +86,7 @@
             <div class="row align-items-center">
                 <div class="col-lg-3 col-md-6">
                     <div class="logo">
-                        <a href="index.html"><img src="assets/img/logo/logo.png" alt=""></a>
+                        <a href="/"><img src="assets/img/logo/logo.png" alt=""></a>
                     </div>
                 </div>
                 <div class="col-lg-9 col-md-6">
@@ -102,7 +102,7 @@
                         <div class="middel_right_info">
 
                             <div class="header_wishlist">
-                                <a href="wishlist.html"><span class="lnr lnr-heart"></span> Lista de deseos </a>
+                                <a href="/wishlist"><span class="lnr lnr-heart"></span> Lista de deseos </a>
                                 <span class="wishlist_quantity">3</span>
                             </div>
                             <div class="mini_cart_wrapper">
@@ -169,10 +169,10 @@
 
         <div class="mini_cart_footer">
             <div class="cart_button">
-                <a href="cart.html">Ver carrito</a>
+                <a href="/cart">Ver carrito</a>
             </div>
             <div class="cart_button">
-                <a class="active" href="checkout.html">Finalizar compra</a>
+                <a class="active" href="/checkout">Finalizar compra</a>
             </div>
         </div>
 
@@ -244,7 +244,7 @@
                                     </ul>
                                 </li>
                                 <li><a href="#">páginas <i class="fa fa-angle-down"></i></a>
-                        <ul class="sub_menu pages">
+                                    <ul class="sub_menu pages">
                                         <li><a href="/about">Sobre nosotros</a></li>
                                         <li><a href="/services">servicios</a></li>
                                         <li><a href="/faq">Preguntas frecuentes</a></li>
@@ -325,47 +325,6 @@
                 </div>
             </div>
             <!--login area start-->
-
-            <!--register area start-->
-            <div class="col-lg-6 col-md-6">
-                <div class="account_form register">
-                    <h2>Registrarse</h2>
-                    <form th:action="@{/register}" method="post" th:object="${registrationForm}">
-                        <p>
-                            <label>Nombre <span>*</span></label>
-                            <input type="text" name="firstName" th:field="*{firstName}" placeholder="First name" required>
-                        </p>
-                        <p>
-                            <label>Apellidos <span>*</span></label>
-                            <input type="text" name="lastName" th:field="*{lastName}" placeholder="Last name" required>
-                        </p>
-                        <p>
-                            <label>Correo electrónico <span>*</span></label>
-                            <input type="email" name="email" th:field="*{email}" placeholder="you@example.com" required>
-                        </p>
-                        <p>
-                            <label>Teléfono</label>
-                            <input type="tel" name="phone" th:field="*{phone}" placeholder="Optional">
-                        </p>
-                        <p>
-                            <label>Contraseña <span>*</span></label>
-                            <input type="password" name="password" th:field="*{password}" placeholder="••••••••" required>
-                        </p>
-                        <p>
-                            <label>Confirmar contraseña <span>*</span></label>
-                            <input type="password" name="confirmPassword" th:field="*{confirmPassword}" placeholder="••••••••" required>
-                        </p>
-                        <div class="login_submit d-flex align-items-center justify-content-between">
-                            <label class="mb-0 d-flex align-items-center">
-                                <input type="checkbox" name="agreeToTerms" th:field="*{agreeToTerms}" class="me-2">
-                                Acepto los <a href="/privacy-policy" class="ms-1">términos</a>
-                            </label>
-                            <button type="submit" class="btn btn-primary">Register</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <!--register area end-->
         </div>
     </div>
 </div>

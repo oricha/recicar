@@ -4,7 +4,15 @@ import com.recicar.marketplace.dto.UserRegistrationDto;
 import com.recicar.marketplace.dto.LoginForm;
 import com.recicar.marketplace.entity.User;
 import com.recicar.marketplace.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,9 +26,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class AuthController {
 
     private final UserService userService;
+    private final AuthenticationManager authenticationManager;
 
-    public AuthController(UserService userService) {
+    public AuthController(UserService userService, AuthenticationManager authenticationManager) {
         this.userService = userService;
+        this.authenticationManager = authenticationManager;
     }
 
     @GetMapping("/login")
@@ -36,6 +46,36 @@ public class AuthController {
             model.addAttribute("message", "You have been logged out successfully.");
         }
         return "auth/login";
+    }
+
+    @PostMapping("/login")
+    public String processLogin(@ModelAttribute("loginForm") LoginForm loginForm,
+                               Model model,
+                               RedirectAttributes redirectAttributes,
+                               HttpServletRequest request) {
+        try {
+            UsernamePasswordAuthenticationToken authRequest =
+                    new UsernamePasswordAuthenticationToken(loginForm.getEmail(), loginForm.getPassword());
+
+            Authentication authentication = authenticationManager.authenticate(authRequest);
+
+            // Create security context and session
+            SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+            securityContext.setAuthentication(authentication);
+            SecurityContextHolder.setContext(securityContext);
+
+            HttpSession session = request.getSession(true);
+            session.setAttribute("SPRING_SECURITY_CONTEXT", securityContext);
+
+            // Optional: flash message
+            redirectAttributes.addFlashAttribute("message", "Welcome back!");
+
+            return "redirect:/";
+        } catch (AuthenticationException ex) {
+            model.addAttribute("error", "Invalid email or password.");
+            model.addAttribute("registrationForm", new com.recicar.marketplace.dto.UserRegistrationDto());
+            return "auth/login";
+        }
     }
 
     @GetMapping("/register")
