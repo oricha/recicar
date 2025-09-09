@@ -10,3 +10,4 @@ public class HashGen {
         System.out.println(encoder.encode("customer123"));
     }
 }
+

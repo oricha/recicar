@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Mini Cart</title>
+</head>
+<body>
+    <div class="mini_cart" th:fragment="miniCart">
+        <div class="cart_close">
+            <div class="cart_text">
+                <h3>cart</h3>
+            </div>
+            <div class="mini_cart_close">
+                <a href="javascript:void(0)"><i class="ion-android-close"></i></a>
+            </div>
+        </div>
+
+        <div th:if="${cart != null and cart.items != null and !cart.items.empty}">
+            <div th:each="item : ${cart.items}" class="cart_item">
+                <div class="cart_img">
+                    <a th:href="@{/product-details(id=${item.productId})}"><img th:src="${item.imageUrl}" alt=""></a>
+                </div>
+                <div class="cart_info">
+                    <a th:href="@{/product-details(id=${item.productId})}" th:text="${item.productName}">Product</a>
+                    <span class="quantity" th:text="'Qty: ' + ${item.quantity}">Qty: 1</span>
+                    <span class="price_cart" th:text="'$' + ${#numbers.formatDecimal(item.price, 1, 2)}">$0.00</span>
+                </div>
+                <div class="cart_remove">
+                    <a th:href="@{'/cart/remove/' + ${item.id}}"><i class="ion-android-close"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${cart == null or cart.items == null or cart.items.empty}" class="empty_cart">
+            <p>Your cart is empty</p>
+        </div>
+
+        <div class="mini_cart_table">
+            <div class="cart_total">
+                <span>Sub total:</span>
+                <span class="price" th:text="'$' + ${#numbers.formatDecimal(cart != null ? cart.subtotal : 0, 1, 2)}">$0.00</span>
+            </div>
+        </div>
+
+        <div class="mini_cart_footer">
+            <div class="cart_button">
+                <a href="/cart">View cart</a>
+            </div>
+            <div class="cart_button">
+                <a class="active" href="/checkout">Checkout</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

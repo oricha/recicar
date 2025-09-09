@@ -297,7 +297,7 @@
                                                 <span class="old_price" th:if="${product.oldPrice != null}" th:text="${#numbers.formatCurrency(product.oldPrice)}">$3200.00</span>
                                             </div>
                                             <div class="add_to_cart">
-                                                <a href="/cart" title="añadir al carrito"><span class="lnr lnr-cart"></span></a>
+                                                <a href="#" class="js-add-to-cart" th:attr="data-product-id=${product.id}" title="añadir al carrito"><span class="lnr lnr-cart"></span></a>
                                             </div>
                                         </div>
                                     </div>
@@ -330,7 +330,7 @@
                                             <span class="old_price" th:if="${product.oldPrice != null}" th:text="${#numbers.formatCurrency(product.oldPrice)}">$420.00</span>
                                         </div>
                                         <div class="cart_links_btn">
-                                            <a href="#" title="add to cart">add to cart</a>
+                                            <a href="#" class="js-add-to-cart" th:attr="data-product-id=${product.id}" title="add to cart">add to cart</a>
                                         </div>
                                         <div class="action_links_btn">
                                             <ul>

@@ -155,49 +155,6 @@
                                 </div>
 
                         </form>
-                        <script>
-                        document.addEventListener('DOMContentLoaded', function () {
-                            // Ensure mini cart link navigates to cart page
-                            const miniCartLink = document.querySelector('.mini_cart_wrapper a');
-                            if (miniCartLink) miniCartLink.setAttribute('href', '/cart');
-
-                            // Initialize cart count on load
-                            fetch('/api/cart/count')
-                                .then(r => r.json())
-                                .then(data => {
-                                    const count = (data && typeof data.count === 'number') ? data.count : 0;
-                                    document.querySelectorAll('.cart_quantity, #cart-count').forEach(el => el.textContent = count);
-                                })
-                                .catch(() => {});
-
-                            const form = document.getElementById('add-to-cart-form');
-                            form.addEventListener('submit', function (e) {
-                                e.preventDefault();
-                                const fd = new FormData(form);
-                                const body = new URLSearchParams(fd);
-                                fetch('/api/cart/items', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                                    body
-                                }).then(r => r.json())
-                                  .then(cart => {
-                                      // compute total quantity in cart
-                                      const total = (cart.items || []).reduce((sum, it) => sum + (it.quantity || 0), 0);
-                                      document.querySelectorAll('.cart_quantity, #cart-count').forEach(el => el.textContent = total);
-                                      // Optional: simple feedback
-                                      const btn = form.querySelector('button[type="submit"]');
-                                      if (btn) {
-                                          const old = btn.textContent;
-                                          btn.disabled = true; btn.textContent = 'Added!';
-                                          setTimeout(() => { btn.disabled = false; btn.textContent = old; }, 1200);
-                                      }
-                                  })
-                                  .catch(err => {
-                                      console.error('Add to cart failed', err);
-                                  });
-                            });
-                        });
-                        </script>
                         <div class="priduct_social">
                             <ul>
                                 <li><a class="facebook" href="#" title="facebook"><i class="fa fa-facebook"></i> Me gusta</a></li>
@@ -792,7 +749,67 @@
 <!-- Main JS -->
 <script src="assets/js/main.js"></script>
 
+<!-- Product Details Specific JS -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Ensure mini cart link navigates to cart page
+    const miniCartLink = document.querySelector('.mini_cart_wrapper a');
+    if (miniCartLink) miniCartLink.setAttribute('href', '/cart');
 
+    // Initialize cart count on load
+    fetch('/api/cart/count')
+        .then(r => r.json())
+        .then(data => {
+            const count = (data && typeof data.count === 'number') ? data.count : 0;
+            document.querySelectorAll('.cart_quantity, #cart-count').forEach(el => el.textContent = count);
+        })
+        .catch(() => {});
+
+    const form = document.getElementById('add-to-cart-form');
+    if (form) {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const fd = new FormData(form);
+            const body = new URLSearchParams(fd);
+            fetch('/api/cart/items', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body
+            }).then(r => r.json())
+              .then(cart => {
+                  // compute total quantity in cart
+                  const total = (cart.items || []).reduce((sum, it) => sum + (it.quantity || 0), 0);
+                  document.querySelectorAll('.cart_quantity, #cart-count').forEach(el => el.textContent = total);
+                  // refresh mini-cart fragment and open it
+                  fetch('/mini-cart', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(r => r.text())
+                    .then(html => {
+                        const container = document.querySelector('.mini_cart');
+                        if (container) {
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(html, 'text/html');
+                            const miniCartContent = doc.querySelector('.mini_cart');
+                            if (miniCartContent) {
+                                container.innerHTML = miniCartContent.innerHTML;
+                            }
+                        }
+                        document.querySelectorAll('.mini_cart,.off_canvars_overlay').forEach(el => el.classList.add('active'));
+                    }).catch(() => {});
+                  // Optional: simple feedback
+                  const btn = form.querySelector('button[type="submit"]');
+                  if (btn) {
+                      const old = btn.textContent;
+                      btn.disabled = true; btn.textContent = 'Added!';
+                      setTimeout(() => { btn.disabled = false; btn.textContent = old; }, 1200);
+                  }
+              })
+              .catch(err => {
+                  console.error('Add to cart failed', err);
+              });
+        });
+    }
+});
+</script>
 
 </body>
 
