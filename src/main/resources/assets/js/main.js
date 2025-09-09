@@ -779,6 +779,14 @@ document.addEventListener('DOMContentLoaded', function() {
       document.querySelectorAll('.cart_quantity, #cart-count').forEach(el => el.textContent = count);
     }).catch(() => {});
 
+  // Init wishlist count on load
+  fetch('/api/wishlist/count')
+    .then(r => r.json())
+    .then(data => {
+      const count = (data && typeof data.count === 'number') ? data.count : 0;
+      document.querySelectorAll('.wishlist_quantity').forEach(el => el.textContent = count);
+    }).catch(() => {});
+
   const openMiniCart = () => {
     document.querySelectorAll('.mini_cart,.off_canvars_overlay').forEach(el => el.classList.add('active'));
   };
@@ -828,6 +836,34 @@ document.addEventListener('DOMContentLoaded', function() {
       })
       .then(() => Promise.all([updateCount(), refreshMiniCart()]))
       .then(() => openMiniCart())
+      .catch(() => {});
+  }, false);
+
+  // Delegate clicks to any .js-add-to-wishlist
+  document.body.addEventListener('click', function(e) {
+    const target = e.target.closest('.js-add-to-wishlist');
+    if (!target) return;
+    e.preventDefault();
+    const productId = target.getAttribute('data-product-id');
+    if (!productId) return;
+    const body = new URLSearchParams({ productId: productId });
+    fetch('/api/wishlist/items', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body
+    })
+      .then(r => {
+        if (!r.ok) throw new Error('Add to wishlist failed');
+        return r.json();
+      })
+      .then(data => {
+        const count = (data && typeof data.count === 'number') ? data.count : 0;
+        document.querySelectorAll('.wishlist_quantity').forEach(el => el.textContent = count);
+        // simple feedback
+        const old = target.textContent;
+        target.textContent = 'Added!';
+        setTimeout(() => { target.textContent = old || '+ Añadir a la lista de deseos'; }, 1200);
+      })
       .catch(() => {});
   }, false);
 });
