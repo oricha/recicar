@@ -768,3 +768,66 @@
     
     
 })(jQuery);	
+
+// Global Add-to-Cart handling and mini-cart refresh
+document.addEventListener('DOMContentLoaded', function() {
+  // Init cart count on load
+  fetch('/api/cart/count')
+    .then(r => r.json())
+    .then(data => {
+      const count = (data && typeof data.count === 'number') ? data.count : 0;
+      document.querySelectorAll('.cart_quantity, #cart-count').forEach(el => el.textContent = count);
+    }).catch(() => {});
+
+  const openMiniCart = () => {
+    document.querySelectorAll('.mini_cart,.off_canvars_overlay').forEach(el => el.classList.add('active'));
+  };
+
+  const refreshMiniCart = () => {
+    return fetch('/mini-cart', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+      .then(r => r.text())
+      .then(html => {
+        const container = document.querySelector('.mini_cart');
+        if (container) {
+          // Extract only the mini cart content from the response
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          const miniCartContent = doc.querySelector('.mini_cart');
+          if (miniCartContent) {
+            container.innerHTML = miniCartContent.innerHTML;
+          }
+        }
+      });
+  };
+
+  const updateCount = () => {
+    return fetch('/api/cart/count')
+      .then(r => r.json())
+      .then(data => {
+        const count = (data && typeof data.count === 'number') ? data.count : 0;
+        document.querySelectorAll('.cart_quantity, #cart-count').forEach(el => el.textContent = count);
+      });
+  };
+
+  // Delegate clicks to any .js-add-to-cart
+  document.body.addEventListener('click', function(e) {
+    const target = e.target.closest('.js-add-to-cart');
+    if (!target) return;
+    e.preventDefault();
+    const productId = target.getAttribute('data-product-id');
+    if (!productId) return;
+    const body = new URLSearchParams({ productId: productId, quantity: '1' });
+    fetch('/api/cart/items', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body
+    })
+      .then(r => {
+        if (!r.ok) throw new Error('Add to cart failed');
+        return r.json();
+      })
+      .then(() => Promise.all([updateCount(), refreshMiniCart()]))
+      .then(() => openMiniCart())
+      .catch(() => {});
+  }, false);
+});
