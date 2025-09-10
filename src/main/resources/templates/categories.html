@@ -1,0 +1,233 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" class="no-js" lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>ReciCar - Búsqueda rápida de categoría</title>
+    <meta name="description" content="Busca repuestos por categoría en ReciCar">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.ico">
+
+     <!-- CSS 
+    ========================= -->
+     <!--bootstrap min css-->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <!--owl carousel min css-->
+    <link rel="stylesheet" href="assets/css/owl.carousel.min.css">
+    <!--slick min css-->
+    <link rel="stylesheet" href="assets/css/slick.css">
+    <!--magnific popup min css-->
+    <link rel="stylesheet" href="assets/css/magnific-popup.css">
+    <!--font awesome css-->
+    <link rel="stylesheet" href="assets/css/font.awesome.css">
+    <!--ionicons min css-->
+    <link rel="stylesheet" href="assets/css/ionicons.min.css">
+    <!--animate css-->
+    <link rel="stylesheet" href="assets/css/animate.css">
+    <!--jquery ui min css-->
+    <link rel="stylesheet" href="assets/css/jquery-ui.min.css">
+    <!--slinky menu css-->
+    <link rel="stylesheet" href="assets/css/slinky.menu.css">
+    <!-- Plugins CSS -->
+    <link rel="stylesheet" href="assets/css/plugins.css">
+    
+    <!-- Main Style CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    
+    <!--modernizr min js here-->
+    <script src="assets/js/vendor/modernizr-3.7.1.min.js"></script>
+
+    <style>
+        .categories-page {
+            background-color: #ffffff;
+            min-height: 100vh;
+        }
+        
+        .categories-header {
+            background-color: #ffffff;
+            padding: 40px 0 20px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .categories-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #333333;
+            margin: 0;
+            text-align: left;
+        }
+        
+        .categories-list {
+            background-color: #ffffff;
+            padding: 20px 0 40px 0;
+        }
+        
+        .category-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #f0f0f0;
+            text-decoration: none;
+            color: #333333;
+            transition: background-color 0.2s ease;
+        }
+        
+        .category-item:hover {
+            background-color: #f8f9fa;
+            text-decoration: none;
+            color: #333333;
+        }
+        
+        .category-item:last-child {
+            border-bottom: none;
+        }
+        
+        .category-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 16px;
+            color: #666666;
+            flex-shrink: 0;
+        }
+        
+        .category-name {
+            flex: 1;
+            font-size: 16px;
+            font-weight: 400;
+            color: #333333;
+            margin: 0;
+        }
+        
+        .category-arrow {
+            width: 16px;
+            height: 16px;
+            color: #999999;
+            flex-shrink: 0;
+        }
+        
+        .container-custom {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Main Wrapper Start -->
+    <!--header area start-->
+    <th:block th:replace="fragments/_header :: header"></th:block>
+    <!--header area end-->
+
+    <!--Offcanvas menu area start-->
+    <th:block th:replace="fragments/_offcanvasmenu :: offcanvasmenu"></th:block>
+    <!--Offcanvas menu area end-->
+
+    <!-- Categories Page Start -->
+    <div class="categories-page">
+        <div class="container-custom">
+            <!-- Categories Header -->
+            <div class="categories-header">
+                <h1 class="categories-title">Búsqueda rápida de categoría</h1>
+            </div>
+            
+            <!-- Categories List -->
+            <div class="categories-list">
+                <a th:each="category : ${categories}" class="category-item" th:href="@{'/categories/' + ${category.slug}}">
+                    <!-- Category Icons -->
+                    <div class="category-icon">
+                        <!-- Caja de cambios/embrague/transmisión -->
+                        <i th:if="${category.slug == 'caja-cambios-embrague-transmision'}" class="fa fa-cogs"></i>
+                        <!-- Carrocería/repuestos de carrocería/gancho -->
+                        <i th:if="${category.slug == 'carroceria-repuestos-gancho'}" class="fa fa-car"></i>
+                        <!-- Dispositivos/interruptores/sistema electrónico -->
+                        <i th:if="${category.slug == 'dispositivos-interruptores-electronico'}" class="fa fa-tachometer"></i>
+                        <!-- Eje delantero -->
+                        <i th:if="${category.slug == 'eje-delantero'}" class="fa fa-circle-o"></i>
+                        <!-- Eje trasero -->
+                        <i th:if="${category.slug == 'eje-trasero'}" class="fa fa-circle-o"></i>
+                        <!-- Habitáculo/interior -->
+                        <i th:if="${category.slug == 'habitaculo-interior'}" class="fa fa-user"></i>
+                        <!-- Lunas -->
+                        <i th:if="${category.slug == 'lunas'}" class="fa fa-square-o"></i>
+                        <!-- Motor -->
+                        <i th:if="${category.slug == 'motor'}" class="fa fa-cog"></i>
+                        <!-- Otros repuestos -->
+                        <i th:if="${category.slug == 'otros-repuestos'}" class="fa fa-wrench"></i>
+                        <!-- Puerta -->
+                        <i th:if="${category.slug == 'puerta'}" class="fa fa-square"></i>
+                        <!-- Radiador de calefacción/aire acondicionado -->
+                        <i th:if="${category.slug == 'radiador-calefaccion-aire-acondicionado'}" class="fa fa-thermometer-half"></i>
+                        <!-- Repuestos de carrocería delantera exterior -->
+                        <i th:if="${category.slug == 'repuestos-carroceria-delantera-exterior'}" class="fa fa-car"></i>
+                        <!-- Repuestos de la carrocería exterior trasera -->
+                        <i th:if="${category.slug == 'repuestos-carroceria-exterior-trasera'}" class="fa fa-car"></i>
+                        <!-- Ruedas/neumáticos/tapacubos -->
+                        <i th:if="${category.slug == 'ruedas-neumaticos-tapacubos'}" class="fa fa-circle"></i>
+                        <!-- Sistema de frenos -->
+                        <i th:if="${category.slug == 'sistema-frenos'}" class="fa fa-stop-circle"></i>
+                        <!-- Sistema de iluminación -->
+                        <i th:if="${category.slug == 'sistema-iluminacion'}" class="fa fa-lightbulb-o"></i>
+                        <!-- Sistema de limpiado/lavado del faro -->
+                        <i th:if="${category.slug == 'sistema-limpiado-lavado-faro'}" class="fa fa-shower"></i>
+                        <!-- Sistema de mezcla de combustible -->
+                        <i th:if="${category.slug == 'sistema-mezcla-combustible'}" class="fa fa-tint"></i>
+                        <!-- Sistema del tubo de escape -->
+                        <i th:if="${category.slug == 'sistema-tubo-escape'}" class="fa fa-pipe"></i>
+                    </div>
+                    
+                    <h3 class="category-name" th:text="${category.name}">Categoría</h3>
+                    
+                    <div class="category-arrow">
+                        <i class="fa fa-chevron-right"></i>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <!-- Categories Page End -->
+
+    <!--call to action start-->
+    <th:block th:replace="fragments/_calltoaction :: calltoaction"></th:block>
+    <!--call to action end-->
+
+    <!--footer area start-->
+    <th:block th:replace="fragments/_footer :: footer"></th:block>
+    <!--footer area end-->
+
+    <!-- JS
+    ============================================ -->
+    <!--jquery min js-->
+    <script src="assets/js/vendor/jquery-3.4.1.min.js"></script>
+    <!--popper min js-->
+    <script src="assets/js/popper.js"></script>
+    <!--bootstrap min js-->
+    <script src="assets/js/bootstrap.min.js"></script>
+    <!--owl carousel min js-->
+    <script src="assets/js/owl.carousel.min.js"></script>
+    <!--slick min js-->
+    <script src="assets/js/slick.min.js"></script>
+    <!--magnific popup min js-->
+    <script src="assets/js/jquery.magnific-popup.min.js"></script>
+    <!--jquery countdown min js-->
+    <script src="assets/js/jquery.countdown.js"></script>
+    <!--jquery ui min js-->
+    <script src="assets/js/jquery.ui.js"></script>
+    <!--jquery elevatezoom min js-->
+    <script src="assets/js/jquery.elevatezoom.js"></script>
+    <!--isotope packaged min js-->
+    <script src="assets/js/isotope.pkgd.min.js"></script>
+    <!--slinky menu js-->
+    <script src="assets/js/slinky.menu.js"></script>
+    <!-- Plugins JS -->
+    <script src="assets/js/plugins.js"></script>
+
+    <!-- Main JS -->
+    <script src="assets/js/main.js"></script>
+
+
+</body>
+
+</html>
