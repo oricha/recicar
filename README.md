@@ -42,6 +42,15 @@ A comprehensive web application that connects customers with junkyards and auto 
    ./gradlew bootRun
    ```
 
+
+3. **Run the Cucumber tests**
+   ```bash
+      - Local: ./gradlew cukeLocalRun
+      - Remote: ./gradlew cukeRemote
+   ```
+
+
+
 4. **Access the application**
    - Application: http://localhost:8080
    - Health Check: http://localhost:8080/actuator/health
