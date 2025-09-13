@@ -26,6 +26,31 @@ repositories {
     mavenCentral()
 }
 
+// Cucumber source set for BDD specs
+sourceSets {
+    cucumber {
+        java {
+            srcDirs = ['src/cucumber/java']
+        }
+        resources {
+            srcDirs = ['src/cucumber/resources']
+        }
+        // Ensure Cucumber can see main and test dependencies
+        compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
+        runtimeClasspath += output + compileClasspath
+    }
+}
+
+configurations {
+    // Ensure cucumber source set can use test and main deps
+    cucumberImplementation {
+        extendsFrom testImplementation
+    }
+    cucumberRuntimeOnly {
+        extendsFrom testRuntimeOnly
+    }
+}
+
 dependencies {
     // Spring Boot Starters
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
@@ -64,6 +89,12 @@ dependencies {
     testImplementation 'org.testcontainers:junit-jupiter'
     testImplementation 'org.testcontainers:postgresql'
     testRuntimeOnly 'com.h2database:h2'
+
+    // Cucumber (BDD)
+    cucumberImplementation 'io.cucumber:cucumber-java:7.14.0'
+    cucumberImplementation 'io.cucumber:cucumber-spring:7.14.0'
+    // Optional: engine to allow running Cucumber via JUnit Platform if desired
+    testImplementation 'io.cucumber:cucumber-junit-platform-engine:7.14.0'
 }
 
 tasks.named('test') {
@@ -80,3 +111,6 @@ flyway {
 application {
     mainClass = 'com.recicar.marketplace.MarketplaceApplication'
 }
+
+// Apply Cucumber task wiring and runners
+apply from: 'gradle/cucumber.gradle'

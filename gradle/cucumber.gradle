@@ -1,0 +1,58 @@
+// Cucumber task configuration and runners
+
+ext {
+    // Main entry point for CLI execution
+    cucumberMainClass = 'io.cucumber.core.cli.Main'
+    // Package with step definitions and hooks
+    cucumberGlue = 'com.recicar'
+    // Features location (points at cucumber resources folder)
+    cucumberFeaturesDir = 'src/cucumber/resources'
+}
+
+def log4jConfigPath = file('src/cucumber/resources/log4j2-cucumber.xml').exists() ?
+        file('src/cucumber/resources/log4j2-cucumber.xml').absolutePath : null
+
+tasks.register('cukeLocalRun', JavaExec) {
+    group = 'verification'
+    description = 'Run Cucumber features with the local profile.'
+    dependsOn tasks.named('cucumberClasses')
+
+    mainClass.set(cucumberMainClass)
+    classpath = sourceSets.cucumber.runtimeClasspath
+
+    // Basic, readable reporting and HTML output
+    args '--plugin', 'pretty',
+         '--plugin', 'summary',
+         '--plugin', 'html:build/reports/cucumber/local',
+         '--glue', cucumberGlue,
+         cucumberFeaturesDir
+
+    // Quieten Cucumber publish banner
+    systemProperty 'cucumber.publish.quiet', 'true'
+    // Activate Spring profile for local run
+    systemProperty 'spring.profiles.active', 'local'
+    if (log4jConfigPath) {
+        systemProperty 'log4j.configurationFile', log4jConfigPath
+    }
+}
+
+tasks.register('cukeRemote', JavaExec) {
+    group = 'verification'
+    description = 'Run Cucumber features with the remote profile.'
+    dependsOn tasks.named('cucumberClasses')
+
+    mainClass.set(cucumberMainClass)
+    classpath = sourceSets.cucumber.runtimeClasspath
+
+    args '--plugin', 'pretty',
+         '--plugin', 'summary',
+         '--plugin', 'html:build/reports/cucumber/remote',
+         '--glue', cucumberGlue,
+         cucumberFeaturesDir
+
+    systemProperty 'cucumber.publish.quiet', 'true'
+    systemProperty 'spring.profiles.active', 'remote'
+    if (log4jConfigPath) {
+        systemProperty 'log4j.configurationFile', log4jConfigPath
+    }
+}
