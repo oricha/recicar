@@ -6,6 +6,8 @@ import com.recicar.marketplace.dto.OrderRequest;
 import com.recicar.marketplace.dto.PaymentRequest;
 import com.recicar.marketplace.dto.ShippingInfoRequest;
 import com.recicar.marketplace.entity.Order;
+import com.recicar.marketplace.entity.User;
+import com.recicar.marketplace.repository.UserRepository;
 import com.recicar.marketplace.service.CartService;
 import com.recicar.marketplace.service.OrderService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,16 +27,25 @@ public class CheckoutController {
 
     private final CartService cartService;
     private final OrderService orderService;
+    private final UserRepository userRepository;
 
-    public CheckoutController(CartService cartService, OrderService orderService) {
+    public CheckoutController(CartService cartService, OrderService orderService, UserRepository userRepository) {
         this.cartService = cartService;
         this.orderService = orderService;
+        this.userRepository = userRepository;
     }
 
     @GetMapping
     public String checkoutPage(@AuthenticationPrincipal UserDetails userDetails, Model model) {
-        // TODO: Get user ID from userDetails
-        Long userId = 1L; // Assuming user ID is 1 for now
+        if (userDetails == null) {
+            return "redirect:/login";
+        }
+        String email = userDetails.getUsername();
+        User user = userRepository.findByEmailIgnoreCase(email).orElse(null);
+        if (user == null) {
+            return "redirect:/login";
+        }
+        Long userId = user.getId();
         cartService.validateCart(userId);
 
         CartDto cart = cartService.getCart(userId);
@@ -50,8 +61,15 @@ public class CheckoutController {
 
     @PostMapping
     public String placeOrder(@AuthenticationPrincipal UserDetails userDetails, @ModelAttribute CheckoutForm checkoutForm) {
-        // TODO: Get user ID from userDetails
-        Long userId = 1L; // Assuming user ID is 1 for now
+        if (userDetails == null) {
+            return "redirect:/login";
+        }
+        String email = userDetails.getUsername();
+        User user = userRepository.findByEmailIgnoreCase(email).orElse(null);
+        if (user == null) {
+            return "redirect:/login";
+        }
+        Long userId = user.getId();
         cartService.validateCart(userId);
 
         CartDto cart = cartService.getCart(userId);

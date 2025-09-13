@@ -73,6 +73,16 @@ public class CartController {
         return "redirect:/cart";
     }
 
+    @PostMapping("/checkout")
+    public String proceedToCheckout(@AuthenticationPrincipal UserDetails userDetails) {
+        Long userId = resolveUserId(userDetails);
+        if (userId == null) {
+            return "redirect:/login";
+        }
+        cartService.validateCart(userId);
+        return "redirect:/checkout";
+    }
+
     private Long resolveUserId(UserDetails userDetails) {
         if (userDetails == null) return null;
         String email = userDetails.getUsername();

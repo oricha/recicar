@@ -11,5 +11,7 @@ public interface NotificationService {
 
     void sendAccountVerificationEmail(User user);
 
+    void sendPasswordResetEmail(User user, String resetLink);
+
     // Other notification methods
 }
