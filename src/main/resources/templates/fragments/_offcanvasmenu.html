@@ -17,13 +17,21 @@
 
                         <div class="top_right text-end">
                             <ul>
-                                <li class="top_links"><a href="#"><i class="ion-android-person"></i> Mi cuenta<i class="ion-ios-arrow-down"></i></a>
+                                <!-- Authenticated: show full My Account dropdown -->
+                                <li class="top_links" th:if="${isAuthenticated}">
+                                    <a href="#"><i class="ion-android-person"></i> My account<i class="ion-ios-arrow-down"></i></a>
                                     <ul class="dropdown_links">
-                                        <li><a href="/checkout">Finalizar compra </a></li>
-                                        <li><a href="/my-account">Mi cuenta </a></li>
-                                        <li><a href="/cart">Carrito</a></li>
-                                        <li><a href="/wishlist">Lista de deseos</a></li>
+                                        <li><a href="/checkout">Checkout</a></li>
+                                        <li><a href="/my-account">My account</a></li>
+                                        <li><a href="/cart">Cart</a></li>
+                                        <li><a href="/wishlist">Wishlist</a></li>
+                                        <li><a href="/logout">Logout</a></li>
                                     </ul>
+                                </li>
+
+                                <!-- Unauthenticated: show Login only (no dropdown) -->
+                                <li class="top_links" th:if="${!isAuthenticated}">
+                                    <a href="/login"><i class="ion-android-person"></i> Login</a>
                                 </li>
                             </ul>
                         </div>

@@ -6,6 +6,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.security.core.Authentication;
+import com.recicar.marketplace.service.CustomUserDetailsService;
 
 @Controller
 public class HomeController {
@@ -19,7 +21,7 @@ public class HomeController {
     }
 
     @GetMapping("/")
-    public String home(Model model) {
+    public String home(Model model, Authentication authentication) {
         // Get featured products (latest 8 products)
         var featuredProducts = productService.findActiveProducts(0, 12);
         model.addAttribute("products", featuredProducts.getContent());
@@ -43,7 +45,14 @@ public class HomeController {
         } else {
             model.addAttribute("engineParts", java.util.List.of());
         }
-        
+        // Add authentication information to the model
+        boolean isAuthenticated = authentication != null && authentication.isAuthenticated();
+        model.addAttribute("isAuthenticated", isAuthenticated);
+
+        if (isAuthenticated && authentication.getPrincipal() instanceof CustomUserDetailsService.CustomUserPrincipal userPrincipal) {
+            model.addAttribute("currentUser", userPrincipal.getUser());
+        }
+
         return "index";
     }
     
