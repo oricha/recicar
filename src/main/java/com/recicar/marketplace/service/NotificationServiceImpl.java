@@ -18,4 +18,10 @@ public class NotificationServiceImpl implements NotificationService {
         System.out.println("Simulating sending account verification email to user: " + user.getEmail());
         // In a real application, integrate with an email service provider here
     }
+
+    @Override
+    public void sendPasswordResetEmail(User user, String resetLink) {
+        System.out.println("Simulating sending password reset email to: " + user.getEmail() + ", link: " + resetLink);
+        // In a real application, integrate with an email service provider here
+    }
 }

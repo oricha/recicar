@@ -35,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 @SpringBootTest
+@org.springframework.test.context.ActiveProfiles("test")
 @AutoConfigureMockMvc
 public class CheckoutControllerIntegrationTest {
 
@@ -79,6 +80,7 @@ public class CheckoutControllerIntegrationTest {
         mockOrder.setOrderNumber("ORD-12345");
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(mockUser));
+        when(userRepository.findByEmailIgnoreCase("test@example.com")).thenReturn(Optional.of(mockUser));
         when(productRepository.findById(anyLong())).thenReturn(Optional.of(mockProduct));
         when(cartService.getCart(anyLong())).thenReturn(mockCartDto);
         when(cartService.calculateShippingCost(anyLong(), anyString(), anyString(), anyString())).thenReturn(new BigDecimal("5.00"));

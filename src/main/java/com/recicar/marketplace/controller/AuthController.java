@@ -136,4 +136,30 @@ public class AuthController {
         }
         return "redirect:/forgot-password";
     }
+
+    @GetMapping("/reset-password")
+    public String showResetPassword(@RequestParam("token") String token, Model model) {
+        model.addAttribute("token", token);
+        return "auth/reset-password";
+    }
+
+    @PostMapping("/reset-password")
+    public String processResetPassword(@RequestParam("token") String token,
+                                       @RequestParam("password") String password,
+                                       @RequestParam("confirmPassword") String confirmPassword,
+                                       RedirectAttributes redirectAttributes) {
+        if (!password.equals(confirmPassword)) {
+            redirectAttributes.addFlashAttribute("error", "Passwords do not match.");
+            redirectAttributes.addFlashAttribute("token", token);
+            return "redirect:/reset-password?token=" + token;
+        }
+        boolean ok = userService.resetPassword(token, password);
+        if (ok) {
+            redirectAttributes.addFlashAttribute("message", "Password updated. You can now sign in.");
+            return "redirect:/login";
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Invalid or expired reset link.");
+            return "redirect:/forgot-password";
+        }
+    }
 }
