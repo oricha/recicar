@@ -1,74 +1,120 @@
 package com.recicar.marketplace.controller;
 
 import com.recicar.marketplace.dto.CartDto;
+import com.recicar.marketplace.dto.CartItemDto;
 import com.recicar.marketplace.service.CartService;
 import com.recicar.marketplace.repository.UserRepository;
+import com.recicar.marketplace.repository.ProductRepository;
 import com.recicar.marketplace.entity.User;
+import com.recicar.marketplace.entity.Product;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/cart")
 public class CartController {
 
+    private static final String SESSION_CART_KEY = "SESSION_CART";
+
     private final CartService cartService;
     private final UserRepository userRepository;
+    private final ProductRepository productRepository;
 
-    public CartController(CartService cartService, UserRepository userRepository) {
+    public CartController(CartService cartService, UserRepository userRepository, ProductRepository productRepository) {
         this.cartService = cartService;
         this.userRepository = userRepository;
+        this.productRepository = productRepository;
     }
 
     @GetMapping
-    public String getCartPage(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+    public String getCartPage(@AuthenticationPrincipal UserDetails userDetails, HttpSession session, Model model) {
         Long userId = resolveUserId(userDetails);
         CartDto cart;
         if (userId != null) {
             cart = cartService.getCart(userId);
         } else {
+            // Anonymous user - get cart from session
+            List<CartItemDto> sessionCart = getSessionCart(session);
+            // Ensure each item has id set to productId for consistency
+            for (CartItemDto item : sessionCart) {
+                if (item.getId() == null) {
+                    item.setId(item.getProductId());
+                }
+            }
             cart = new CartDto();
-            cart.setItems(java.util.Collections.emptyList());
-            cart.setSubtotal(java.math.BigDecimal.ZERO);
+            cart.setItems(sessionCart);
+            // Calculate subtotal for session cart
+            cart.setSubtotal(sessionCart.stream()
+                    .map(item -> item.getPrice().multiply(java.math.BigDecimal.valueOf(item.getQuantity())))
+                    .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add));
         }
         model.addAttribute("cart", cart);
         return "cart";
     }
 
     @PostMapping("/items")
-    public String addItemToCart(@AuthenticationPrincipal UserDetails userDetails, @RequestParam Long productId, @RequestParam int quantity) {
+    public String addItemToCart(@AuthenticationPrincipal UserDetails userDetails, HttpSession session, @RequestParam Long productId, @RequestParam int quantity) {
         Long userId = resolveUserId(userDetails);
         if (userId != null) {
             cartService.addItemToCart(userId, productId, quantity);
+        } else {
+            // Anonymous user - add to session cart
+            List<CartItemDto> sessionCart = getSessionCart(session);
+            addItemToSessionCart(sessionCart, productId, quantity);
+            session.setAttribute(SESSION_CART_KEY, sessionCart);
         }
         return "redirect:/cart";
     }
 
     @PostMapping("/update")
-    public String updateCart(@AuthenticationPrincipal UserDetails userDetails, @RequestParam("items[0].id") Long itemId, @RequestParam("items[0].quantity") int quantity) {
+    public String updateCart(@AuthenticationPrincipal UserDetails userDetails, HttpSession session, @RequestParam("items[0].id") Long itemId, @RequestParam("items[0].quantity") int quantity) {
         Long userId = resolveUserId(userDetails);
         if (userId != null) {
             cartService.updateItemInCart(userId, itemId, quantity);
+        } else {
+            // Anonymous user - update session cart
+            List<CartItemDto> sessionCart = getSessionCart(session);
+            for (CartItemDto item : sessionCart) {
+                if (item.getId() != null && item.getId().equals(itemId)) {
+                    item.setQuantity(quantity);
+                    break;
+                }
+            }
+            session.setAttribute(SESSION_CART_KEY, sessionCart);
         }
         return "redirect:/cart";
     }
 
     @GetMapping("/remove/{itemId}")
-    public String removeItemFromCart(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long itemId) {
+    public String removeItemFromCart(@AuthenticationPrincipal UserDetails userDetails, HttpSession session, @PathVariable Long itemId) {
         Long userId = resolveUserId(userDetails);
         if (userId != null) {
             cartService.removeItemFromCart(userId, itemId);
+        } else {
+            // Anonymous user - remove from session cart
+            List<CartItemDto> sessionCart = getSessionCart(session);
+            sessionCart.removeIf(item -> item.getId() != null && item.getId().equals(itemId));
+            session.setAttribute(SESSION_CART_KEY, sessionCart);
         }
         return "redirect:/cart";
     }
 
     @GetMapping("/clear")
-    public String clearCart(@AuthenticationPrincipal UserDetails userDetails) {
+    public String clearCart(@AuthenticationPrincipal UserDetails userDetails, HttpSession session) {
         Long userId = resolveUserId(userDetails);
         if (userId != null) {
             cartService.clearCart(userId);
+        } else {
+            // Anonymous user - clear session cart
+            List<CartItemDto> sessionCart = getSessionCart(session);
+            sessionCart.clear();
+            session.setAttribute(SESSION_CART_KEY, sessionCart);
         }
         return "redirect:/cart";
     }
@@ -81,6 +127,49 @@ public class CartController {
         }
         cartService.validateCart(userId);
         return "redirect:/checkout";
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<CartItemDto> getSessionCart(HttpSession session) {
+        List<CartItemDto> cart = (List<CartItemDto>) session.getAttribute(SESSION_CART_KEY);
+        if (cart == null) {
+            cart = new java.util.ArrayList<>();
+            session.setAttribute(SESSION_CART_KEY, cart);
+        }
+        return cart;
+    }
+
+    private void addItemToSessionCart(List<CartItemDto> cart, Long productId, int quantity) {
+        // Check if item already exists in cart
+        for (CartItemDto item : cart) {
+            if (item.getProductId().equals(productId)) {
+                item.setQuantity(item.getQuantity() + quantity);
+                return;
+            }
+        }
+
+        // Item doesn't exist, add new item with product details
+        var productOpt = productRepository.findById(productId);
+        if (productOpt.isPresent()) {
+            var product = productOpt.get();
+            CartItemDto newItem = new CartItemDto();
+            newItem.setId(productId); // Use productId as id for session cart
+            newItem.setProductId(productId);
+            newItem.setQuantity(quantity);
+            newItem.setProductName(product.getName());
+            newItem.setPrice(product.getPrice());
+
+            // Set image URL if available
+            if (product.getImages() != null && !product.getImages().isEmpty()) {
+                var primaryImage = product.getImages().stream()
+                        .filter(img -> img.isPrimary())
+                        .findFirst()
+                        .orElse(product.getImages().get(0));
+                newItem.setImageUrl(primaryImage.getImageUrl());
+            }
+
+            cart.add(newItem);
+        }
     }
 
     private Long resolveUserId(UserDetails userDetails) {

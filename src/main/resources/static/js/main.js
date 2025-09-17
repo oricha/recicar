@@ -772,7 +772,84 @@
     }
     
     
-})(jQuery);	
+})(jQuery);
+
+    // Cart functionality
+    $(document).ready(function() {
+        // Initialize cart count on page load
+        updateCartCount();
+
+        // Handle Add to Cart button clicks
+        $(document).on('click', '.js-add-to-cart', function(e) {
+            e.preventDefault();
+
+            const button = $(this);
+            const productId = button.data('product-id');
+            const quantity = 1; // Default quantity, could be enhanced to get from input field
+
+            if (!productId) {
+                console.error('Product ID not found');
+                return;
+            }
+
+            // Disable button and show loading state
+            const originalHtml = button.html();
+            button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+
+            // Add item to cart
+            $.ajax({
+                url: '/api/cart/items',
+                method: 'POST',
+                data: {
+                    productId: productId,
+                    quantity: quantity
+                },
+                success: function(cartData) {
+                    // Update cart count after successful addition
+                    updateCartCount();
+
+                    // Show success feedback
+                    button.html('<i class="fas fa-check"></i> Added!');
+                    setTimeout(function() {
+                        button.prop('disabled', false).html(originalHtml);
+                    }, 2000);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error adding item to cart:', error);
+
+                    // Handle different error types
+                    if (xhr.status === 400) {
+                        // Bad request - possibly out of stock or invalid product
+                        alert('Unable to add item to cart. Please try again.');
+                    } else {
+                        // Generic error
+                        alert('An error occurred while adding the item to your cart.');
+                    }
+
+                    // Reset button
+                    button.prop('disabled', false).html(originalHtml);
+                }
+            });
+        });
+    });
+
+    // Function to update cart count in header
+    function updateCartCount() {
+        $.ajax({
+            url: '/api/cart/count',
+            method: 'GET',
+            success: function(data) {
+                const count = data.count || 0;
+                // Update both counter elements
+                $('#cart-count').text(count);
+                $('.cart_quantity').text(count);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error updating cart count:', error);
+                // Don't show error to user for count updates, just log it
+            }
+        });
+    }
 
     // Car Part Search Logic
     $(document).ready(function() {
