@@ -775,37 +775,42 @@ document.addEventListener('DOMContentLoaded', function () {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body
-            }).then(r => r.json())
-              .then(cart => {
-                  // compute total quantity in cart
-                  const total = (cart.items || []).reduce((sum, it) => sum + (it.quantity || 0), 0);
-                  document.querySelectorAll('.cart_quantity, #cart-count').forEach(el => el.textContent = total);
-                  // refresh mini-cart fragment and open it
-                  fetch('/mini-cart', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-                    .then(r => r.text())
-                    .then(html => {
-                        const container = document.querySelector('.mini_cart');
-                        if (container) {
-                            const parser = new DOMParser();
-                            const doc = parser.parseFromString(html, 'text/html');
-                            const miniCartContent = doc.querySelector('.mini_cart');
-                            if (miniCartContent) {
-                                container.innerHTML = miniCartContent.innerHTML;
-                            }
-                        }
-                        document.querySelectorAll('.mini_cart,.off_canvars_overlay').forEach(el => el.classList.add('active'));
-                    }).catch(() => {});
-                  // Optional: simple feedback
-                  const btn = form.querySelector('button[type="submit"]');
-                  if (btn) {
-                      const old = btn.textContent;
-                      btn.disabled = true; btn.textContent = 'Added!';
-                      setTimeout(() => { btn.disabled = false; btn.textContent = old; }, 1200);
-                  }
-              })
-              .catch(err => {
-                  console.error('Add to cart failed', err);
-              });
+            }).then(r => {
+                if (!r.ok) {
+                    throw new Error('Failed to add item to cart');
+                }
+                return r.json();
+            }).then(cart => {
+                if (!cart) return; // Already handled 401 case
+                // compute total quantity in cart
+                const total = (cart.items || []).reduce((sum, it) => sum + (it.quantity || 0), 0);
+                document.querySelectorAll('.cart_quantity, #cart-count').forEach(el => el.textContent = total);
+                // refresh mini-cart fragment and open it
+                fetch('/mini-cart', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                  .then(r => r.text())
+                  .then(html => {
+                      const container = document.querySelector('.mini_cart');
+                      if (container) {
+                          const parser = new DOMParser();
+                          const doc = parser.parseFromString(html, 'text/html');
+                          const miniCartContent = doc.querySelector('.mini_cart');
+                          if (miniCartContent) {
+                              container.innerHTML = miniCartContent.innerHTML;
+                          }
+                      }
+                      document.querySelectorAll('.mini_cart,.off_canvars_overlay').forEach(el => el.classList.add('active'));
+                  }).catch(() => {});
+                // Optional: simple feedback
+                const btn = form.querySelector('button[type="submit"]');
+                if (btn) {
+                    const old = btn.textContent;
+                    btn.disabled = true; btn.textContent = 'Added!';
+                    setTimeout(() => { btn.disabled = false; btn.textContent = old; }, 1200);
+                }
+            }).catch(err => {
+                console.error('Add to cart failed', err);
+                alert('Failed to add item to cart. Please try again.');
+            });
         });
     }
 });

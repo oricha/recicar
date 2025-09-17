@@ -59,8 +59,8 @@
                 <div class="col-12">
                     <div class="breadcrumb_content">
                         <ul>
-                            <li><a href="/">home</a></li>
-                            <li>Shopping Cart</li>
+                            <li><a href="/">inicio</a></li>
+                            <li>Carrito de Compras</li>
                         </ul>
                     </div>
                 </div>
@@ -80,17 +80,17 @@
                                 <table>
                                     <thead>
                                         <tr>
-                                            <th class="product_remove">Delete</th>
-                                            <th class="product_thumb">Image</th>
-                                            <th class="product_name">Product</th>
-                                            <th class="product-price">Price</th>
-                                            <th class="product_quantity">Quantity</th>
+                                            <th class="product_remove">Eliminar</th>
+                                            <th class="product_thumb">Imagen</th>
+                                            <th class="product_name">Producto</th>
+                                            <th class="product-price">Precio</th>
+                                            <th class="product_quantity">Cantidad</th>
                                             <th class="product_total">Total</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr th:if="${cart == null || #lists.isEmpty(cart.items)}">
-                                            <td colspan="6" class="text-center">Your cart is empty.</td>
+                                            <td colspan="6" class="text-center">Tu carrito está vacío.</td>
                                         </tr>
                                         <tr th:each="item, iterStat : ${cart.items}">
                                             <td class="product_remove">
@@ -108,9 +108,9 @@
                                             <td class="product_quantity">
                                                 <form th:action="@{/cart/update}" method="post" class="d-flex align-items-center gap-2">
                                                     <input type="hidden" name="items[0].id" th:value="${item.id}">
-                                                    <label class="me-2">Quantity</label>
+                                                    <label class="me-2">Cantidad</label>
                                                     <input name="items[0].quantity" min="1" max="100" th:value="${item.quantity}" type="number">
-                                                    <button type="submit" class="btn btn-sm btn-outline-primary ms-2">Update</button>
+                                                    <button type="submit" class="btn btn-sm btn-outline-primary ms-2">Actualizar</button>
                                                 </form>
                                             </td>
                                             <td class="product_total" th:text="${#numbers.formatCurrency(item.price.multiply(T(java.math.BigDecimal).valueOf(item.quantity)))}">€0.00</td>
@@ -119,7 +119,7 @@
                                 </table>
                             </div>
                             <div class="cart_submit" th:if="${cart != null && !#lists.isEmpty(cart.items)}">
-                                <a class="btn btn-outline-danger" th:href="@{/cart/clear}">Clear cart</a>
+                                <a class="btn btn-outline-danger" th:href="@{/cart/clear}">Vaciar carrito</a>
                             </div>
                         </div>
                     </div>
@@ -129,34 +129,34 @@
                     <div class="row">
                         <div class="col-lg-6 col-md-6">
                             <div class="coupon_code left">
-                                <h3>Coupon</h3>
+                                <h3>Cupón</h3>
                                 <div class="coupon_inner">
-                                    <p>Enter your coupon code if you have one.</p>
+                                    <p>Introduce tu código de cupón si tienes uno.</p>
                                     <input placeholder="Coupon code" type="text">
-                                    <button type="submit">Apply coupon</button>
+                                    <button type="submit">Aplicar cupón</button>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-6 col-md-6">
                             <div class="coupon_code right">
-                                <h3>Cart Totals</h3>
+                                <h3>Totales del carrito</h3>
                                 <div class="coupon_inner">
                                     <div class="cart_subtotal">
                                         <p>Subtotal</p>
                                         <p class="cart_amount" th:text="${#numbers.formatCurrency(cart.subtotal)}">€0.00</p>
                                     </div>
                                     <div class="cart_subtotal ">
-                                        <p>Shipping</p>
-                                        <p class="cart_amount"><span>Flat Rate:</span> £255.00</p>
+                                        <p>Envío</p>
+                                        <p class="cart_amount"><span>Tarifa fija:</span> £255.00</p>
                                     </div>
-                                    <a href="#">Calculate shipping</a>
+                                    <a href="#">Calcular envío</a>
 
                                     <div class="cart_subtotal">
                                         <p>Total</p>
                                         <p class="cart_amount">£215.00</p>
                                     </div>
                                     <div class="checkout_btn">
-                                        <a th:href="@{/checkout}">Proceed to Checkout</a>
+                                        <a th:href="@{/checkout}">Proceder al Pago</a>
                                     </div>
                                 </div>
                             </div>
