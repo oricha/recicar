@@ -346,13 +346,59 @@
                     </div>
 
                     <div class="shop_toolbar t_bottom">
-                        <div class="pagination">
+                        <div class="pagination" th:if="${page != null}">
                             <ul>
-                                <li th:if="${page.hasPrevious()}"><a th:href="@{/list(page=${page.number-1})}">Previous</a></li>
-                                <li th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}" th:class="${i == page.number ? 'current' : ''}">
-                                    <a th:href="@{/list(page=${i})}" th:text="${i + 1}">1</a>
+                                <!-- Previous link -->
+                                <li th:if="${page.hasPrevious()}">
+                                    <!-- Vehicle search pagination -->
+                                    <a th:if="${searchType == 'vehicle'}"
+                                       th:href="@{/search/vehicle(make=${vehicleMake}, model=${vehicleModel}, engineType=${vehicleEngine}, partName=${partName}, page=${page.number-1})}">Previous</a>
+                                    <!-- Part name search pagination -->
+                                    <a th:if="${searchType == 'partName'}"
+                                       th:href="@{/search/part-name(partName=${partName}, page=${page.number-1})}">Previous</a>
+                                    <!-- General search pagination -->
+                                    <a th:if="${searchQuery != null and (searchType == 'general' or searchType == 'partNumberContaining' or searchType == 'oemNumberContaining')}"
+                                       th:href="@{/search(query=${searchQuery}, page=${page.number-1})}">Previous</a>
+                                    <!-- Default shop list pagination -->
+                                    <a th:if="${searchType == null and searchQuery == null and partName == null and vehicleMake == null}"
+                                       th:href="@{/shop-list(page=${page.number-1})}">Previous</a>
                                 </li>
-                                <li th:if="${page.hasNext()}"><a th:href="@{/list(page=${page.number+1})}">Next</a></li>
+
+                                <!-- Page number links -->
+                                <li th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}" th:class="${i == page.number ? 'current' : ''}">
+                                    <!-- Vehicle search -->
+                                    <a th:if="${searchType == 'vehicle'}"
+                                       th:href="@{/search/vehicle(make=${vehicleMake}, model=${vehicleModel}, engineType=${vehicleEngine}, partName=${partName}, page=${i})}"
+                                       th:text="${i + 1}">1</a>
+                                    <!-- Part name search -->
+                                    <a th:if="${searchType == 'partName'}"
+                                       th:href="@{/search/part-name(partName=${partName}, page=${i})}"
+                                       th:text="${i + 1}">1</a>
+                                    <!-- General search -->
+                                    <a th:if="${searchQuery != null and (searchType == 'general' or searchType == 'partNumberContaining' or searchType == 'oemNumberContaining')}"
+                                       th:href="@{/search(query=${searchQuery}, page=${i})}"
+                                       th:text="${i + 1}">1</a>
+                                    <!-- Default shop list -->
+                                    <a th:if="${searchType == null and searchQuery == null and partName == null and vehicleMake == null}"
+                                       th:href="@{/shop-list(page=${i})}"
+                                       th:text="${i + 1}">1</a>
+                                </li>
+
+                                <!-- Next link -->
+                                <li th:if="${page.hasNext()}">
+                                    <!-- Vehicle search pagination -->
+                                    <a th:if="${searchType == 'vehicle'}"
+                                       th:href="@{/search/vehicle(make=${vehicleMake}, model=${vehicleModel}, engineType=${vehicleEngine}, partName=${partName}, page=${page.number+1})}">Next</a>
+                                    <!-- Part name search pagination -->
+                                    <a th:if="${searchType == 'partName'}"
+                                       th:href="@{/search/part-name(partName=${partName}, page=${page.number+1})}">Next</a>
+                                    <!-- General search pagination -->
+                                    <a th:if="${searchQuery != null and (searchType == 'general' or searchType == 'partNumberContaining' or searchType == 'oemNumberContaining')}"
+                                       th:href="@{/search(query=${searchQuery}, page=${page.number+1})}">Next</a>
+                                    <!-- Default shop list pagination -->
+                                    <a th:if="${searchType == null and searchQuery == null and partName == null and vehicleMake == null}"
+                                       th:href="@{/shop-list(page=${page.number+1})}">Next</a>
+                                </li>
                             </ul>
                         </div>
                     </div>

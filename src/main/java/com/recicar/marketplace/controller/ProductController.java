@@ -18,8 +18,8 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping("/shop-list")
-    public String productList(Model model) {
-        Page<Product> productPage = productService.findActiveProducts(0, 12);
+    public String productList(@RequestParam(value = "page", defaultValue = "0") int page, Model model) {
+        Page<Product> productPage = productService.findActiveProducts(page, 12);
         model.addAttribute("products", productPage.getContent());
         model.addAttribute("page", productPage);
         return "shop-list";
