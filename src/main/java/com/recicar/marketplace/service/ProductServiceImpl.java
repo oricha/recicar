@@ -124,7 +124,7 @@ public class ProductServiceImpl implements ProductService {
     public List<Vendor> findOtherVendorsSellingProduct(Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
-        return productRepository.findByPartNumberIgnoreCase(product.getPartNumber()).stream()
+        return productRepository.findByPartNumberContaining(product.getPartNumber(), Pageable.unpaged()).stream()
                 .filter(p -> !p.getVendor().getId().equals(product.getVendor().getId()))
                 .map(Product::getVendor)
                 .distinct()
@@ -260,14 +260,20 @@ public class ProductServiceImpl implements ProductService {
         return findByVehicleCompatibility(make, model, engine, year, pageable);
     }
 
+
     @Override
-    public List<Product> findByPartNumber(String partNumber) {
-        return productRepository.findByPartNumberIgnoreCase(partNumber);
+    public Page<Product> findByPartNumberContaining(String partNumber, Pageable pageable) {
+        return productRepository.findByPartNumberContaining(partNumber, pageable);
     }
 
     @Override
-    public List<Product> findByOemNumber(String oemNumber) {
-        return productRepository.findByOemNumberIgnoreCase(oemNumber);
+    public Page<Product> findByOemNumberContaining(String oemNumber, Pageable pageable) {
+        return productRepository.findByOemNumberContaining(oemNumber, pageable);
+    }
+
+    @Override
+    public Page<Product> findByProductName(String productName, Pageable pageable) {
+        return productRepository.findByProductName(productName, pageable);
     }
 
     @Override
@@ -307,5 +313,15 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public long countActiveByVendor(Vendor vendor) {
         return productRepository.countByVendorAndActiveTrue(vendor);
+    }
+
+    @Override
+    public List<Product> findByPartNumber(String partNumber) {
+        return productRepository.findByPartNumberIgnoreCase(partNumber);
+    }
+
+    @Override
+    public List<Product> findByOemNumber(String oemNumber) {
+        return productRepository.findByOemNumberIgnoreCase(oemNumber);
     }
 }

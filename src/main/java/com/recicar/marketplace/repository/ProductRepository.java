@@ -18,9 +18,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT p FROM Product p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(p.partNumber) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
     Page<Product> searchByNameOrPartNumber(@Param("searchTerm") String searchTerm, Pageable pageable);
 
-    List<Product> findByPartNumberIgnoreCase(String partNumber);
+    Page<Product> findByPartNumberContaining(String partNumber, Pageable pageable);
 
-    List<Product> findByOemNumberIgnoreCase(String oemNumber);
+    Page<Product> findByOemNumberContaining(String oemNumber, Pageable pageable);
+
+    @Query("SELECT p FROM Product p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :productName, '%'))")
+    Page<Product> findByProductName(@Param("productName") String productName, Pageable pageable);
 
     @Query("SELECT p FROM Product p JOIN p.compatibilities c WHERE c.make = :make AND c.model = :model AND c.engine = :engine AND c.yearFrom <= :year AND c.yearTo >= :year")
     Page<Product> findByVehicleCompatibility(@Param("make") String make, @Param("model") String model, @Param("engine") String engine, @Param("year") Integer year, Pageable pageable);
@@ -55,4 +58,16 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findLowStockProductsByVendor(@Param("vendor") Vendor vendor);
 
     long countByVendorAndActiveTrue(Vendor vendor);
+
+    // Methods for exact match searches (case insensitive)
+    List<Product> findByPartNumberIgnoreCase(String partNumber);
+    
+    List<Product> findByOemNumberIgnoreCase(String oemNumber);
+    
+    // Count methods for search statistics
+    long countByNameContainingIgnoreCase(String name);
+    
+    long countByPartNumberContainingIgnoreCase(String partNumber);
+    
+    long countByOemNumberContainingIgnoreCase(String oemNumber);
 }

@@ -98,12 +98,11 @@ public interface ProductService {
     /**
      * Find products by part number
      */
-    List<Product> findByPartNumber(String partNumber);
+    Page<Product> findByPartNumberContaining(String partNumber, Pageable pageable);
 
-    /**
-     * Find products by OEM number
-     */
-    List<Product> findByOemNumber(String oemNumber);
+    Page<Product> findByOemNumberContaining(String oemNumber, Pageable pageable);
+
+    Page<Product> findByProductName(String productName, Pageable pageable);
 
     /**
      * Find products by vehicle compatibility with default pagination
@@ -166,4 +165,14 @@ public interface ProductService {
      * Count active products by vendor
      */
     long countActiveByVendor(Vendor vendor);
+
+    /**
+     * Find products by part number (exact match, case insensitive)
+     */
+    List<Product> findByPartNumber(String partNumber);
+
+    /**
+     * Find products by OEM number (exact match, case insensitive)
+     */
+    List<Product> findByOemNumber(String oemNumber);
 }

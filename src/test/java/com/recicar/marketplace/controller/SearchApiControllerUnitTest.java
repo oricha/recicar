@@ -38,7 +38,7 @@ class SearchApiControllerUnitTest {
     private CategoryService categoryService;
 
     @InjectMocks
-    private SearchApiController searchApiController;
+    private SearchController searchController;
 
     private MockMvc mockMvc;
 
@@ -48,7 +48,7 @@ class SearchApiControllerUnitTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(searchApiController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(searchController).build();
         
         // Create test data without database
         testCategory = new Category();
@@ -78,7 +78,7 @@ class SearchApiControllerUnitTest {
 
     @Test
     void contextLoads() {
-        assertNotNull(searchApiController);
+        assertNotNull(searchController);
         assertNotNull(mockMvc);
     }
 
