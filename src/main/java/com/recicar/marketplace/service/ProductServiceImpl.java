@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -323,5 +324,127 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<Product> findByOemNumber(String oemNumber) {
         return productRepository.findByOemNumberIgnoreCase(oemNumber);
+    }
+
+    @Override
+    public List<Product> findByIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        return productRepository.findAllById(ids).stream().collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Product> findEnginePartsForHomePage() {
+        // First try to find products with "driver" in name or description
+        List<Product> driverResults = productRepository.searchByNameOrPartNumber("driver", Pageable.unpaged()).getContent();
+
+        // If we have enough results, return the first 9
+        if (driverResults.size() >= 9) {
+            return driverResults.subList(0, 9);
+        }
+
+        // If not enough, search for "engine" related products
+        List<Product> engineResults = productRepository.searchByNameOrPartNumber("engine", Pageable.unpaged()).getContent();
+
+        // Combine results and remove duplicates
+        List<Product> combinedResults = driverResults.stream()
+            .collect(Collectors.toList());
+
+        for (Product engineProduct : engineResults) {
+            if (combinedResults.size() >= 9) break;
+            if (!combinedResults.contains(engineProduct)) {
+                combinedResults.add(engineProduct);
+            }
+        }
+
+        // If still not enough, get some random active products to fill up to 9
+        if (combinedResults.size() < 9) {
+            List<Product> allActiveProducts = productRepository.findByActiveTrue(Pageable.unpaged()).getContent();
+            for (Product product : allActiveProducts) {
+                if (combinedResults.size() >= 9) break;
+                if (!combinedResults.contains(product)) {
+                    combinedResults.add(product);
+                }
+            }
+        }
+
+        return combinedResults.subList(0, Math.min(combinedResults.size(), 9));
+    }
+
+    @Override
+    public List<Product> findBodyPartsForHomePage() {
+        // First try to find products with "controller" in name or description
+        List<Product> controllerResults = productRepository.searchByNameOrPartNumber("controller", Pageable.unpaged()).getContent();
+
+        // If we have enough results, return the first 9
+        if (controllerResults.size() >= 9) {
+            return controllerResults.subList(0, 9);
+        }
+
+        // If not enough, search for "body" related products
+        List<Product> bodyResults = productRepository.searchByNameOrPartNumber("body", Pageable.unpaged()).getContent();
+
+        // Combine results and remove duplicates
+        List<Product> combinedResults = controllerResults.stream()
+            .collect(Collectors.toList());
+
+        for (Product bodyProduct : bodyResults) {
+            if (combinedResults.size() >= 9) break;
+            if (!combinedResults.contains(bodyProduct)) {
+                combinedResults.add(bodyProduct);
+            }
+        }
+
+        // If still not enough, get some random active products to fill up to 9
+        if (combinedResults.size() < 9) {
+            List<Product> allActiveProducts = productRepository.findByActiveTrue(Pageable.unpaged()).getContent();
+            for (Product product : allActiveProducts) {
+                if (combinedResults.size() >= 9) break;
+                if (!combinedResults.contains(product)) {
+                    combinedResults.add(product);
+                }
+            }
+        }
+
+        return combinedResults.subList(0, Math.min(combinedResults.size(), 9));
+    }
+
+    @Override
+    public List<Product> findRelatedProducts(Long productId) {
+        Product currentProduct = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+        List<Product> relatedProducts = new ArrayList<>();
+
+        // First, try to find products from the same category
+        List<Product> categoryProducts = productRepository.findByCategoryAndActiveTrue(currentProduct.getCategory(), Pageable.unpaged()).getContent();
+        for (Product product : categoryProducts) {
+            if (!product.getId().equals(productId) && relatedProducts.size() < 8) {
+                relatedProducts.add(product);
+            }
+        }
+
+        // If not enough products from same category, add products from same vendor
+        if (relatedProducts.size() < 8) {
+            List<Product> vendorProducts = productRepository.findByVendorAndActiveTrue(currentProduct.getVendor(), Pageable.unpaged()).getContent();
+            for (Product product : vendorProducts) {
+                if (!product.getId().equals(productId) && !relatedProducts.contains(product) && relatedProducts.size() < 8) {
+                    relatedProducts.add(product);
+                }
+            }
+        }
+
+        // If still not enough, add random active products
+        if (relatedProducts.size() < 8) {
+            List<Product> allActiveProducts = productRepository.findByActiveTrue(Pageable.unpaged()).getContent();
+            for (Product product : allActiveProducts) {
+                if (!product.getId().equals(productId) && !relatedProducts.contains(product) && relatedProducts.size() < 8) {
+                    relatedProducts.add(product);
+                }
+            }
+        }
+
+        return relatedProducts;
     }
 }

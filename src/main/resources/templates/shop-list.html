@@ -254,7 +254,19 @@
 
                         </div>
                         <div class="page_amount">
-                            <p>Mostrando 1–9 de 21 resultados</p>
+                            <!-- Show count based on available model attributes -->
+                            <p th:if="${page != null}"
+                               th:text="'Mostrando ' + ${page.numberOfElements} + ' de ' + ${page.totalElements} + ' resultados'">
+                                Mostrando 0 de 0 resultados
+                            </p>
+                            <p th:if="${page == null and totalElements != null}"
+                               th:text="'Mostrando ' + ${#lists.size(products)} + ' de ' + ${totalElements} + ' resultados'">
+                                Mostrando 0 de 0 resultados
+                            </p>
+                            <p th:if="${page == null and totalElements == null}"
+                               th:text="'Mostrando ' + ${#lists.size(products)} + ' resultados'">
+                                Mostrando 0 resultados
+                            </p>
                         </div>
                     </div>
                     <!--shop toolbar end-->
@@ -335,7 +347,11 @@
                                         <div class="action_links_btn">
                                             <ul>
                                                 <li class="quick_button"><a href="#" data-bs-toggle="modal" data-bs-target="#modal_box" title="quick view"> <span class="lnr lnr-magnifier"></span></a></li>
-                                                <li class="wishlist"><a href="/wishlist" title="Add to Wishlist"><span class="lnr lnr-heart"></span></a></li>
+                                                <li class="wishlist">
+                                                    <a href="#" class="js-wishlist-toggle" th:attr="data-product-id=${product.id}" title="Add to Wishlist">
+                                                        <span class="lnr lnr-heart"></span>
+                                                    </a>
+                                                </li>
                                                 <li class="compare"><a href="/compare" title="compare"><span class="lnr lnr-sync"></span></a></li>
                                             </ul>
                                         </div>

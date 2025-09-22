@@ -851,8 +851,137 @@
         });
     }
 
+    function updateWishlistCount() {
+        $.ajax({
+            url: '/api/wishlist/count',
+            method: 'GET',
+            success: function(data) {
+                const count = (data && typeof data.count === 'number') ? data.count : 0;
+                // Update both header indicators
+                $('#wishlist-count').text(count);
+                $('.wishlist_quantity').text(count);
+            },
+            error: function() {
+                // Silent failure for count polling
+            }
+        });
+    }
+
     // Car Part Search Logic
     $(document).ready(function() {
+        // Initialize counts on page load
+        updateCartCount();
+        updateWishlistCount();
+
+        // Hydrate initial wishlist state for toggles
+        $.ajax({
+            url: '/api/wishlist/items',
+            method: 'GET',
+            success: function(data) {
+                var ids = (data && data.items) ? new Set(data.items) : new Set();
+                $(document).find('.js-wishlist-toggle').each(function(){
+                    var $btn = $(this);
+                    var id = $btn.data('product-id');
+                    if (!id) return;
+                    if (ids.has(id)) {
+                        $btn.addClass('is-wishlisted').attr('data-wishlisted', 'true');
+                        // If button has text content, change it; if icon-only, just title
+                        if ($btn.text().trim().length > 0) {
+                            $btn.text('Quitar de la lista de deseos');
+                        }
+                        $btn.attr('title', 'Remove from wishlist');
+                    } else {
+                        $btn.removeClass('is-wishlisted').attr('data-wishlisted', 'false');
+                        if ($btn.text().trim().length > 0) {
+                            $btn.text('+ Añadir a la lista de deseos');
+                        }
+                        $btn.attr('title', 'Add to wishlist');
+                    }
+                });
+            }
+        });
+
+        // Unified wishlist toggle (add/remove)
+        $(document).on('click', '.js-wishlist-toggle', function(e) {
+            e.preventDefault();
+            const $btn = $(this);
+            const productId = $btn.data('product-id');
+            if (!productId) return;
+            const isWishlisted = ($btn.attr('data-wishlisted') === 'true') || $btn.hasClass('is-wishlisted');
+            if (!isWishlisted) {
+                $.ajax({
+                    url: '/api/wishlist/items',
+                    method: 'POST',
+                    data: { productId: productId },
+                    success: function(res) {
+                        const count = (res && typeof res.count === 'number') ? res.count : undefined;
+                        if (typeof count === 'number') {
+                            $('#wishlist-count').text(count);
+                            $('.wishlist_quantity').text(count);
+                        } else {
+                            updateWishlistCount();
+                        }
+                        $btn.addClass('is-wishlisted').attr('data-wishlisted','true');
+                        if ($btn.text().trim().length > 0) {
+                            $btn.text('Quitar de la lista de deseos');
+                        }
+                        $btn.attr('title', 'Remove from wishlist');
+                    },
+                    error: function(err) {
+                        console.error('Failed to add to wishlist', err);
+                    }
+                });
+            } else {
+                $.ajax({
+                    url: `/api/wishlist/items/${productId}`,
+                    method: 'DELETE',
+                    success: function(res) {
+                        const count = (res && typeof res.count === 'number') ? res.count : undefined;
+                        if (typeof count === 'number') {
+                            $('#wishlist-count').text(count);
+                            $('.wishlist_quantity').text(count);
+                        } else {
+                            updateWishlistCount();
+                        }
+                        $btn.removeClass('is-wishlisted').attr('data-wishlisted','false');
+                        if ($btn.text().trim().length > 0) {
+                            $btn.text('+ Añadir a la lista de deseos');
+                        }
+                        $btn.attr('title', 'Add to wishlist');
+                    },
+                    error: function(err) {
+                        console.error('Failed to remove from wishlist', err);
+                    }
+                });
+            }
+        });
+
+        // Remove-from-wishlist handler (wishlist page)
+        $(document).on('click', '.js-remove-from-wishlist', function(e) {
+            e.preventDefault();
+            const $btn = $(this);
+            const productId = $btn.data('product-id');
+            if (!productId) return;
+            $.ajax({
+                url: `/api/wishlist/items/${productId}`,
+                method: 'DELETE',
+                success: function(res) {
+                    const count = (res && typeof res.count === 'number') ? res.count : undefined;
+                    if (typeof count === 'number') {
+                        $('#wishlist-count').text(count);
+                        $('.wishlist_quantity').text(count);
+                    } else {
+                        updateWishlistCount();
+                    }
+                    // Remove the row from the table
+                    const $row = $btn.closest('tr');
+                    $row.fadeOut(200, function(){ $(this).remove(); });
+                },
+                error: function(err) {
+                    console.error('Failed to remove from wishlist', err);
+                }
+            });
+        });
         const carMakeSelect = $('#car-make');
         const carModelSelect = $('#car-model');
         const carEngineSelect = $('#car-engine');

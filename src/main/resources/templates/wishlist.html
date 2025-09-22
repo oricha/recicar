@@ -90,10 +90,12 @@
                                     </thead>
                                     <tbody>
                                         <tr th:each="p : ${wishlistProducts}">
-                                            <td class="product_remove"><a href="#">X</a></td>
+                                            <td class="product_remove">
+                                                <a href="#" class="js-remove-from-wishlist" th:attr="data-product-id=${p.id}" title="Remove from wishlist">X</a>
+                                            </td>
                                             <td class="product_thumb">
                                                 <a th:href="@{/product-details(id=${p.id})}">
-                                                    <img th:src="${p.primaryImage != null ? p.primaryImage.imageUrl : '/assets/img/product/product1.jpg'}" alt="">
+                                                    <img th:src="${p.primaryImage != null ? p.primaryImage.url : '/assets/img/product/product1.jpg'}" alt="">
                                                 </a>
                                             </td>
                                             <td class="product_name"><a th:href="@{/product-details(id=${p.id})}" th:text="${p.name}">Product Name</a></td>

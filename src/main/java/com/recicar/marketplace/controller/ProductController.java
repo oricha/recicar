@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -29,7 +30,13 @@ public class ProductController {
     public String productDetails(@RequestParam("id") Long id, Model model) {
         Optional<Product> productOptional = productService.findById(id);
         if (productOptional.isPresent()) {
-            model.addAttribute("product", productOptional.get());
+            Product product = productOptional.get();
+            model.addAttribute("product", product);
+
+            // Get related products for the product details page
+            List<Product> relatedProducts = productService.findRelatedProducts(id);
+            model.addAttribute("relatedProducts", relatedProducts);
+
             return "product-details";
         }
         return "redirect:/";

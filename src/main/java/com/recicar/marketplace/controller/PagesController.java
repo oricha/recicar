@@ -118,10 +118,12 @@ public class PagesController {
      @GetMapping("/faq")
      public String faq(Model model) { return "faq";}
      @GetMapping("/wishlist" )
-     public String wishlist(Model model) {
-         // For now, use active products as placeholder for wishlist items
-         var productPage = productService.findActiveProducts(0, 12);
-         model.addAttribute("wishlistProducts", productPage.getContent());
+     public String wishlist(Model model, jakarta.servlet.http.HttpSession session) {
+         @SuppressWarnings("unchecked")
+         java.util.Set<Long> ids = (java.util.Set<Long>) session.getAttribute("WISHLIST_PRODUCT_IDS");
+         java.util.List<Long> idList = (ids != null) ? new java.util.ArrayList<>(ids) : java.util.List.of();
+         var products = productService.findByIds(idList);
+         model.addAttribute("wishlistProducts", products);
          return "wishlist";
      }
     @GetMapping("/my-account.html" )

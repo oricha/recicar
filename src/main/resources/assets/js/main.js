@@ -784,7 +784,36 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(r => r.json())
     .then(data => {
       const count = (data && typeof data.count === 'number') ? data.count : 0;
-      document.querySelectorAll('.wishlist_quantity').forEach(el => el.textContent = count);
+      document.querySelectorAll('.wishlist_quantity, #wishlist-count').forEach(el => el.textContent = count);
+    }).catch(() => {});
+
+  // Hydrate wishlist state for toggle buttons if present
+  fetch('/api/wishlist/items')
+    .then(r => r.json())
+    .then(data => {
+      const ids = new Set(Array.isArray(data.items) ? data.items : []);
+      document.querySelectorAll('.js-wishlist-toggle, .js-add-to-wishlist').forEach(btn => {
+        const id = btn.getAttribute('data-product-id');
+        if (!id) return;
+        const inList = ids.has(Number(id));
+        if (inList) {
+          btn.classList.add('is-wishlisted');
+          btn.setAttribute('data-wishlisted', 'true');
+          if (btn.textContent && btn.textContent.trim().length > 0) {
+            btn.textContent = 'Quitar de la lista de deseos';
+          }
+          btn.setAttribute('title', 'Remove from wishlist');
+        } else {
+          btn.classList.remove('is-wishlisted');
+          btn.setAttribute('data-wishlisted', 'false');
+          if (btn.classList.contains('js-wishlist-toggle') || btn.classList.contains('js-add-to-wishlist')) {
+            if (btn.textContent && btn.textContent.trim().length > 0) {
+              btn.textContent = '+ Añadir a la lista de deseos';
+            }
+            btn.setAttribute('title', 'Add to wishlist');
+          }
+        }
+      });
     }).catch(() => {});
 
   const openMiniCart = () => {
@@ -839,31 +868,47 @@ document.addEventListener('DOMContentLoaded', function() {
       .catch(() => {});
   }, false);
 
-  // Delegate clicks to any .js-add-to-wishlist
+  // Delegate wishlist add/remove toggles
   document.body.addEventListener('click', function(e) {
-    const target = e.target.closest('.js-add-to-wishlist');
+    const target = e.target.closest('.js-wishlist-toggle, .js-add-to-wishlist');
     if (!target) return;
     e.preventDefault();
     const productId = target.getAttribute('data-product-id');
     if (!productId) return;
-    const body = new URLSearchParams({ productId: productId });
-    fetch('/api/wishlist/items', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body
-    })
-      .then(r => {
-        if (!r.ok) throw new Error('Add to wishlist failed');
-        return r.json();
+    const wishlisted = target.getAttribute('data-wishlisted') === 'true' || target.classList.contains('is-wishlisted');
+    if (!wishlisted) {
+      const body = new URLSearchParams({ productId: productId });
+      fetch('/api/wishlist/items', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body
       })
-      .then(data => {
-        const count = (data && typeof data.count === 'number') ? data.count : 0;
-        document.querySelectorAll('.wishlist_quantity').forEach(el => el.textContent = count);
-        // simple feedback
-        const old = target.textContent;
-        target.textContent = 'Added!';
-        setTimeout(() => { target.textContent = old || '+ Añadir a la lista de deseos'; }, 1200);
-      })
-      .catch(() => {});
+        .then(r => { if (!r.ok) throw new Error('Add to wishlist failed'); return r.json(); })
+        .then(data => {
+          const count = (data && typeof data.count === 'number') ? data.count : 0;
+          document.querySelectorAll('.wishlist_quantity, #wishlist-count').forEach(el => el.textContent = count);
+          target.classList.add('is-wishlisted');
+          target.setAttribute('data-wishlisted', 'true');
+          if (target.textContent && target.textContent.trim().length > 0) {
+            target.textContent = 'Quitar de la lista de deseos';
+          }
+          target.setAttribute('title', 'Remove from wishlist');
+        })
+        .catch(() => {});
+    } else {
+      fetch(`/api/wishlist/items/${productId}`, { method: 'DELETE' })
+        .then(r => { if (!r.ok) throw new Error('Remove wishlist failed'); return r.json(); })
+        .then(data => {
+          const count = (data && typeof data.count === 'number') ? data.count : 0;
+          document.querySelectorAll('.wishlist_quantity, #wishlist-count').forEach(el => el.textContent = count);
+          target.classList.remove('is-wishlisted');
+          target.setAttribute('data-wishlisted', 'false');
+          if (target.textContent && target.textContent.trim().length > 0) {
+            target.textContent = '+ Añadir a la lista de deseos';
+          }
+          target.setAttribute('title', 'Add to wishlist');
+        })
+        .catch(() => {});
+    }
   }, false);
 });

@@ -29,22 +29,12 @@ public class HomeController {
         // Get categories for navigation
         model.addAttribute("categories", categoryService.findRootCategories());
 
-        // Load Body Parts and Engine Parts sections
-        var bodyCategories = categoryService.searchByName("Body");
-        if (bodyCategories != null && !bodyCategories.isEmpty()) {
-            var bodyPage = productService.findByCategory(bodyCategories.get(0), PageRequest.of(0, 9));
-            model.addAttribute("bodyParts", bodyPage.getContent());
-        } else {
-            model.addAttribute("bodyParts", java.util.List.of());
-        }
+        // Load Body Parts and Engine Parts sections using new search methods
+        var bodyParts = productService.findBodyPartsForHomePage();
+        model.addAttribute("bodyParts", bodyParts);
 
-        var engineCategories = categoryService.searchByName("Engine");
-        if (engineCategories != null && !engineCategories.isEmpty()) {
-            var enginePage = productService.findByCategory(engineCategories.get(0), PageRequest.of(0, 9));
-            model.addAttribute("engineParts", enginePage.getContent());
-        } else {
-            model.addAttribute("engineParts", java.util.List.of());
-        }
+        var engineParts = productService.findEnginePartsForHomePage();
+        model.addAttribute("engineParts", engineParts);
         // Add authentication information to the model
         boolean isAuthenticated = authentication != null && authentication.isAuthenticated();
         model.addAttribute("isAuthenticated", isAuthenticated);

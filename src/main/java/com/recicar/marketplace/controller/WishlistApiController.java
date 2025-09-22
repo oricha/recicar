@@ -15,6 +15,15 @@ public class WishlistApiController {
 
     private static final String SESSION_KEY = "WISHLIST_PRODUCT_IDS";
 
+    @GetMapping("/items")
+    public Map<String, Object> listItems(HttpSession session) {
+        Set<Long> wl = getWishlist(session);
+        Map<String, Object> out = new HashMap<>();
+        out.put("items", wl);
+        out.put("count", wl.size());
+        return out;
+    }
+
     @GetMapping("/count")
     public Map<String, Integer> count(HttpSession session) {
         Set<Long> wl = getWishlist(session);
@@ -60,4 +69,3 @@ public class WishlistApiController {
         return wl;
     }
 }
-

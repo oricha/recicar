@@ -175,4 +175,24 @@ public interface ProductService {
      * Find products by OEM number (exact match, case insensitive)
      */
     List<Product> findByOemNumber(String oemNumber);
+
+    /**
+     * Find products by a list of IDs
+     */
+    List<Product> findByIds(List<Long> ids);
+
+    /**
+     * Find engine parts using "driver" keyword search - returns exactly 9 products
+     */
+    List<Product> findEnginePartsForHomePage();
+
+    /**
+     * Find body parts using "controller" keyword search - returns exactly 9 products
+     */
+    List<Product> findBodyPartsForHomePage();
+
+    /**
+     * Find 8 random products related to the given product for product details page
+     */
+    List<Product> findRelatedProducts(Long productId);
 }
