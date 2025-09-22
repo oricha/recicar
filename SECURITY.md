@@ -14,10 +14,10 @@ DATABASE_URL=jdbc:postgresql://localhost:5432/marketplace_dev
 DATABASE_USERNAME=marketplace_user
 DATABASE_PASSWORD=your_very_secure_password_here
 
-# Redis
-REDIS_HOST=localhost
-REDIS_PORT=6379
-REDIS_PASSWORD=your_redis_password_here
+# Redis - disabled
+# REDIS_HOST=localhost
+# REDIS_PORT=6379
+# REDIS_PASSWORD=your_redis_password_here
 
 # Admin User (CHANGE THESE IN PRODUCTION!)
 ADMIN_EMAIL=admin@yourdomain.com
@@ -70,9 +70,10 @@ JWT_SECRET=your_very_long_random_jwt_secret_here
 DATABASE_URL=jdbc:postgresql://localhost:5432/marketplace_dev
 DATABASE_USERNAME=marketplace_user
 DATABASE_PASSWORD=your_secure_password_here
-REDIS_HOST=localhost
-REDIS_PORT=6379
-REDIS_PASSWORD=your_redis_password_here
+# Redis - disabled
+# REDIS_HOST=localhost
+# REDIS_PORT=6379
+# REDIS_PASSWORD=your_redis_password_here
 ADMIN_EMAIL=admin@recicar.com
 ADMIN_PASSWORD=user123
 JWT_SECRET=your_jwt_secret_here

@@ -65,8 +65,8 @@ dependencies {
     implementation 'org.postgresql:postgresql'
     implementation 'org.flywaydb:flyway-core'
     
-    // Redis for caching
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    // Redis for caching - temporarily disabled
+    // implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     
     // Rate Limiting - temporarily disabled due to dependency issues
     // implementation 'io.github.bucket4j:bucket4j-core:8.7.0'
