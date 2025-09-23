@@ -26,9 +26,15 @@ RUN cp build/libs/*-SNAPSHOT.jar app.jar || cp build/libs/*.jar app.jar
 # 2) Runtime stage
 FROM eclipse-temurin:17-jre
 
+# Install necessary packages for production
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
 ENV SPRING_PROFILES_ACTIVE=prod \
     SERVER_PORT=8080 \
-    JAVA_OPTS=""
+    JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UseG1GC -XX:+UseStringDeduplication" \
+    TZ=UTC
 
 WORKDIR /app
 
@@ -40,8 +46,12 @@ RUN addgroup --system app && adduser --system --ingroup app --home /app app \
     && chown -R app:app /app
 USER app
 
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8080/actuator/health || exit 1
+
 # Expose the HTTP port
 EXPOSE 8080
 
-# Run the application
-ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -Dserver.port=$SERVER_PORT -jar /app/app.jar"]
+# Run the application with optimized JVM settings
+ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -Dserver.port=$SERVER_PORT -jar /app/app.jar"]
