@@ -15,7 +15,7 @@ COPY build.gradle ./
 RUN chmod +x gradlew && ./gradlew --no-daemon dependencies > /dev/null || true
 
 # Copy the rest of the source code
-COPY . .
+COPY .. .
 
 # Build the Spring Boot fat jar (skip tests to speed up image builds)
 RUN ./gradlew clean bootJar --no-daemon -x test
