@@ -1,0 +1,29 @@
+name: recicar-marketplace
+services:
+  - name: recicar-app
+    image: recicar-marketplace:latest
+    ports:
+      - port: 8080
+        http:
+          paths:
+            - path: /
+    env:
+      - name: SPRING_PROFILES_ACTIVE
+        value: prod
+      - name: DATABASE_URL
+        secret: DATABASE_URL
+      - name: DATABASE_USERNAME
+        secret: DATABASE_USERNAME
+      - name: DATABASE_PASSWORD
+        secret: DATABASE_PASSWORD
+    resources:
+      cpu: 1000m
+      memory: 1Gi
+    healthcheck:
+      http:
+        path: /actuator/health
+        port: 8080
+      initial_delay: 30
+      period: 10
+      timeout: 5
+      retries: 3
