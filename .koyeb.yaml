@@ -1,0 +1,24 @@
+name: marketplace-app
+services:
+  - name: spring-service
+    image: registry.koyeb.com/oricha/recicar:latest
+    ports:
+      - 8080
+    auto_deploy: true
+    env:
+      SPRING_PROFILES_ACTIVE: prod
+      DATABASE_URL: ${DATABASE_URL}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+    checks:
+      - name: http-health
+        type: http
+        port: 8080
+        path: /actuator/health
+        interval: 10s
+        timeout: 5s
+        initial_delay: 30s
+        retries: 3
+    routes:
+      - type: http
+        path: /

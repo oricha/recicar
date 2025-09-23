@@ -1,0 +1,23 @@
+# Gradle
+.gradle
+build
+.gradle-cache
+.gradle-worker-id
+
+# IDE
+*.iml
+.idea
+.vscode
+
+# Logs and metadata
+*.log
+*.md
+.DS_Store
+
+# VCS
+.git
+.gitignore
+
+# Docker/Koyeb
+docker-compose.yml
+.env
