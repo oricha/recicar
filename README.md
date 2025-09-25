@@ -15,7 +15,7 @@ A comprehensive web application that connects customers with junkyards and auto 
 - **Build Tool**: Gradle 8.5
 - **Containerization**: Docker & Docker Compose
 - **Security**: Spring Security with role-based access control
-- **Deployment**: Koyeb with SSL certificate support
+- **Deployment**: Northflank with Supabase database
 
 
 ## 🚀 Getting Started
@@ -42,7 +42,6 @@ A comprehensive web application that connects customers with junkyards and auto 
 3. **Run the application**
    ```bash
   For local development: ./gradlew runLocal
-  For test environment: ./gradlew runTest
   For production environment: ./gradlew runProd
    ```
 
@@ -61,21 +60,17 @@ A comprehensive web application that connects customers with junkyards and auto 
 
 ### Environments
 
-- Local (dev, local PostgreSQL):
+- **Development** (local PostgreSQL):
   - `./gradlew runLocal`
 
-- Test (local run, Supabase DB):
-  - Add Supabase DB creds in `.env` as `TEST_DATABASE_URL`, `TEST_DATABASE_USERNAME`, `TEST_DATABASE_PASSWORD`.
-  - `./gradlew bootTest`  # or `./gradlew runTest`
-
-- Prod (local run, Supabase DB):
+- **Production** (Supabase DB):
   - Add Supabase DB creds in `.env` as `PROD_DATABASE_URL`, `PROD_DATABASE_USERNAME`, `PROD_DATABASE_PASSWORD`.
   - `./gradlew runProd`
 
-Flyway migrations:
-- Local dev DB: `./gradlew flywayMigrateLocal`
-- Test Supabase DB: `./gradlew flywayMigrateTest`
-- Prod Supabase DB: `./gradlew flywayMigrateProd`
+### Database Migrations
+
+- **Development DB**: `./gradlew flywayMigrateDev`
+- **Production DB**: `./gradlew flywayMigrateProd`
 
 
 
@@ -113,29 +108,27 @@ The project includes Docker Compose configuration for local development:
 
 ## 🚀 Deployment
 
-### Koyeb Deployment
+### Northflank Deployment
 
-The application is configured for deployment on Koyeb with Supabase as the database:
+The application is configured for deployment on Northflank with Supabase as the database:
 
-1. **Configure environment variables** in Koyeb:
+1. **Configure environment variables** in Northflank:
    - `SPRING_PROFILES_ACTIVE=prod`
    - `DATABASE_URL`, `DATABASE_USERNAME`, `DATABASE_PASSWORD`
-   - `DATABASE_SSL_ENABLED=true` (if SSL certificate required)
+   - `SERVER_PORT=8080`
 
-2. **Deploy using koyeb.yaml**:
-   ```bash
-   koyeb service create --file koyeb.yaml
-   ```
+2. **Deploy using northflank.yaml**:
+   - Upload the `northflank.yaml` file to your project
+   - Configure the service using the YAML configuration
 
 3. **Or use Docker**:
    ```bash
    docker build -t your-registry/recicar-marketplace:latest .
-   koyeb service create --image your-registry/recicar-marketplace:latest
+   # Deploy using the Docker image in Northflank
    ```
 
 For detailed deployment instructions, see:
-- [Supabase Deployment Guide](SUPABASE_DEPLOYMENT_GUIDE.md)
-- [SSL Certificate Deployment Guide](SSL_DEPLOYMENT_GUIDE.md)
+- [Northflank Deployment Guide](NORTHFLANK_DEPLOYMENT_GUIDE.md)
 
 ## 🤝 Contributing
 

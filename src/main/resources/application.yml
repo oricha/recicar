@@ -1,14 +1,80 @@
+spring:
+  profiles:
+    active: dev
+  application:
+    name: car-parts-marketplace
 
+server:
+  port: 8080
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+logging:
+  level:
+    com.recicar.marketplace: INFO
+    org.springframework.security: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/marketplace_dev}
+    username: ${DATABASE_USERNAME:marketplace_user}
+    password: ${DATABASE_PASSWORD:marketplace_pass}
+    driver-class-name: org.postgresql.Driver
+    
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    repair-on-migrate: true
+    clean-disabled: false
+    
+  thymeleaf:
+    cache: false
+    
+server:
+  error:
+    include-stacktrace: on_param
+
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+---
 spring:
   config:
     activate:
       on-profile: prod
       
   datasource:
-    url: ${DATABASE_URL}
-    username: ${DATABASE_USERNAME}
-    password: ${DATABASE_PASSWORD}
+    url: jdbc:postgresql://${HOST}:${PORT}/${DB_NAME}
+    username: ${USERNAME}
+    password: ${PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 20
@@ -36,26 +102,12 @@ spring:
     baseline-on-migrate: true
     repair-on-migrate: true
     
-  data:
-    # redis:
-    #   host: ${REDIS_HOST}
-    #   port: ${REDIS_PORT}
-    #   password: ${REDIS_PASSWORD}
-    #   ssl: true
-      
   thymeleaf:
     cache: true
     enabled: true
     
   security:
-    require-ssl: false  # Koyeb handles SSL termination
-
-# SSL Certificate configuration for production database connections
-database:
-  ssl:
-    enabled: ${DATABASE_SSL_ENABLED:true}
-    certificate: ${DATABASE_SSL_CERTIFICATE}
-    certificate-path: ${DATABASE_SSL_CERTIFICATE_PATH:}
+    require-ssl: false  # Northflank handles SSL termination
 
 server:
   port: ${SERVER_PORT:8080}

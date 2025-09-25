@@ -146,21 +146,6 @@ tasks.register('runLocal', org.springframework.boot.gradle.tasks.run.BootRun) {
     mainClass.set(application.mainClass)
 }
 
-tasks.register('runTest', org.springframework.boot.gradle.tasks.run.BootRun) {
-    group = 'application'
-    description = 'Run app with test profile against Supabase DB (from .env TEST_*)'
-    dependsOn 'classes'
-    classpath = sourceSets.main.runtimeClasspath
-    def envs = loadDotEnv()
-    systemProperty 'spring.profiles.active', 'test'
-    // Map TEST_ variables onto the generic names Spring expects
-    environment 'DATABASE_URL', envs['TEST_DATABASE_URL'] ?: System.getenv('TEST_DATABASE_URL')
-    environment 'DATABASE_USERNAME', envs['TEST_DATABASE_USERNAME'] ?: System.getenv('TEST_DATABASE_USERNAME')
-    environment 'DATABASE_PASSWORD', envs['TEST_DATABASE_PASSWORD'] ?: System.getenv('TEST_DATABASE_PASSWORD')
-    // Pass through common secrets if present
-    if (envs['JWT_SECRET']) environment 'JWT_SECRET', envs['JWT_SECRET']
-    mainClass.set(application.mainClass)
-}
 
 tasks.register('runProd', org.springframework.boot.gradle.tasks.run.BootRun) {
     group = 'application'
@@ -177,42 +162,17 @@ tasks.register('runProd', org.springframework.boot.gradle.tasks.run.BootRun) {
     mainClass.set(application.mainClass)
 }
 
-// Alias that matches the requested command name
-tasks.register('bootTest', org.springframework.boot.gradle.tasks.run.BootRun) {
-    group = 'application'
-    description = 'Run app locally with test profile against Supabase DB (reads .env TEST_*)'
-    dependsOn 'classes'
-    classpath = sourceSets.main.runtimeClasspath
-    def envs = loadDotEnv()
-    systemProperty 'spring.profiles.active', 'test'
-    environment 'DATABASE_URL', envs['TEST_DATABASE_URL'] ?: System.getenv('TEST_DATABASE_URL')
-    environment 'DATABASE_USERNAME', envs['TEST_DATABASE_USERNAME'] ?: System.getenv('TEST_DATABASE_USERNAME')
-    environment 'DATABASE_PASSWORD', envs['TEST_DATABASE_PASSWORD'] ?: System.getenv('TEST_DATABASE_PASSWORD')
-    if (envs['JWT_SECRET']) environment 'JWT_SECRET', envs['JWT_SECRET']
-    mainClass.set(application.mainClass)
-}
 
 // Also wire Flyway convenience tasks per environment
-tasks.register('flywayMigrateLocal') {
+tasks.register('flywayMigrateDev') {
     group = 'flyway'
     description = 'Run Flyway migrate using local dev DB (from defaults)'
     doLast {
-        println 'Running Flyway migrate for LOCAL (dev defaults)'
+        println 'Running Flyway migrate for DEV (local defaults)'
         tasks.flywayMigrate.execute()
     }
 }
 
-tasks.register('flywayMigrateTest') {
-    group = 'flyway'
-    description = 'Run Flyway migrate against TEST Supabase DB using .env TEST_*'
-    doFirst {
-        def envs = loadDotEnv()
-        project.extensions.flyway.url = envs['TEST_DATABASE_URL'] ?: System.getenv('TEST_DATABASE_URL')
-        project.extensions.flyway.user = envs['TEST_DATABASE_USERNAME'] ?: System.getenv('TEST_DATABASE_USERNAME')
-        project.extensions.flyway.password = envs['TEST_DATABASE_PASSWORD'] ?: System.getenv('TEST_DATABASE_PASSWORD')
-    }
-    finalizedBy 'flywayMigrate'
-}
 
 tasks.register('flywayMigrateProd') {
     group = 'flyway'
