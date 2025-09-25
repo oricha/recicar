@@ -90,6 +90,8 @@ credentials/
 *.pem
 *.p12
 *.jks
+*.crt
+*.cer
 
 # Database
 *.db
@@ -130,3 +132,6 @@ target/
 .classpath
 .factorypath
 .settings/
+/recicar/
+/.codex
+node_modules/

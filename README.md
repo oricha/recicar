@@ -9,11 +9,13 @@ A comprehensive web application that connects customers with junkyards and auto 
 
 - **Backend**: Spring Boot 3.2.0 with Java 21
 - **Frontend**: Thymeleaf for server-side rendering
-- **Database**: PostgreSQL 15+ with Flyway migrations
-- **Caching**: Redis
+- **Database**: PostgreSQL 15+ with Supabase (production) and local PostgreSQL (development)
+- **Database Migrations**: Flyway
+- **Caching**: Redis (optional)
 - **Build Tool**: Gradle 8.5
 - **Containerization**: Docker & Docker Compose
 - **Security**: Spring Security with role-based access control
+- **Deployment**: Koyeb with SSL certificate support
 
 
 ## 🚀 Getting Started
@@ -39,7 +41,9 @@ A comprehensive web application that connects customers with junkyards and auto 
 
 3. **Run the application**
    ```bash
-   ./gradlew bootRun
+  For local development: ./gradlew runLocal
+  For test environment: ./gradlew runTest
+  For production environment: ./gradlew runProd
    ```
 
 
@@ -54,6 +58,24 @@ A comprehensive web application that connects customers with junkyards and auto 
 4. **Access the application**
    - Application: http://localhost:8080
    - Health Check: http://localhost:8080/actuator/health
+
+### Environments
+
+- Local (dev, local PostgreSQL):
+  - `./gradlew runLocal`
+
+- Test (local run, Supabase DB):
+  - Add Supabase DB creds in `.env` as `TEST_DATABASE_URL`, `TEST_DATABASE_USERNAME`, `TEST_DATABASE_PASSWORD`.
+  - `./gradlew bootTest`  # or `./gradlew runTest`
+
+- Prod (local run, Supabase DB):
+  - Add Supabase DB creds in `.env` as `PROD_DATABASE_URL`, `PROD_DATABASE_USERNAME`, `PROD_DATABASE_PASSWORD`.
+  - `./gradlew runProd`
+
+Flyway migrations:
+- Local dev DB: `./gradlew flywayMigrateLocal`
+- Test Supabase DB: `./gradlew flywayMigrateTest`
+- Prod Supabase DB: `./gradlew flywayMigrateProd`
 
 
 
@@ -86,8 +108,34 @@ Run tests with:
 
 The project includes Docker Compose configuration for local development:
 - PostgreSQL 15 database
-- Redis cache
+- Redis cache (optional)
 - Automatic database initialization
+
+## 🚀 Deployment
+
+### Koyeb Deployment
+
+The application is configured for deployment on Koyeb with Supabase as the database:
+
+1. **Configure environment variables** in Koyeb:
+   - `SPRING_PROFILES_ACTIVE=prod`
+   - `DATABASE_URL`, `DATABASE_USERNAME`, `DATABASE_PASSWORD`
+   - `DATABASE_SSL_ENABLED=true` (if SSL certificate required)
+
+2. **Deploy using koyeb.yaml**:
+   ```bash
+   koyeb service create --file koyeb.yaml
+   ```
+
+3. **Or use Docker**:
+   ```bash
+   docker build -t your-registry/recicar-marketplace:latest .
+   koyeb service create --image your-registry/recicar-marketplace:latest
+   ```
+
+For detailed deployment instructions, see:
+- [Supabase Deployment Guide](SUPABASE_DEPLOYMENT_GUIDE.md)
+- [SSL Certificate Deployment Guide](SSL_DEPLOYMENT_GUIDE.md)
 
 ## 🤝 Contributing
 

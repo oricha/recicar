@@ -41,6 +41,9 @@ WORKDIR /app
 # Copy the built application jar from the build stage
 COPY --from=build /workspace/app.jar /app/app.jar
 
+# Create SSL certificate directory for database connections
+RUN mkdir -p /app/ssl
+
 # Create non-root user and set ownership for least-privilege runtime
 RUN addgroup --system app && adduser --system --ingroup app --home /app app \
     && chown -R app:app /app
