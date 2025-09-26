@@ -1,5 +1,4 @@
 # Multi-stage Dockerfile for Recicar (Spring Boot)
-# Build with JDK + Gradle, run on slim JRE
 
 # 1) Build stage
 FROM eclipse-temurin:17-jdk AS build
@@ -10,51 +9,41 @@ WORKDIR /workspace
 COPY gradlew ./
 COPY gradle ./gradle
 COPY build.gradle ./
+COPY settings.gradle ./
 
-# Make wrapper executable and optionally warm dependency cache
+# Make wrapper executable and warm up dependency cache
 RUN chmod +x gradlew && ./gradlew --no-daemon dependencies > /dev/null || true
 
 # Copy the rest of the source code
-COPY .. .
+COPY src ./src
 
-# Build the Spring Boot fat jar (skip tests to speed up image builds)
+# Build the Spring Boot fat jar with layers enabled
 RUN ./gradlew clean bootJar --no-daemon -x test
 
-# Ensure a single predictable jar name for the runtime stage
-RUN cp build/libs/*-SNAPSHOT.jar app.jar || cp build/libs/*.jar app.jar
+# Extract the layers
+RUN java -Djarmode=layertools -jar build/libs/*-SNAPSHOT.jar extract
 
 # 2) Runtime stage
-FROM eclipse-temurin:17-jre
+FROM gcr.io/distroless/java17-debian12
 
-# Install necessary packages for production
-RUN apt-get update && apt-get install -y \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+
+# Copy the layers from the build stage
+COPY --from=build /workspace/dependencies/ ./
+COPY --from=build /workspace/spring-boot-loader/ ./
+COPY --from=build /workspace/snapshot-dependencies/ ./
+COPY --from=build /workspace/application/ ./
 
 ENV SPRING_PROFILES_ACTIVE=prod \
     SERVER_PORT=8080 \
     JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UseG1GC -XX:+UseStringDeduplication" \
     TZ=UTC
 
-WORKDIR /app
-
-# Copy the built application jar from the build stage
-COPY --from=build /workspace/app.jar /app/app.jar
-
-# Create SSL certificate directory for database connections
-RUN mkdir -p /app/ssl
-
 # Create non-root user and set ownership for least-privilege runtime
-RUN addgroup --system app && adduser --system --ingroup app --home /app app \
-    && chown -R app:app /app
-USER app
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost:8080/actuator/health || exit 1
+USER nonroot:nonroot
 
 # Expose the HTTP port
 EXPOSE 8080
 
-# Run the application with optimized JVM settings
-ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -Dserver.port=$SERVER_PORT -jar /app/app.jar"]
+# Run the application
+ENTRYPOINT ["java", "org.springframework.boot.loader.JarLauncher"]
