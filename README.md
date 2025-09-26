@@ -42,6 +42,7 @@ A comprehensive web application that connects customers with junkyards and auto 
 3. **Run the application**
    ```bash
   For local development: ./gradlew runLocal
+  For test environment: ./gradlew runTest
   For production environment: ./gradlew runProd
    ```
 
@@ -60,16 +61,21 @@ A comprehensive web application that connects customers with junkyards and auto 
 
 ### Environments
 
-- **Development** (local PostgreSQL):
+- **Local Development** (local PostgreSQL):
   - `./gradlew runLocal`
 
-- **Production** (Supabase DB):
-  - Add Supabase DB creds in `.env` as `PROD_DATABASE_URL`, `PROD_DATABASE_USERNAME`, `PROD_DATABASE_PASSWORD`.
+- **Test Environment** (DEV profile + Neon DB):
+  - Add Neon DB creds in `.env` as `TEST_DATABASE_URL`, `TEST_DATABASE_USERNAME`, `TEST_DATABASE_PASSWORD`.
+  - `./gradlew runTest`
+
+- **Production Environment** (PROD profile + Neon DB):
+  - Add Neon DB creds in `.env` as `PROD_DATABASE_URL`, `PROD_DATABASE_USERNAME`, `PROD_DATABASE_PASSWORD`.
   - `./gradlew runProd`
 
 ### Database Migrations
 
 - **Development DB**: `./gradlew flywayMigrateDev`
+- **Test DB**: `./gradlew flywayMigrateTest`
 - **Production DB**: `./gradlew flywayMigrateProd`
 
 
@@ -106,29 +112,7 @@ The project includes Docker Compose configuration for local development:
 - Redis cache (optional)
 - Automatic database initialization
 
-## 🚀 Deployment
 
-### Northflank Deployment
-
-The application is configured for deployment on Northflank with Supabase as the database:
-
-1. **Configure environment variables** in Northflank:
-   - `SPRING_PROFILES_ACTIVE=prod`
-   - `DATABASE_URL`, `DATABASE_USERNAME`, `DATABASE_PASSWORD`
-   - `SERVER_PORT=8080`
-
-2. **Deploy using northflank.yaml**:
-   - Upload the `northflank.yaml` file to your project
-   - Configure the service using the YAML configuration
-
-3. **Or use Docker**:
-   ```bash
-   docker build -t your-registry/recicar-marketplace:latest .
-   # Deploy using the Docker image in Northflank
-   ```
-
-For detailed deployment instructions, see:
-- [Northflank Deployment Guide](NORTHFLANK_DEPLOYMENT_GUIDE.md)
 
 ## 🤝 Contributing
 
