@@ -41,7 +41,7 @@
 
     <style>
         .categories-page {
-            background-color: #ffffff;
+            background-color: #f8f9fa;
             min-height: 100vh;
         }
         
@@ -60,28 +60,40 @@
         }
         
         .categories-list {
-            background-color: #ffffff;
+            background-color: #f8f9fa;
             padding: 20px 0 40px 0;
         }
         
         .category-item {
             display: flex;
             align-items: center;
-            padding: 16px 0;
-            border-bottom: 1px solid #f0f0f0;
+            padding: 16px 20px;
+            margin-bottom: 8px;
+            background-color: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
             text-decoration: none;
             color: #333333;
-            transition: background-color 0.2s ease;
+            transition: all 0.2s ease;
+            cursor: pointer;
         }
         
         .category-item:hover {
             background-color: #f8f9fa;
             text-decoration: none;
             color: #333333;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
-        .category-item:last-child {
-            border-bottom: none;
+        .category-item.active {
+            background-color: #fff3cd;
+            border-color: #ffc107;
+        }
+        
+        .category-item.active .category-name,
+        .category-item.active .category-count,
+        .category-item.active .category-expand {
+            color: #ff8c00;
         }
         
         .category-icon {
@@ -90,27 +102,114 @@
             margin-right: 16px;
             color: #666666;
             flex-shrink: 0;
+            font-size: 18px;
         }
         
         .category-name {
             flex: 1;
             font-size: 16px;
-            font-weight: 400;
+            font-weight: 500;
             color: #333333;
             margin: 0;
         }
         
-        .category-arrow {
-            width: 16px;
-            height: 16px;
-            color: #999999;
+        .category-count {
+            font-size: 14px;
+            color: #6c757d;
+            margin-right: 12px;
+            font-weight: 400;
+        }
+        
+        .category-expand {
+            width: 20px;
+            height: 20px;
+            color: #6c757d;
             flex-shrink: 0;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.2s ease;
+        }
+        
+        .category-item.expanded .category-expand {
+            transform: rotate(45deg);
+        }
+        
+        .subcategories {
+            display: none;
+            background-color: #f8f9fa;
+            border-left: 3px solid #ffc107;
+            margin-left: 20px;
+            margin-top: 8px;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .subcategories.show {
+            display: block;
+        }
+        
+        .subcategory-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            margin-bottom: 4px;
+            background-color: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #495057;
+            transition: all 0.2s ease;
+        }
+        
+        .subcategory-item:hover {
+            background-color: #e9ecef;
+            text-decoration: none;
+            color: #495057;
+        }
+        
+        .subcategory-name {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 400;
+            margin: 0;
+        }
+        
+        .subcategory-count {
+            font-size: 12px;
+            color: #6c757d;
+            margin-right: 8px;
         }
         
         .container-custom {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 0 20px;
+        }
+        
+        .search-box {
+            background-color: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .search-box input {
+            border: none;
+            outline: none;
+            flex: 1;
+            font-size: 16px;
+            color: #333333;
+        }
+        
+        .search-box input::placeholder {
+            color: #6c757d;
+        }
+        
+        .search-icon {
+            color: #6c757d;
+            margin-right: 12px;
         }
     </style>
 </head>
@@ -133,57 +232,397 @@
                 <h1 class="categories-title">Búsqueda rápida de categoría</h1>
             </div>
             
+            <!-- Search Box -->
+            <div class="search-box">
+                <i class="fa fa-search search-icon"></i>
+                <input type="text" placeholder="Búsqueda rápida de categoría" id="categorySearch">
+            </div>
+            
             <!-- Categories List -->
             <div class="categories-list">
-                <a th:each="category : ${categories}" class="category-item" th:href="@{'/categories/' + ${category.slug}}">
-                    <!-- Category Icons -->
+                <!-- Caja de cambios/embrague/transmisión -->
+                <div class="category-item" data-category="caja-cambios-embrague-transmision">
                     <div class="category-icon">
-                        <!-- Caja de cambios/embrague/transmisión -->
-                        <i th:if="${category.slug == 'caja-cambios-embrague-transmision'}" class="fa fa-cogs"></i>
-                        <!-- Carrocería/repuestos de carrocería/gancho -->
-                        <i th:if="${category.slug == 'carroceria-repuestos-gancho'}" class="fa fa-car"></i>
-                        <!-- Dispositivos/interruptores/sistema electrónico -->
-                        <i th:if="${category.slug == 'dispositivos-interruptores-electronico'}" class="fa fa-tachometer"></i>
-                        <!-- Eje delantero -->
-                        <i th:if="${category.slug == 'eje-delantero'}" class="fa fa-circle-o"></i>
-                        <!-- Eje trasero -->
-                        <i th:if="${category.slug == 'eje-trasero'}" class="fa fa-circle-o"></i>
-                        <!-- Habitáculo/interior -->
-                        <i th:if="${category.slug == 'habitaculo-interior'}" class="fa fa-user"></i>
-                        <!-- Lunas -->
-                        <i th:if="${category.slug == 'lunas'}" class="fa fa-square-o"></i>
-                        <!-- Motor -->
-                        <i th:if="${category.slug == 'motor'}" class="fa fa-cog"></i>
-                        <!-- Otros repuestos -->
-                        <i th:if="${category.slug == 'otros-repuestos'}" class="fa fa-wrench"></i>
-                        <!-- Puerta -->
-                        <i th:if="${category.slug == 'puerta'}" class="fa fa-square"></i>
-                        <!-- Radiador de calefacción/aire acondicionado -->
-                        <i th:if="${category.slug == 'radiador-calefaccion-aire-acondicionado'}" class="fa fa-thermometer-half"></i>
-                        <!-- Repuestos de carrocería delantera exterior -->
-                        <i th:if="${category.slug == 'repuestos-carroceria-delantera-exterior'}" class="fa fa-car"></i>
-                        <!-- Repuestos de la carrocería exterior trasera -->
-                        <i th:if="${category.slug == 'repuestos-carroceria-exterior-trasera'}" class="fa fa-car"></i>
-                        <!-- Ruedas/neumáticos/tapacubos -->
-                        <i th:if="${category.slug == 'ruedas-neumaticos-tapacubos'}" class="fa fa-circle"></i>
-                        <!-- Sistema de frenos -->
-                        <i th:if="${category.slug == 'sistema-frenos'}" class="fa fa-stop-circle"></i>
-                        <!-- Sistema de iluminación -->
-                        <i th:if="${category.slug == 'sistema-iluminacion'}" class="fa fa-lightbulb-o"></i>
-                        <!-- Sistema de limpiado/lavado del faro -->
-                        <i th:if="${category.slug == 'sistema-limpiado-lavado-faro'}" class="fa fa-shower"></i>
-                        <!-- Sistema de mezcla de combustible -->
-                        <i th:if="${category.slug == 'sistema-mezcla-combustible'}" class="fa fa-tint"></i>
-                        <!-- Sistema del tubo de escape -->
-                        <i th:if="${category.slug == 'sistema-tubo-escape'}" class="fa fa-pipe"></i>
+                        <i class="fa fa-cogs"></i>
                     </div>
-                    
-                    <h3 class="category-name" th:text="${category.name}">Categoría</h3>
-                    
-                    <div class="category-arrow">
-                        <i class="fa fa-chevron-right"></i>
+                    <h3 class="category-name">Caja de cambios/embrague/transmisión</h3>
+                    <span class="category-count">6276</span>
+                    <div class="category-expand">+</div>
+                </div>
+                <div class="subcategories" id="subcategories-caja-cambios-embrague-transmision">
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Caja de cambios manual de 5 velocidades</span>
+                        <span class="subcategory-count">142</span>
+                    </a>
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Caja de cambios manual de 6 velocidades</span>
+                        <span class="subcategory-count">9</span>
+                    </a>
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Caja de cambios automática</span>
+                        <span class="subcategory-count">265</span>
+                    </a>
+                </div>
+
+                <!-- Carrocería/repuestos de carrocería/gancho -->
+                <div class="category-item" data-category="carroceria-repuestos-gancho">
+                    <div class="category-icon">
+                        <i class="fa fa-car"></i>
                     </div>
-                </a>
+                    <h3 class="category-name">Carrocería/repuestos de carrocería/gancho</h3>
+                    <span class="category-count">16936</span>
+                    <div class="category-expand">+</div>
+                </div>
+                <div class="subcategories" id="subcategories-carroceria-repuestos-gancho">
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Parachoques delantero</span>
+                        <span class="subcategory-count">1250</span>
+                    </a>
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Parachoques trasero</span>
+                        <span class="subcategory-count">980</span>
+                    </a>
+                </div>
+
+                <!-- Dispositivos/interruptores/sistema electrónico -->
+                <div class="category-item" data-category="dispositivos-interruptores-electronico">
+                    <div class="category-icon">
+                        <i class="fa fa-tachometer"></i>
+                    </div>
+                    <h3 class="category-name">Dispositivos/interruptores/sistema electrónico</h3>
+                    <span class="category-count">93737</span>
+                    <div class="category-expand">+</div>
+                </div>
+                <div class="subcategories" id="subcategories-dispositivos-interruptores-electronico">
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Centralitas</span>
+                        <span class="subcategory-count">2500</span>
+                    </a>
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Sensores</span>
+                        <span class="subcategory-count">1800</span>
+                    </a>
+                </div>
+
+                <!-- Eje delantero -->
+                <div class="category-item" data-category="eje-delantero">
+                    <div class="category-icon">
+                        <i class="fa fa-circle-o"></i>
+                    </div>
+                    <h3 class="category-name">Eje delantero</h3>
+                    <span class="category-count">16236</span>
+                    <div class="category-expand">+</div>
+                </div>
+                <div class="subcategories" id="subcategories-eje-delantero">
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Amortiguadores delanteros</span>
+                        <span class="subcategory-count">850</span>
+                    </a>
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Brazos de suspensión</span>
+                        <span class="subcategory-count">1200</span>
+                    </a>
+                </div>
+
+                <!-- Eje trasero -->
+                <div class="category-item" data-category="eje-trasero">
+                    <div class="category-icon">
+                        <i class="fa fa-circle-o"></i>
+                    </div>
+                    <h3 class="category-name">Eje trasero</h3>
+                    <span class="category-count">15751</span>
+                    <div class="category-expand">+</div>
+                </div>
+                <div class="subcategories" id="subcategories-eje-trasero">
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Amortiguadores traseros</span>
+                        <span class="subcategory-count">750</span>
+                    </a>
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Muelles traseros</span>
+                        <span class="subcategory-count">600</span>
+                    </a>
+                </div>
+
+                <!-- Habitáculo/interior -->
+                <div class="category-item" data-category="habitaculo-interior">
+                    <div class="category-icon">
+                        <i class="fa fa-user"></i>
+                    </div>
+                    <h3 class="category-name">Habitáculo/interior</h3>
+                    <span class="category-count">62979</span>
+                    <div class="category-expand">+</div>
+                </div>
+                <div class="subcategories" id="subcategories-habitaculo-interior">
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Asientos delanteros</span>
+                        <span class="subcategory-count">1200</span>
+                    </a>
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Asientos traseros</span>
+                        <span class="subcategory-count">800</span>
+                    </a>
+                </div>
+
+                <!-- Lunas -->
+                <div class="category-item" data-category="lunas">
+                    <div class="category-icon">
+                        <i class="fa fa-square-o"></i>
+                    </div>
+                    <h3 class="category-name">Lunas</h3>
+                    <span class="category-count">3784</span>
+                    <div class="category-expand">+</div>
+                </div>
+                <div class="subcategories" id="subcategories-lunas">
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Luna delantera</span>
+                        <span class="subcategory-count">450</span>
+                    </a>
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Luna trasera</span>
+                        <span class="subcategory-count">380</span>
+                    </a>
+                </div>
+
+                <!-- Motor -->
+                <div class="category-item" data-category="motor">
+                    <div class="category-icon">
+                        <i class="fa fa-cog"></i>
+                    </div>
+                    <h3 class="category-name">Motor</h3>
+                    <span class="category-count">8202</span>
+                    <div class="category-expand">+</div>
+                </div>
+                <div class="subcategories" id="subcategories-motor">
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Culata</span>
+                        <span class="subcategory-count">320</span>
+                    </a>
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Bloque motor</span>
+                        <span class="subcategory-count">180</span>
+                    </a>
+                </div>
+
+                <!-- Otros repuestos -->
+                <div class="category-item" data-category="otros-repuestos">
+                    <div class="category-icon">
+                        <i class="fa fa-wrench"></i>
+                    </div>
+                    <h3 class="category-name">Otros repuestos</h3>
+                    <span class="category-count">16888</span>
+                    <div class="category-expand">+</div>
+                </div>
+                <div class="subcategories" id="subcategories-otros-repuestos">
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Accesorios varios</span>
+                        <span class="subcategory-count">2500</span>
+                    </a>
+                </div>
+
+                <!-- Puerta -->
+                <div class="category-item" data-category="puerta">
+                    <div class="category-icon">
+                        <i class="fa fa-square"></i>
+                    </div>
+                    <h3 class="category-name">Puerta</h3>
+                    <span class="category-count">33084</span>
+                    <div class="category-expand">+</div>
+                </div>
+                <div class="subcategories" id="subcategories-puerta">
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Puerta delantera izquierda</span>
+                        <span class="subcategory-count">1200</span>
+                    </a>
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Puerta delantera derecha</span>
+                        <span class="subcategory-count">1200</span>
+                    </a>
+                </div>
+
+                <!-- Radiador de calefacción/aire acondicionado -->
+                <div class="category-item" data-category="radiador-calefaccion-aire-acondicionado">
+                    <div class="category-icon">
+                        <i class="fa fa-thermometer-half"></i>
+                    </div>
+                    <h3 class="category-name">Radiador de calefacción/aire acondicionado</h3>
+                    <span class="category-count">42061</span>
+                    <div class="category-expand">+</div>
+                </div>
+                <div class="subcategories" id="subcategories-radiador-calefaccion-aire-acondicionado">
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Radiador de calefacción</span>
+                        <span class="subcategory-count">850</span>
+                    </a>
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Compresor aire acondicionado</span>
+                        <span class="subcategory-count">420</span>
+                    </a>
+                </div>
+
+                <!-- Repuestos de carrocería delantera exterior -->
+                <div class="category-item" data-category="repuestos-carroceria-delantera-exterior">
+                    <div class="category-icon">
+                        <i class="fa fa-car"></i>
+                    </div>
+                    <h3 class="category-name">Repuestos de carrocería delantera exterior</h3>
+                    <span class="category-count">24343</span>
+                    <div class="category-expand">+</div>
+                </div>
+                <div class="subcategories" id="subcategories-repuestos-carroceria-delantera-exterior">
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Capó delantero</span>
+                        <span class="subcategory-count">650</span>
+                    </a>
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Guardabarros delanteros</span>
+                        <span class="subcategory-count">800</span>
+                    </a>
+                </div>
+
+                <!-- Repuestos de la carrocería exterior trasera -->
+                <div class="category-item" data-category="repuestos-carroceria-exterior-trasera">
+                    <div class="category-icon">
+                        <i class="fa fa-car"></i>
+                    </div>
+                    <h3 class="category-name">Repuestos de la carrocería exterior trasera</h3>
+                    <span class="category-count">19104</span>
+                    <div class="category-expand">+</div>
+                </div>
+                <div class="subcategories" id="subcategories-repuestos-carroceria-exterior-trasera">
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Maletero</span>
+                        <span class="subcategory-count">450</span>
+                    </a>
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Guardabarros traseros</span>
+                        <span class="subcategory-count">600</span>
+                    </a>
+                </div>
+
+                <!-- Ruedas/neumáticos/tapacubos -->
+                <div class="category-item" data-category="ruedas-neumaticos-tapacubos">
+                    <div class="category-icon">
+                        <i class="fa fa-circle"></i>
+                    </div>
+                    <h3 class="category-name">Ruedas/neumáticos/tapacubos</h3>
+                    <span class="category-count">3112</span>
+                    <div class="category-expand">+</div>
+                </div>
+                <div class="subcategories" id="subcategories-ruedas-neumaticos-tapacubos">
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Neumáticos</span>
+                        <span class="subcategory-count">800</span>
+                    </a>
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Tapacubos</span>
+                        <span class="subcategory-count">300</span>
+                    </a>
+                </div>
+
+                <!-- Sistema de frenos -->
+                <div class="category-item" data-category="sistema-frenos">
+                    <div class="category-icon">
+                        <i class="fa fa-stop-circle"></i>
+                    </div>
+                    <h3 class="category-name">Sistema de frenos</h3>
+                    <span class="category-count">14190</span>
+                    <div class="category-expand">+</div>
+                </div>
+                <div class="subcategories" id="subcategories-sistema-frenos">
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Pastillas de freno</span>
+                        <span class="subcategory-count">1200</span>
+                    </a>
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Discos de freno</span>
+                        <span class="subcategory-count">800</span>
+                    </a>
+                </div>
+
+                <!-- Sistema de iluminación (Highlighted) -->
+                <div class="category-item active" data-category="sistema-iluminacion">
+                    <div class="category-icon">
+                        <i class="fa fa-lightbulb-o"></i>
+                    </div>
+                    <h3 class="category-name">Sistema de iluminación</h3>
+                    <span class="category-count">15367</span>
+                    <div class="category-expand">+</div>
+                </div>
+                <div class="subcategories show" id="subcategories-sistema-iluminacion">
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Faros delanteros</span>
+                        <span class="subcategory-count">1200</span>
+                    </a>
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Luces traseras</span>
+                        <span class="subcategory-count">950</span>
+                    </a>
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Luces de señalización</span>
+                        <span class="subcategory-count">600</span>
+                    </a>
+                </div>
+
+                <!-- Sistema de limpiado/lavado del faro -->
+                <div class="category-item" data-category="sistema-limpiado-lavado-faro">
+                    <div class="category-icon">
+                        <i class="fa fa-shower"></i>
+                    </div>
+                    <h3 class="category-name">Sistema de limpiado/lavado del faro</h3>
+                    <span class="category-count">6370</span>
+                    <div class="category-expand">+</div>
+                </div>
+                <div class="subcategories" id="subcategories-sistema-limpiado-lavado-faro">
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Limpiaparabrisas</span>
+                        <span class="subcategory-count">400</span>
+                    </a>
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Bomba de agua</span>
+                        <span class="subcategory-count">200</span>
+                    </a>
+                </div>
+
+                <!-- Sistema de mezcla de combustible -->
+                <div class="category-item" data-category="sistema-mezcla-combustible">
+                    <div class="category-icon">
+                        <i class="fa fa-tint"></i>
+                    </div>
+                    <h3 class="category-name">Sistema de mezcla de combustible</h3>
+                    <span class="category-count">3450</span>
+                    <div class="category-expand">+</div>
+                </div>
+                <div class="subcategories" id="subcategories-sistema-mezcla-combustible">
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Inyectores</span>
+                        <span class="subcategory-count">300</span>
+                    </a>
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Bomba de combustible</span>
+                        <span class="subcategory-count">150</span>
+                    </a>
+                </div>
+
+                <!-- Sistema del tubo de escape -->
+                <div class="category-item" data-category="sistema-tubo-escape">
+                    <div class="category-icon">
+                        <i class="fa fa-pipe"></i>
+                    </div>
+                    <h3 class="category-name">Sistema del tubo de escape</h3>
+                    <span class="category-count">631</span>
+                    <div class="category-expand">+</div>
+                </div>
+                <div class="subcategories" id="subcategories-sistema-tubo-escape">
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Silenciador</span>
+                        <span class="subcategory-count">200</span>
+                    </a>
+                    <a href="#" class="subcategory-item">
+                        <span class="subcategory-name">Catalizador</span>
+                        <span class="subcategory-count">150</span>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -227,6 +666,91 @@
     <!-- Main JS -->
     <script src="assets/js/main.js"></script>
 
+    <!-- Categories Page JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all category items and search input
+            const categoryItems = document.querySelectorAll('.category-item');
+            const searchInput = document.getElementById('categorySearch');
+            
+            // Handle category expansion/collapse
+            categoryItems.forEach(item => {
+                const expandButton = item.querySelector('.category-expand');
+                const categoryName = item.getAttribute('data-category');
+                const subcategories = document.getElementById(`subcategories-${categoryName}`);
+                
+                // Click handler for category item
+                item.addEventListener('click', function(e) {
+                    // Don't trigger if clicking on subcategory links
+                    if (e.target.closest('.subcategory-item')) {
+                        return;
+                    }
+                    
+                    // Toggle active state
+                    categoryItems.forEach(cat => cat.classList.remove('active'));
+                    item.classList.add('active');
+                    
+                    // Toggle expanded state
+                    const isExpanded = item.classList.contains('expanded');
+                    
+                    // Close all other categories
+                    categoryItems.forEach(cat => {
+                        cat.classList.remove('expanded');
+                        const catName = cat.getAttribute('data-category');
+                        const catSubcategories = document.getElementById(`subcategories-${catName}`);
+                        if (catSubcategories) {
+                            catSubcategories.classList.remove('show');
+                        }
+                    });
+                    
+                    // Toggle current category
+                    if (!isExpanded) {
+                        item.classList.add('expanded');
+                        if (subcategories) {
+                            subcategories.classList.add('show');
+                        }
+                    }
+                });
+            });
+            
+            // Search functionality
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                categoryItems.forEach(item => {
+                    const categoryName = item.querySelector('.category-name').textContent.toLowerCase();
+                    const subcategories = item.nextElementSibling;
+                    
+                    if (categoryName.includes(searchTerm)) {
+                        item.style.display = 'flex';
+                        if (subcategories) {
+                            subcategories.style.display = 'block';
+                        }
+                    } else {
+                        item.style.display = 'none';
+                        if (subcategories) {
+                            subcategories.style.display = 'none';
+                        }
+                    }
+                });
+            });
+            
+            // Clear search on escape key
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    this.value = '';
+                    categoryItems.forEach(item => {
+                        item.style.display = 'flex';
+                        const categoryName = item.getAttribute('data-category');
+                        const subcategories = document.getElementById(`subcategories-${categoryName}`);
+                        if (subcategories) {
+                            subcategories.style.display = 'none';
+                        }
+                    });
+                }
+            });
+        });
+    </script>
 
 </body>
 

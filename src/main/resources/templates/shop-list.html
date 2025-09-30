@@ -38,6 +38,244 @@
     
     <!--modernizr min js here-->
     <script src="js/vendor/modernizr-3.7.1.min.js"></script>
+    
+    <!-- Custom CSS for Filter Sidebar -->
+    <style>
+        /* Category Search Box */
+        .category-search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .category-search-box .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            z-index: 2;
+        }
+        
+        .category-search-input {
+            width: 100%;
+            padding: 12px 12px 12px 40px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .category-search-input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        
+        /* Category Items */
+        .parts-catalog__items {
+            margin-bottom: 8px;
+            position: relative;
+        }
+        
+        .parts-catalog__title {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            text-decoration: none;
+            color: #333;
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s ease;
+        }
+        
+        .parts-catalog__title:hover {
+            background-color: #f8f9fa;
+            color: #007bff;
+        }
+        
+        .parts-catalog__title i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+            color: #666;
+        }
+        
+        .cat__links__name {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .cat__links__count {
+            color: #999;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        
+        .parts-catalog__items.active .cat__links__name {
+            color: #ff6b35;
+            font-weight: 600;
+        }
+        
+        /* Checkbox Styling */
+        .cat-checkbox-js {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            margin: 0;
+            opacity: 0;
+            z-index: 1;
+        }
+        
+        .cat-checkbox-js + .parts-catalog__title {
+            padding-left: 30px;
+        }
+        
+        .cat-checkbox-js:checked + .parts-catalog__title {
+            background-color: #fff3e0;
+            color: #ff6b35;
+        }
+        
+        /* Filter Sections */
+        .widget_list h2 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 8px;
+        }
+        
+        .widget_list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .widget_list li {
+            margin-bottom: 8px;
+            position: relative;
+        }
+        
+        .widget_list input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.1);
+        }
+        
+        .widget_list label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+            padding: 8px 0;
+            transition: color 0.3s ease;
+        }
+        
+        .widget_list label:hover {
+            color: #007bff;
+        }
+        
+        .widget_list .count {
+            margin-left: auto;
+            color: #999;
+            font-size: 12px;
+        }
+        
+        .widget_list li.checked label {
+            color: #ff6b35;
+            font-weight: 500;
+        }
+        
+        .widget_list li.checked .count {
+            color: #ff6b35;
+        }
+        
+        /* Range Filters */
+        .range-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .range-input {
+            flex: 1;
+        }
+        
+        .range-input label {
+            display: block;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .range-input select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        /* Clear Filter Button */
+        .clear-filter-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #ff6b35, #ff8c42);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .clear-filter-btn:hover {
+            background: linear-gradient(135deg, #e55a2b, #ff7a35);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(255, 107, 53, 0.3);
+        }
+        
+        .clear-icon {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        /* Show More Link */
+        .show-more {
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        .show-more-link {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .show-more-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .range-filter {
+                flex-direction: column;
+            }
+            
+            .parts-catalog__title {
+                padding: 10px 0;
+            }
+            
+            .cat__links__name {
+                font-size: 13px;
+            }
+        }
+    </style>
 
 </head>
 
@@ -78,127 +316,377 @@
                    <!--sidebar widget start-->
                     <aside class="sidebar_widget">
                         <div class="widget_inner">
+                            <!-- Quick Category Search -->
                             <div class="widget_list widget_filter">
-                                <h2>Filtrar por precio</h2>
-                                <form action="#">
-                                    <div id="slider-range"></div>
-                                    <button type="submit">Filtrar</button>
-                                    <input type="text" name="text" id="amount" />
-                                </form>
+                                <div class="category-search-box">
+                                    <i class="fa fa-search search-icon"></i>
+                                    <input type="text" placeholder="Búsqueda rápida de categoría" id="category-filter" class="category-search-input">
+                                </div>
                             </div>
+
+                            <!-- Main Categories -->
                             <div class="widget_list widget_categories">
-                                <h2>categorías</h2>
+                                <h2>Categorías</h2>
+                                <ul class="parts-catalog cat clearfix">
+                                    <!-- Categories will be added here -->
+                                </ul>
+                            </div>
+
+                            <!-- Fuel Type Filter -->
+                            <div class="widget_list widget_categories">
+                                <h2>Tipo de combustible</h2>
                                 <ul>
                                     <li>
-                                        <input type="checkbox">
-                                        <a href="#">Categories1 (6)</a>
-                                        <span class="checkmark"></span>
+                                        <input type="checkbox" name="fuel-diesel" value="diesel" id="fuel-diesel">
+                                        <label for="fuel-diesel">Diésel <span class="count">157647</span></label>
                                     </li>
                                     <li>
-                                        <input type="checkbox">
-                                        <a href="#">Categories2(10)</a>
-                                        <span class="checkmark"></span>
+                                        <input type="checkbox" name="fuel-gasoline" value="gasoline" id="fuel-gasoline">
+                                        <label for="fuel-gasoline">Gasolina <span class="count">92631</span></label>
                                     </li>
                                     <li>
-                                        <input type="checkbox">
-                                        <a href="#">Categories3 (4)</a>
-                                        <span class="checkmark"></span>
+                                        <input type="checkbox" name="fuel-gasoline-gas" value="gasoline-gas" id="fuel-gasoline-gas">
+                                        <label for="fuel-gasoline-gas">Gasolina/gas <span class="count">1189</span></label>
                                     </li>
                                     <li>
-                                        <input type="checkbox">
-                                        <a href="#">Categories4(10)</a>
-                                        <span class="checkmark"></span>
+                                        <input type="checkbox" name="fuel-gasoline-electric" value="gasoline-electric" id="fuel-gasoline-electric">
+                                        <label for="fuel-gasoline-electric">Gasolina/electricidad <span class="count">2644</span></label>
+                                    </li>
+                                    <li class="checked">
+                                        <input type="checkbox" name="fuel-electric" value="electric" id="fuel-electric" checked>
+                                        <label for="fuel-electric">Electricidad <span class="count">3489</span></label>
                                     </li>
                                     <li>
-                                        <input type="checkbox">
-                                        <a href="#">Categories5(8)</a>
-                                        <span class="checkmark"></span>
+                                        <input type="checkbox" name="fuel-diesel-electric" value="diesel-electric" id="fuel-diesel-electric">
+                                        <label for="fuel-diesel-electric">Diésel/electricidad <span class="count">335</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="fuel-diesel-gas" value="diesel-gas" id="fuel-diesel-gas">
+                                        <label for="fuel-diesel-gas">Diésel/gas <span class="count">17</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="fuel-bioethanol" value="bioethanol" id="fuel-bioethanol">
+                                        <label for="fuel-bioethanol">Bioetanol (E85) <span class="count">162</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="fuel-other" value="other" id="fuel-other">
+                                        <label for="fuel-other">Otro <span class="count">17150</span></label>
                                     </li>
                                 </ul>
                             </div>
+
+                            <!-- Body Type Filter -->
                             <div class="widget_list widget_categories">
-                                <h2>Fabricante</h2>
+                                <h2>Tipo de carrocería</h2>
                                 <ul>
                                     <li>
-                                        <input type="checkbox">
-                                        <a href="#">Piezas de freno(6)</a>
-                                        <span class="checkmark"></span>
+                                        <input type="checkbox" name="body-other" value="other" id="body-other">
+                                        <label for="body-other">Otro <span class="count">1063</span></label>
                                     </li>
                                     <li>
-                                        <input type="checkbox">
-                                        <a href="#">Accesorios (10)</a>
-                                        <span class="checkmark"></span>
+                                        <input type="checkbox" name="body-turismo" value="turismo" id="body-turismo">
+                                        <label for="body-turismo">Turismo <span class="count">299</span></label>
                                     </li>
                                     <li>
-                                        <input type="checkbox">
-                                        <a href="#">Piezas de motor (4)</a>
-                                        <span class="checkmark"></span>
+                                        <input type="checkbox" name="body-3doors" value="3doors" id="body-3doors">
+                                        <label for="body-3doors">3 puertas <span class="count">1077</span></label>
                                     </li>
                                     <li>
-                                        <input type="checkbox">
-                                        <a href="#">hermes(10)</a>
-                                        <span class="checkmark"></span>
+                                        <input type="checkbox" name="body-caravana" value="caravana" id="body-caravana">
+                                        <label for="body-caravana">Caravana <span class="count">35</span></label>
                                     </li>
                                     <li>
-                                        <input type="checkbox">
-                                        <a href="#">louis vuitton(8)</a>
-                                        <span class="checkmark"></span>
+                                        <input type="checkbox" name="body-minifurgoneta" value="minifurgoneta" id="body-minifurgoneta">
+                                        <label for="body-minifurgoneta">Minifurgoneta <span class="count">80</span></label>
                                     </li>
                                     <li>
-                                        <input type="checkbox">
-                                        <a href="#">Tommy Hilfiger(7)</a>
-                                        <span class="checkmark"></span>
+                                        <input type="checkbox" name="body-suv" value="suv" id="body-suv">
+                                        <label for="body-suv">SUV <span class="count">874</span></label>
                                     </li>
                                     <li>
-                                        <input type="checkbox">
-                                        <a href="#">Plantas de interior(6)</a>
-                                        <span class="checkmark"></span>
+                                        <input type="checkbox" name="body-coupe" value="coupe" id="body-coupe">
+                                        <label for="body-coupe">Coupé <span class="count">28</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="body-comercial" value="comercial" id="body-comercial">
+                                        <label for="body-comercial">Comercial <span class="count">23</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="body-cabriolet" value="cabriolet" id="body-cabriolet">
+                                        <label for="body-cabriolet">Cabriolet <span class="count">3</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="body-roadster" value="roadster" id="body-roadster">
+                                        <label for="body-roadster">Roadster <span class="count">1</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="body-limusina" value="limusina" id="body-limusina">
+                                        <label for="body-limusina">Limusina <span class="count">5</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="body-pickup" value="pickup" id="body-pickup">
+                                        <label for="body-pickup">Pick-up <span class="count">1</span></label>
                                     </li>
                                 </ul>
                             </div>
+
+                            <!-- Gearbox Type Filter -->
                             <div class="widget_list widget_categories">
-                                <h2>Seleccionar por color</h2>
+                                <h2>Tipo de caja de cambios</h2>
                                 <ul>
                                     <li>
-                                        <input type="checkbox">
-                                        <a href="#">Negro (6)</a>
-                                        <span class="checkmark"></span>
+                                        <input type="checkbox" name="gearbox-manual" value="manual" id="gearbox-manual">
+                                        <label for="gearbox-manual">Manual <span class="count">1510</span></label>
                                     </li>
                                     <li>
-                                        <input type="checkbox">
-                                        <a href="#"> Azul (8)</a>
-                                        <span class="checkmark"></span>
-                                    </li>
-                                    <li>
-                                        <input type="checkbox">
-                                        <a href="#">Marrón (10)</a>
-                                        <span class="checkmark"></span>
-                                    </li>
-                                    <li>
-                                        <input type="checkbox">
-                                        <a href="#"> Verde (6)</a>
-                                        <span class="checkmark"></span>
-                                    </li>
-                                    <li>
-                                        <input type="checkbox">
-                                        <a href="#">Rosa (4)</a>
-                                        <span class="checkmark"></span>
-                                    </li>
-                                    <li>
-                                        <input type="checkbox">
-                                        <a href="#">Blanco (2)</a>
-                                        <span class="checkmark"></span>
-                                    </li>
-                                    <li>
-                                        <input type="checkbox">
-                                        <a href="#">Amarillo (3)</a>
-                                        <span class="checkmark"></span>
+                                        <input type="checkbox" name="gearbox-automatic" value="automatic" id="gearbox-automatic">
+                                        <label for="gearbox-automatic">Automático <span class="count">1979</span></label>
                                     </li>
                                 </ul>
                             </div>
-                        </div>
-                        <div class="shop_sidebar_banner">
-                            <a href="#"><img src="assets/img/bg/banner9.jpg" alt=""></a>
+
+                            <!-- Drive Wheels Filter -->
+                            <div class="widget_list widget_categories">
+                                <h2>Ruedas motrices</h2>
+                                <ul>
+                                    <li>
+                                        <input type="checkbox" name="drive-frontal" value="frontal" id="drive-frontal">
+                                        <label for="drive-frontal">Frontal <span class="count">957</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="drive-trasero" value="trasero" id="drive-trasero">
+                                        <label for="drive-trasero">Trasero <span class="count">266</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="drive-total" value="total" id="drive-total">
+                                        <label for="drive-total">Tracción total <span class="count">564</span></label>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Steering Wheel Position Filter -->
+                            <div class="widget_list widget_categories">
+                                <h2>Posición del volante</h2>
+                                <ul>
+                                    <li>
+                                        <input type="checkbox" name="steering-izquierda" value="izquierda" id="steering-izquierda">
+                                        <label for="steering-izquierda">Izquierda <span class="count">3122</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="steering-derecha" value="derecha" id="steering-derecha">
+                                        <label for="steering-derecha">Derecha <span class="count">365</span></label>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Position Filter -->
+                            <div class="widget_list widget_categories">
+                                <h2>Posición</h2>
+                                <ul>
+                                    <li>
+                                        <input type="checkbox" name="position-todos" value="todos" id="position-todos">
+                                        <label for="position-todos">Todos <span class="count">2</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="position-izquierda" value="izquierda" id="position-izquierda">
+                                        <label for="position-izquierda">Izquierda <span class="count">574</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="position-centro" value="centro" id="position-centro">
+                                        <label for="position-centro">Centro <span class="count">7</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="position-derecha" value="derecha" id="position-derecha">
+                                        <label for="position-derecha">Derecha <span class="count">543</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="position-conjunto" value="conjunto" id="position-conjunto">
+                                        <label for="position-conjunto">El conjunto <span class="count">12</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="position-trasero-izquierdo" value="trasero-izquierdo" id="position-trasero-izquierdo">
+                                        <label for="position-trasero-izquierdo">Trasero izquierdo <span class="count">3</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="position-trasero-derecho" value="trasero-derecho" id="position-trasero-derecho">
+                                        <label for="position-trasero-derecho">Trasero derecho <span class="count">3</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="position-frontal-izquierdo" value="frontal-izquierdo" id="position-frontal-izquierdo">
+                                        <label for="position-frontal-izquierdo">Frontal izquierdo <span class="count">486</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="position-frontal-derecho" value="frontal-derecho" id="position-frontal-derecho">
+                                        <label for="position-frontal-derecho">Frontal derecho <span class="count">490</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="position-frontal" value="frontal" id="position-frontal">
+                                        <label for="position-frontal">Frontal <span class="count">12</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="position-trasero" value="trasero" id="position-trasero">
+                                        <label for="position-trasero">Trasero <span class="count">1</span></label>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Item Location Filter -->
+                            <div class="widget_list widget_categories">
+                                <h2>Ubicación del artículo</h2>
+                                <ul>
+                                    <li>
+                                        <input type="checkbox" name="location-lituania" value="lituania" id="location-lituania">
+                                        <label for="location-lituania">Lituania <span class="count">1439</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="location-letonia" value="letonia" id="location-letonia">
+                                        <label for="location-letonia">Letonia <span class="count">149</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="location-polonia" value="polonia" id="location-polonia">
+                                        <label for="location-polonia">Polonia <span class="count">1144</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="location-estonia" value="estonia" id="location-estonia">
+                                        <label for="location-estonia">Estonia <span class="count">57</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="location-espana" value="espana" id="location-espana">
+                                        <label for="location-espana">España <span class="count">86</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="location-francia" value="francia" id="location-francia">
+                                        <label for="location-francia">Francia, Metropolitana <span class="count">47</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="location-suecia" value="suecia" id="location-suecia">
+                                        <label for="location-suecia">Suecia <span class="count">2</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="location-italia" value="italia" id="location-italia">
+                                        <label for="location-italia">Italia <span class="count">370</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="location-portugal" value="portugal" id="location-portugal">
+                                        <label for="location-portugal">Portugal <span class="count">30</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="location-dinamarca" value="dinamarca" id="location-dinamarca">
+                                        <label for="location-dinamarca">Dinamarca <span class="count">2</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="location-rumania" value="rumania" id="location-rumania">
+                                        <label for="location-rumania">Rumania <span class="count">65</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="location-paises-bajos" value="paises-bajos" id="location-paises-bajos">
+                                        <label for="location-paises-bajos">Países Bajos <span class="count">58</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="location-belgica" value="belgica" id="location-belgica">
+                                        <label for="location-belgica">Bélgica <span class="count">36</span></label>
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="location-alemania" value="alemania" id="location-alemania">
+                                        <label for="location-alemania">Alemania <span class="count">4</span></label>
+                                    </li>
+                                    <li class="show-more">
+                                        <a href="#" class="show-more-link">Mostrar más</a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Range Filters -->
+                            <div class="widget_list widget_filter">
+                                <h2>Año del modelo</h2>
+                                <div class="range-filter">
+                                    <div class="range-input">
+                                        <label>Desde</label>
+                                        <select name="year-from">
+                                            <option value="">Seleccionar</option>
+                                            <option value="2024">2024</option>
+                                            <option value="2023">2023</option>
+                                            <option value="2022">2022</option>
+                                            <option value="2021">2021</option>
+                                            <option value="2020">2020</option>
+                                        </select>
+                                    </div>
+                                    <div class="range-input">
+                                        <label>A</label>
+                                        <select name="year-to">
+                                            <option value="">Seleccionar</option>
+                                            <option value="2024">2024</option>
+                                            <option value="2023">2023</option>
+                                            <option value="2022">2022</option>
+                                            <option value="2021">2021</option>
+                                            <option value="2020">2020</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="widget_list widget_filter">
+                                <h2>Cilindrada del motor cm³</h2>
+                                <div class="range-filter">
+                                    <div class="range-input">
+                                        <label>Desde</label>
+                                        <select name="displacement-from">
+                                            <option value="">Seleccionar</option>
+                                            <option value="1000">1000</option>
+                                            <option value="1500">1500</option>
+                                            <option value="2000">2000</option>
+                                            <option value="2500">2500</option>
+                                            <option value="3000">3000</option>
+                                        </select>
+                                    </div>
+                                    <div class="range-input">
+                                        <label>A</label>
+                                        <select name="displacement-to">
+                                            <option value="">Seleccionar</option>
+                                            <option value="1000">1000</option>
+                                            <option value="1500">1500</option>
+                                            <option value="2000">2000</option>
+                                            <option value="2500">2500</option>
+                                            <option value="3000">3000</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="widget_list widget_filter">
+                                <h2>Potencia del motor, kW</h2>
+                                <div class="range-filter">
+                                    <div class="range-input">
+                                        <label>Desde</label>
+                                        <select name="power-from">
+                                            <option value="">Seleccionar</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                            <option value="150">150</option>
+                                            <option value="200">200</option>
+                                            <option value="250">250</option>
+                                        </select>
+                                    </div>
+                                    <div class="range-input">
+                                        <label>A</label>
+                                        <select name="power-to">
+                                            <option value="">Seleccionar</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                            <option value="150">150</option>
+                                            <option value="200">200</option>
+                                            <option value="250">250</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Clear Filter Button -->
+                            <div class="widget_list widget_filter">
+                                <button type="button" class="clear-filter-btn">
+                                    <span class="clear-icon">X</span> LIMPIAR FILTRO
+                                </button>
+                            </div>
                         </div>
                     </aside>
                     <!--sidebar widget end-->
@@ -576,8 +1064,138 @@
 
      <!-- Main JS -->
      <script src="js/main.js"></script>
-    
-
+     
+     <!-- Filter Sidebar JavaScript -->
+     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Category search functionality
+            const categorySearchInput = document.getElementById('category-filter');
+            const categoryItems = document.querySelectorAll('.parts-catalog__items');
+            
+            if (categorySearchInput) {
+                categorySearchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    
+                    categoryItems.forEach(item => {
+                        const categoryName = item.querySelector('.cat__links__name').textContent.toLowerCase();
+                        const categoryLink = item.querySelector('.parts-catalog__title');
+                        
+                        if (categoryName.includes(searchTerm)) {
+                            item.style.display = 'block';
+                            categoryLink.style.backgroundColor = searchTerm ? '#fff3e0' : '';
+                        } else {
+                            item.style.display = searchTerm ? 'none' : 'block';
+                        }
+                    });
+                });
+            }
+            
+            // Category expansion functionality
+            const categoryLinks = document.querySelectorAll('.cat-links-js');
+            
+            categoryLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const parentItem = this.closest('.parts-catalog__items');
+                    const checkbox = parentItem.querySelector('.cat-checkbox-js');
+                    
+                    // Toggle checkbox
+                    if (checkbox) {
+                        checkbox.checked = !checkbox.checked;
+                        
+                        // Update active state
+                        if (checkbox.checked) {
+                            parentItem.classList.add('active');
+                        } else {
+                            parentItem.classList.remove('active');
+                        }
+                    }
+                });
+            });
+            
+            // Filter checkbox functionality
+            const filterCheckboxes = document.querySelectorAll('input[type="checkbox"]:not(.cat-checkbox-js)');
+            
+            filterCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const parentLi = this.closest('li');
+                    
+                    if (this.checked) {
+                        parentLi.classList.add('checked');
+                    } else {
+                        parentLi.classList.remove('checked');
+                    }
+                });
+            });
+            
+            // Clear filter functionality
+            const clearFilterBtn = document.querySelector('.clear-filter-btn');
+            
+            if (clearFilterBtn) {
+                clearFilterBtn.addEventListener('click', function() {
+                    // Uncheck all checkboxes
+                    const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+                    allCheckboxes.forEach(checkbox => {
+                        checkbox.checked = false;
+                    });
+                    
+                    // Remove active/checked classes
+                    const activeItems = document.querySelectorAll('.active, .checked');
+                    activeItems.forEach(item => {
+                        item.classList.remove('active', 'checked');
+                    });
+                    
+                    // Clear search input
+                    if (categorySearchInput) {
+                        categorySearchInput.value = '';
+                    }
+                    
+                    // Show all category items
+                    categoryItems.forEach(item => {
+                        item.style.display = 'block';
+                        const categoryLink = item.querySelector('.parts-catalog__title');
+                        categoryLink.style.backgroundColor = '';
+                    });
+                    
+                    // Reset all select elements
+                    const selectElements = document.querySelectorAll('select');
+                    selectElements.forEach(select => {
+                        select.selectedIndex = 0;
+                    });
+                });
+            }
+            
+            // Show more functionality for location filter
+            const showMoreLink = document.querySelector('.show-more-link');
+            const locationItems = document.querySelectorAll('#location-lituania, #location-letonia, #location-polonia, #location-estonia, #location-espana, #location-francia, #location-suecia, #location-italia, #location-portugal, #location-dinamarca, #location-rumania, #location-paises-bajos, #location-belgica, #location-alemania');
+            
+            if (showMoreLink) {
+                showMoreLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    locationItems.forEach(item => {
+                        const parentLi = item.closest('li');
+                        if (parentLi) {
+                            parentLi.style.display = parentLi.style.display === 'none' ? 'block' : 'none';
+                        }
+                    });
+                    
+                    this.textContent = this.textContent === 'Mostrar más' ? 'Mostrar menos' : 'Mostrar más';
+                });
+            }
+            
+            // Initialize: Hide some location items by default
+            if (locationItems.length > 8) {
+                for (let i = 8; i < locationItems.length; i++) {
+                    const parentLi = locationItems[i].closest('li');
+                    if (parentLi) {
+                        parentLi.style.display = 'none';
+                    }
+                }
+            }
+        });
+     </script>
 
 </body>
 
