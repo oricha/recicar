@@ -49,62 +49,6 @@ public class PagesController {
         model.addAttribute("categories", categoryService.findRootCategories());
         return "index-2";
     }
-
-    @GetMapping("/index-3")
-    public String index3(Model model) {
-         // Get featured products (latest 8 products)
-        var featuredProducts = productService.findActiveProducts(0, 12);
-        model.addAttribute("featuredProducts", featuredProducts.getContent());
-        
-        // Get categories for navigation
-        model.addAttribute("categories", categoryService.findRootCategories());
-        return "home/index-3";
-    }
-
-    @GetMapping("/index-4")
-    public String index4(Model model) {
-         // Get featured products (latest 8 products)
-        var featuredProducts = productService.findActiveProducts(0, 12);
-        model.addAttribute("featuredProducts", featuredProducts.getContent());
-        
-        // Get categories for navigation
-        model.addAttribute("categories", categoryService.findRootCategories());
-        return "home/index-4";
-    }
-
-    @GetMapping("/index-5")
-    public String index5(Model model) {
-         // Get featured products (latest 8 products)
-        var featuredProducts = productService.findActiveProducts(0, 12);
-        model.addAttribute("featuredProducts", featuredProducts.getContent());
-        
-        // Get categories for navigation
-        model.addAttribute("categories", categoryService.findRootCategories());
-        return "home/index-5";
-    }
-
-    @GetMapping("/index-6")
-    public String index6(Model model) {
-         // Get featured products (latest 8 products)
-        var featuredProducts = productService.findActiveProducts(0, 12);
-        model.addAttribute("featuredProducts", featuredProducts.getContent());
-        
-        // Get categories for navigation
-        model.addAttribute("categories", categoryService.findRootCategories());
-        return "home/index-6";
-    }
-
-    @GetMapping("/index-7")
-    public String index7(Model model) {
-         // Get featured products (latest 8 products)
-        var featuredProducts = productService.findActiveProducts(0, 12);
-        model.addAttribute("featuredProducts", featuredProducts.getContent());
-        
-        // Get categories for navigation
-        model.addAttribute("categories", categoryService.findRootCategories());
-        return "home/index-7";
-    }
-
     
     @GetMapping("/about")
     public String about(Model model) {

@@ -32,8 +32,18 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional(readOnly = true)
     public CartDto getCart(Long userId) {
-        Cart cart = getCartForUser(userId);
-        return toDto(cart);
+        System.out.println("=== CartService.getCart called with userId: " + userId + " ===");
+        try {
+            Cart cart = getCartForUser(userId);
+            System.out.println("Cart retrieved successfully, items count: " + cart.getItems().size());
+            CartDto dto = toDto(cart);
+            System.out.println("CartDto created successfully");
+            return dto;
+        } catch (Exception e) {
+            System.err.println("Error in CartService.getCart: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @Override

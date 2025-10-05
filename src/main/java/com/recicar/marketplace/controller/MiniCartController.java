@@ -28,27 +28,40 @@ public class MiniCartController {
 
     @GetMapping("/mini-cart")
     public String getMiniCart(@AuthenticationPrincipal UserDetails userDetails, HttpSession session, Model model) {
-        if (userDetails != null) {
-            // Authenticated user - get cart from database
-            userRepository.findByEmailIgnoreCase(userDetails.getUsername())
-                    .ifPresent(user -> model.addAttribute("cart", cartService.getCart(user.getId())));
-        } else {
-            // Anonymous user - get cart from session
-            List<CartItemDto> sessionCart = getSessionCart(session);
-            CartDto cartDto = new CartDto();
-            cartDto.setItems(sessionCart);
-            // Calculate subtotal for session cart
-            cartDto.setSubtotal(sessionCart.stream()
-                    .map(item -> item.getPrice().multiply(java.math.BigDecimal.valueOf(item.getQuantity())))
-                    .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add));
-            model.addAttribute("cart", cartDto);
-        }
+        try {
+            if (userDetails != null) {
+                // Authenticated user - get cart from database
+                userRepository.findByEmailIgnoreCase(userDetails.getUsername())
+                        .ifPresent(user -> model.addAttribute("cart", cartService.getCart(user.getId())));
+            } else {
+                // Anonymous user - get cart from session
+                List<CartItemDto> sessionCart = getSessionCart(session);
+                CartDto cartDto = new CartDto();
+                cartDto.setItems(sessionCart);
+                // Calculate subtotal for session cart with null safety
+                cartDto.setSubtotal(sessionCart.stream()
+                        .filter(item -> item.getPrice() != null) // Filter out null prices
+                        .map(item -> item.getPrice().multiply(java.math.BigDecimal.valueOf(item.getQuantity())))
+                        .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add));
+                model.addAttribute("cart", cartDto);
+            }
 
-        if (!model.containsAttribute("cart")) {
+            if (!model.containsAttribute("cart")) {
+                CartDto emptyCart = new CartDto();
+                model.addAttribute("cart", emptyCart);
+            }
+            return "fragments/_mini_cart :: miniCart";
+        } catch (Exception e) {
+            System.err.println("Error loading mini cart: " + e.getMessage());
+            e.printStackTrace();
+            
+            // Return empty cart on error
             CartDto emptyCart = new CartDto();
+            emptyCart.setItems(new java.util.ArrayList<>());
+            emptyCart.setSubtotal(java.math.BigDecimal.ZERO);
             model.addAttribute("cart", emptyCart);
+            return "fragments/_mini_cart :: miniCart";
         }
-        return "fragments/_mini_cart :: miniCart";
     }
 
     @SuppressWarnings("unchecked")

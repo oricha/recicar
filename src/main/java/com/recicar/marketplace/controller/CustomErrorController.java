@@ -21,9 +21,27 @@ public class CustomErrorController implements ErrorController {
             } catch (NumberFormatException ignored) {}
         }
 
-        // Always present the custom 404 page; set status appropriately
-        response.setStatus(HttpStatus.NOT_FOUND.value());
-        return "404";
+        // Log the error for debugging
+        System.err.println("Error occurred with status code: " + statusCode);
+        System.err.println("Request URI: " + request.getRequestURI());
+        System.err.println("Error message: " + request.getAttribute(RequestDispatcher.ERROR_MESSAGE));
+        
+        // Don't set status if response is already committed
+        if (!response.isCommitted()) {
+            if (statusCode == 0) {
+                statusCode = HttpStatus.INTERNAL_SERVER_ERROR.value();
+            }
+            response.setStatus(statusCode);
+        }
+        
+        // Return appropriate error page based on status code
+        if (statusCode == HttpStatus.NOT_FOUND.value()) {
+            return "404";
+        } else if (statusCode == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
+            return "500";
+        } else {
+            return "error";
+        }
     }
 }
 

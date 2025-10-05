@@ -6,7 +6,6 @@ import com.recicar.marketplace.service.CartService;
 import com.recicar.marketplace.repository.UserRepository;
 import com.recicar.marketplace.repository.ProductRepository;
 import com.recicar.marketplace.entity.User;
-import com.recicar.marketplace.entity.Product;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -34,28 +33,56 @@ public class CartController {
 
     @GetMapping
     public String getCartPage(@AuthenticationPrincipal UserDetails userDetails, HttpSession session, Model model) {
-        Long userId = resolveUserId(userDetails);
-        CartDto cart;
-        if (userId != null) {
-            cart = cartService.getCart(userId);
-        } else {
-            // Anonymous user - get cart from session
-            List<CartItemDto> sessionCart = getSessionCart(session);
-            // Ensure each item has id set to productId for consistency
-            for (CartItemDto item : sessionCart) {
-                if (item.getId() == null) {
-                    item.setId(item.getProductId());
+        System.out.println("=== CartController.getCartPage START ===");
+        try {
+            System.out.println("=== CartController.getCartPage called ===");
+            System.out.println("UserDetails: " + userDetails);
+            System.out.println("Session: " + session.getId());
+            
+            Long userId = resolveUserId(userDetails);
+            System.out.println("Resolved userId: " + userId);
+            
+            CartDto cart;
+            if (userId != null) {
+                System.out.println("Getting cart for authenticated user");
+                cart = cartService.getCart(userId);
+            } else {
+                System.out.println("Getting cart for anonymous user");
+                // Anonymous user - get cart from session
+                List<CartItemDto> sessionCart = getSessionCart(session);
+                // Ensure each item has id set to productId for consistency
+                for (CartItemDto item : sessionCart) {
+                    if (item.getId() == null) {
+                        item.setId(item.getProductId());
+                    }
                 }
+                cart = new CartDto();
+                cart.setItems(sessionCart);
+                // Calculate subtotal for session cart with null safety
+                cart.setSubtotal(sessionCart.stream()
+                        .filter(item -> item.getPrice() != null) // Filter out null prices
+                        .map(item -> item.getPrice().multiply(java.math.BigDecimal.valueOf(item.getQuantity())))
+                        .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add));
             }
-            cart = new CartDto();
-            cart.setItems(sessionCart);
-            // Calculate subtotal for session cart
-            cart.setSubtotal(sessionCart.stream()
-                    .map(item -> item.getPrice().multiply(java.math.BigDecimal.valueOf(item.getQuantity())))
-                    .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add));
+            
+            System.out.println("Cart items count: " + (cart.getItems() != null ? cart.getItems().size() : "null"));
+            System.out.println("Cart subtotal: " + cart.getSubtotal());
+            
+            model.addAttribute("cart", cart);
+            System.out.println("Returning 'cart' template");
+            return "cart";
+        } catch (Exception e) {
+            // Log the error and return a safe fallback
+            System.err.println("Error loading cart page: " + e.getMessage());
+            e.printStackTrace();
+            
+            // Create an empty cart as fallback
+            CartDto emptyCart = new CartDto();
+            emptyCart.setItems(new java.util.ArrayList<>());
+            emptyCart.setSubtotal(java.math.BigDecimal.ZERO);
+            model.addAttribute("cart", emptyCart);
+            return "cart";
         }
-        model.addAttribute("cart", cart);
-        return "cart";
     }
 
     @PostMapping("/items")
@@ -73,7 +100,7 @@ public class CartController {
     }
 
     @PostMapping("/update")
-    public String updateCart(@AuthenticationPrincipal UserDetails userDetails, HttpSession session, @RequestParam("items[0].id") Long itemId, @RequestParam("items[0].quantity") int quantity) {
+    public String updateCart(@AuthenticationPrincipal UserDetails userDetails, HttpSession session, @RequestParam("itemId") Long itemId, @RequestParam("quantity") int quantity) {
         Long userId = resolveUserId(userDetails);
         if (userId != null) {
             cartService.updateItemInCart(userId, itemId, quantity);
@@ -140,43 +167,61 @@ public class CartController {
     }
 
     private void addItemToSessionCart(List<CartItemDto> cart, Long productId, int quantity) {
-        // Check if item already exists in cart
-        for (CartItemDto item : cart) {
-            if (item.getProductId().equals(productId)) {
-                item.setQuantity(item.getQuantity() + quantity);
-                return;
-            }
-        }
-
-        // Item doesn't exist, add new item with product details
-        var productOpt = productRepository.findById(productId);
-        if (productOpt.isPresent()) {
-            var product = productOpt.get();
-            CartItemDto newItem = new CartItemDto();
-            newItem.setId(productId); // Use productId as id for session cart
-            newItem.setProductId(productId);
-            newItem.setQuantity(quantity);
-            newItem.setProductName(product.getName());
-            newItem.setPrice(product.getPrice());
-
-            // Set image URL if available
-            if (product.getImages() != null && !product.getImages().isEmpty()) {
-                var primaryImage = product.getImages().stream()
-                        .filter(img -> img.isPrimary())
-                        .findFirst()
-                        .orElse(product.getImages().get(0));
-                newItem.setImageUrl(primaryImage.getImageUrl());
+        try {
+            // Check if item already exists in cart
+            for (CartItemDto item : cart) {
+                if (item.getProductId() != null && item.getProductId().equals(productId)) {
+                    item.setQuantity(item.getQuantity() + quantity);
+                    return;
+                }
             }
 
-            cart.add(newItem);
+            // Item doesn't exist, add new item with product details
+            var productOpt = productRepository.findById(productId);
+            if (productOpt.isPresent()) {
+                var product = productOpt.get();
+                CartItemDto newItem = new CartItemDto();
+                newItem.setId(productId); // Use productId as id for session cart
+                newItem.setProductId(productId);
+                newItem.setQuantity(quantity);
+                newItem.setProductName(product.getName());
+                newItem.setPrice(product.getPrice());
+
+                // Set image URL if available
+                if (product.getImages() != null && !product.getImages().isEmpty()) {
+                    var primaryImage = product.getImages().stream()
+                            .filter(img -> img.isPrimary())
+                            .findFirst()
+                            .orElse(product.getImages().get(0));
+                    newItem.setImageUrl(primaryImage.getImageUrl());
+                }
+
+                cart.add(newItem);
+            }
+        } catch (Exception e) {
+            System.err.println("Error adding item to session cart: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
     private Long resolveUserId(UserDetails userDetails) {
-        if (userDetails == null) return null;
+        System.out.println("=== resolveUserId called ===");
+        if (userDetails == null) {
+            System.out.println("UserDetails is null, returning null");
+            return null;
+        }
         String email = userDetails.getUsername();
-        return userRepository.findByEmailIgnoreCase(email)
-                .map(User::getId)
-                .orElse(null);
+        System.out.println("Email: " + email);
+        try {
+            Long userId = userRepository.findByEmailIgnoreCase(email)
+                    .map(User::getId)
+                    .orElse(null);
+            System.out.println("Resolved userId: " + userId);
+            return userId;
+        } catch (Exception e) {
+            System.err.println("Error resolving userId: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
     }
 }

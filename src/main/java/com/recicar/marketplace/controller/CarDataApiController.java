@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/car-data")
-public class CarApiController {
+public class CarDataApiController {
 
     @Autowired
     private CarDataService carDataService;

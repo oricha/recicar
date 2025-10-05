@@ -44,12 +44,187 @@
 <body>
 
     <!--header area start-->
-<th:block th:replace="fragments/_header :: header"></th:block>
-<!--header area end-->
-
+    <header class="header_area">
+        <!--header top start-->
+        <div class="header_top">
+            <div class="container">
+                <div class="top_inner">
+                    <div class="row align-items-center">
+                        <div class="col-lg-6 col-md-6">
+                            <div class="follow_us">
+                                <label>Síguenos:</label>
+                                <ul class="follow_link">
+                                    <li><a href="#"><i class="ion-social-facebook"></i></a></li>
+                                    <li><a href="#"><i class="ion-social-twitter"></i></a></li>
+                                    <li><a href="#"><i class="ion-social-googleplus"></i></a></li>
+                                    <li><a href="#"><i class="ion-social-youtube"></i></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6">
+                            <div class="top_right text-end">
+                                <ul>
+                                    <li class="top_links">
+                                        <a href="/login"><i class="ion-android-person"></i> Login</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--header top start-->
+        
+        <!--header middel start-->
+        <div class="header_middle">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-3 col-md-6">
+                        <div class="logo">
+                            <a href="/"><img src="/img/logo/logo.png" alt=""></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-9 col-md-6">
+                        <div class="middel_right">
+                            <div class="search-container">
+                                <form action="/search" method="get">
+                                    <div class="search_box">
+                                        <input name="query" placeholder="Introduzca el número o el nombre de la pieza" type="text">
+                                        <button type="submit"><i class="ion-ios-search-strong"></i></button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="middel_right_info">
+                                <div class="header_wishlist">
+                                    <a href="/wishlist"><span class="lnr lnr-heart"></span> Wish list </a>
+                                    <span class="wishlist_quantity" id="wishlist-count">0</span>
+                                </div>
+                                <div class="mini_cart_wrapper">
+                                    <a href="javascript:void(0)"><span class="lnr lnr-cart"></span>My Cart </a>
+                                    <span class="cart_quantity" id="cart-count">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--header middel end-->
+        
+        <!--mini cart-->
+        <div class="mini_cart">
+            <div class="mini_cart_inner">
+                <div class="mini_cart_table">
+                    <div class="cart_table_border">
+                        <div class="cart_total">
+                            <span>Sub total:</span>
+                            <span class="price">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mini_cart_footer">
+                    <div class="cart_button">
+                        <a href="/cart">View cart</a>
+                    </div>
+                    <div class="cart_button">
+                        <a class="active" href="/checkout">Checkout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--mini cart end-->
+        
+        <!--header bottom satrt-->
+        <div class="header_bottom sticky-header">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-12">
+                        <div class="main_menu header_position">
+                            <nav>
+                                <ul>
+                                    <li><a href="/">Home</i></a></li>
+                                    <li><a href="/categories">Categories</a></li>
+                                    <li><a href="/shop-list">Productos</i></a></li>
+                                    <li><a href="/blog">Blog</i></a></li>
+                                    <li><a href="/about">Sobre nosotros</a></li>
+                                    <li><a href="/contact"> Contáctenos</a></li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--header bottom end-->
+    </header>
+    <!--header area end-->
 
 <!--Offcanvas menu area start-->
-<th:block th:replace="fragments/_offcanvasmenu :: offcanvasmenu"></th:block>
+<div class="off_canvars_overlay"></div>
+<div class="Offcanvas_menu">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="canvas_open">
+                    <span>MENU</span>
+                    <a href="javascript:void(0)"><i class="ion-navicon"></i></a>
+                </div>
+                <div class="Offcanvas_menu_wrapper">
+                    <div class="canvas_close">
+                        <a href="#"><i class="ion-android-close"></i></a>
+                    </div>
+                    <div class="top_right text-end">
+                        <ul>
+                            <li class="top_links">
+                                <a href="/login"><i class="ion-android-person"></i> Login</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="Offcanvas_follow">
+                        <label>Síguenos:</label>
+                        <ul class="follow_link">
+                            <li><a href="#"><i class="ion-social-facebook"></i></a></li>
+                            <li><a href="#"><i class="ion-social-twitter"></i></a></li>
+                            <li><a href="#"><i class="ion-social-googleplus"></i></a></li>
+                            <li><a href="#"><i class="ion-social-youtube"></i></a></li>
+                        </ul>
+                    </div>
+                    <div class="search-container">
+                        <form action="#">
+                            <div class="search_box">
+                                <input placeholder="Introduzca el número o el nombre de la pieza" type="text">
+                                <button type="submit"><i class="ion-ios-search-strong"></i></button>
+                            </div>
+                        </form>
+                    </div>
+                    <div id="menu" class="text-left ">
+                        <ul class="offcanvas_main_menu">
+                            <li class="menu-item-has-children">
+                                <a href="/">Home</a>
+                            </li>
+                            <li class="menu-item-has-children">
+                                <a href="/categories">Categories</a>
+                            </li>
+                            <li class="menu-item-has-children">
+                                <a href="/my-account">Mi cuenta</a>
+                            </li>
+                            <li class="menu-item-has-children">
+                                <a href="/about">Sobre nosotros</a>
+                            </li>
+                            <li class="menu-item-has-children">
+                                <a href="/contact"> Contáctenos</a>
+                            </li>
+                            <li class="menu-item-has-children">
+                                <a href="/blog">Blog</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <!--Offcanvas menu area end-->
 
     <!--breadcrumbs area start-->
@@ -89,10 +264,10 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr th:if="${cart == null || #lists.isEmpty(cart.items)}">
+                                        <tr th:if="${cart == null || cart.items == null || cart.items.isEmpty()}">
                                             <td colspan="6" class="text-center">Tu carrito está vacío.</td>
                                         </tr>
-                                        <tr th:each="item, iterStat : ${cart.items}">
+                                        <tr th:each="item : ${cart.items}" th:if="${cart != null && cart.items != null && !cart.items.isEmpty()}">
                                             <td class="product_remove">
                                                 <a th:href="@{/cart/remove/{id}(id=${item.id})}"><i class="fa fa-trash-o"></i></a>
                                             </td>
@@ -107,9 +282,9 @@
                                             <td class="product-price" th:text="${#numbers.formatCurrency(item.price)}">€0.00</td>
                                             <td class="product_quantity">
                                                 <form th:action="@{/cart/update}" method="post" class="d-flex align-items-center gap-2">
-                                                    <input type="hidden" name="items[0].id" th:value="${item.id}">
+                                                    <input type="hidden" name="itemId" th:value="${item.id}">
                                                     <label class="me-2">Cantidad</label>
-                                                    <input name="items[0].quantity" min="1" max="100" th:value="${item.quantity}" type="number">
+                                                    <input name="quantity" min="1" max="100" th:value="${item.quantity}" type="number">
                                                     <button type="submit" class="btn btn-sm btn-outline-primary ms-2">Actualizar</button>
                                                 </form>
                                             </td>
@@ -118,7 +293,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="cart_submit" th:if="${cart != null && !#lists.isEmpty(cart.items)}">
+                            <div class="cart_submit" th:if="${cart != null && cart.items != null && !cart.items.isEmpty()}">
                                 <a class="btn btn-outline-danger" th:href="@{/cart/clear}">Vaciar carrito</a>
                             </div>
                         </div>
@@ -147,16 +322,16 @@
                                     </div>
                                     <div class="cart_subtotal ">
                                         <p>Envío</p>
-                                        <p class="cart_amount"><span>Tarifa fija:</span> £255.00</p>
+                                        <p class="cart_amount"><span>Tarifa fija:</span> €25.00</p>
                                     </div>
                                     <a href="#">Calcular envío</a>
 
                                     <div class="cart_subtotal">
                                         <p>Total</p>
-                                        <p class="cart_amount">£215.00</p>
+                                        <p class="cart_amount" th:text="${#numbers.formatCurrency(cart.subtotal.add(T(java.math.BigDecimal).valueOf(25)))}">€25.00</p>
                                     </div>
                                     <div class="checkout_btn">
-                                        <a th:href="@{/checkout}">Proceder al Pago</a>
+                                        <a href="/checkout">Proceder al Pago</a>
                                     </div>
                                 </div>
                             </div>
@@ -170,11 +345,117 @@
     <!--shopping cart area end -->
 
 <!--call to action start-->
-<th:block th:replace="fragments/_calltoaction :: calltoaction"></th:block>
+<section class="call_to_action">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="call_action_inner">
+                    <div class="call_text">
+                        <h3>Tenemos <span>Recomendaciones</span> para Ti</h3>
+                        <p>Obtén un 30% de descuento al gastar $150 o más con el código Recicar11</p>
+                    </div>
+                    <div class="discover_now">
+                        <a href="#">descúbrelo ahora</a>
+                    </div>
+                    <div class="link_follow">
+                        <ul>
+                            <li><a href="#"><i class="ion-social-facebook"></i></a></li>
+                            <li><a href="#"><i class="ion-social-twitter"></i></a></li>
+                            <li><a href="#"><i class="ion-social-googleplus"></i></a></li>
+                            <li><a href="#"><i class="ion-social-youtube"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 <!--call to action end-->
 
 <!--footer area start-->
-<th:block th:replace="fragments/_footer :: footer"></th:block>
+<footer class="footer_widgets">
+    <div class="container">
+        <div class="footer_top">
+            <div class="row">
+                <div class="col-lg-4 col-md-6">
+                    <div class="widgets_container contact_us">
+                        <div class="footer_logo">
+                            <a href="#"><img src="/img/logo/logo.png" alt=""></a>
+                        </div>
+                        <div class="footer_contact">
+                            <p>Somos un equipo de diseñadores y desarrolladores que crean Magento, Prestashop, Opencart de alta calidad...</p>
+                            <p><span>Dirección</span> 4710-4890 Breckinridge St, UK Burlington, VT 05401</p>
+                            <p><span>¿Necesitas ayuda?</span>Llama: <a href="tel:1-800-345-6789">1-800-345-6789</a></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 col-sm-6">
+                    <div class="widgets_container widget_menu">
+                        <h3>Información</h3>
+                        <div class="footer_menu">
+                            <ul>
+                                <li><a href="/about">Sobre Nosotros</a></li>
+                                <li><a href="#">Información de Entrega</a></li>
+                                <li><a href="/privacy-policy">Política de Privacidad</a></li>
+                                <li><a href="/coming-soon">Próximamente</a></li>
+                                <li><a href="#">Términos y Condiciones</a></li>
+                                <li><a href="#">Devoluciones</a></li>
+                                <li><a href="#">Tarjetas de Regalo</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 col-sm-6">
+                    <div class="widgets_container widget_menu">
+                        <h3>Extras</h3>
+                        <div class="footer_menu">
+                            <ul>
+                                <li><a href="#">Devoluciones</a></li>
+                                <li><a href="#">Historial de Pedidos</a></li>
+                                <li><a href="/wishlist">Lista de Deseos</a></li>
+                                <li><a href="#">Boletín</a></li>
+                                <li><a href="#">Afiliados</a></li>
+                                <li><a href="#">Ofertas Especiales</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="widgets_container">
+                        <h3>Suscríbete al Boletín</h3>
+                        <p>Nunca compartiremos tu dirección de correo electrónico con terceros.</p>
+                        <div class="subscribe_form">
+                            <form id="mc-form" class="mc-form footer-newsletter">
+                                <input id="mc-email" type="email" autocomplete="off" placeholder="Introduce tu dirección de correo electrónico aquí..." />
+                                <button id="mc-submit">Suscribirse</button>
+                            </form>
+                            <!-- mailchimp-alerts Start -->
+                            <div class="mailchimp-alerts text-centre">
+                                <div class="mailchimp-submitting"></div><!-- mailchimp-submitting end -->
+                                <div class="mailchimp-success"></div><!-- mailchimp-success end -->
+                                <div class="mailchimp-error"></div><!-- mailchimp-error end -->
+                            </div><!-- mailchimp-alerts end -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer_bottom">
+            <div class="row">
+                <div class="col-lg-6 col-md-6">
+                    <div class="copyright_area">
+                        <p>Copyright &copy; 2021 <a href="#">Recicar</a> All Right Reserved.</p>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6">
+                    <div class="footer_payment text-right">
+                        <a href="#"><img src="/img/icon/payment.png" alt=""></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
 <!--footer area end-->
 
 <!-- JS
