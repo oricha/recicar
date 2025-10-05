@@ -18,7 +18,7 @@
         <div th:if="${cart != null and cart.items != null and !cart.items.empty}">
             <div th:each="item : ${cart.items}" class="cart_item">
                 <div class="cart_img">
-                    <a th:href="@{/product-details(id=${item.productId})}"><img th:src="${item.imageUrl}" alt=""></a>
+                    <a th:href="@{/product-details(id=${item.productId})}"><img th:src="${item.imageUrl != null ? item.imageUrl : '/assets/img/product/product1.jpg'}" alt=""></a>
                 </div>
                 <div class="cart_info">
                     <a th:href="@{/product-details(id=${item.productId})}" th:text="${item.productName}">Product</a>
@@ -53,4 +53,3 @@
     </div>
 </body>
 </html>
-

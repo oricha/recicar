@@ -56,7 +56,18 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .headers(headers -> headers
-                .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self';"))
+                .contentSecurityPolicy(csp -> csp.policyDirectives(
+                        "default-src 'self'; " +
+                        "script-src 'self' 'unsafe-inline'; " +
+                        // Allow Google Fonts stylesheets
+                        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+                        // Some browsers look at style-src-elem for <link rel=stylesheet>
+                        "style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+                        // Allow images and data URIs
+                        "img-src 'self' data:; " +
+                        // Allow font files from Google Fonts and data URIs
+                        "font-src 'self' https://fonts.gstatic.com data:;"
+                ))
                 .frameOptions(frameOptions -> frameOptions.sameOrigin())
                 .xssProtection(xss -> xss.disable())
                 .cacheControl(cache -> cache.disable())

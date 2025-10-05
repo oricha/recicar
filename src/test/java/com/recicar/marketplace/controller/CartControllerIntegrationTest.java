@@ -106,4 +106,21 @@ class CartControllerIntegrationTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/checkout"));
     }
+
+    @Test
+    @WithMockUser(username = "buyer@example.com", roles = {"CUSTOMER"})
+    void getCart_authenticated_rendersCartPage() throws Exception {
+        when(cartService.getCart(anyLong())).thenReturn(mockCart);
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/cart"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Carrito de Compras")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Test Part")));
+    }
+
+    @Test
+    void getCart_anonymous_ok() throws Exception {
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/cart"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Carrito de Compras")));
+    }
 }

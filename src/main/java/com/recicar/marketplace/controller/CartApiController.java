@@ -94,6 +94,10 @@ public class CartApiController {
         for (CartItemDto item : cart) {
             if (item.getProductId().equals(productId)) {
                 item.setQuantity(item.getQuantity() + quantity);
+                // Ensure session item has a stable id for remove/update links
+                if (item.getId() == null) {
+                    item.setId(productId);
+                }
                 return;
             }
         }
@@ -104,6 +108,8 @@ public class CartApiController {
             if (productOpt.isPresent()) {
                 var product = productOpt.get();
                 CartItemDto newItem = new CartItemDto();
+                // Use productId as a stable id in session carts
+                newItem.setId(productId);
                 newItem.setProductId(productId);
                 newItem.setQuantity(quantity);
                 newItem.setProductName(product.getName());

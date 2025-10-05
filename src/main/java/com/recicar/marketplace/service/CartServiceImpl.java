@@ -152,7 +152,18 @@ public class CartServiceImpl implements CartService {
         dto.setProductName(cartItem.getProduct().getName());
         dto.setQuantity(cartItem.getQuantity());
         dto.setPrice(cartItem.getProduct().getPrice());
-        dto.setImageUrl(cartItem.getProduct().getPrimaryImage().getImageUrl());
+        // Resolve a safe image URL (avoid NPE if no images)
+        String imageUrl = null;
+        if (cartItem.getProduct() != null) {
+            var primary = cartItem.getProduct().getPrimaryImage();
+            if (primary != null) {
+                imageUrl = primary.getImageUrl();
+            }
+        }
+        if (imageUrl == null) {
+            imageUrl = "/assets/img/product/product1.jpg"; // fallback placeholder
+        }
+        dto.setImageUrl(imageUrl);
         return dto;
     }
 
