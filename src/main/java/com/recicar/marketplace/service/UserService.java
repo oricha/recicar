@@ -123,11 +123,6 @@ public class UserService {
             token.setUser(user);
             token.setExpiresAt(java.time.LocalDateTime.now().plusHours(1));
             tokenRepository.save(token);
-            // Build link
-            String link = appBaseUrl + "/reset-password?token=" + tokenStr;
-            // Defer to NotificationService via a listener or external call (simplified for this task)
-            // In this simplified service class, we can't autowire NotificationService without circular deps in tests.
-            System.out.println("Password reset requested for: " + email + " link=" + link);
         }
     }
 

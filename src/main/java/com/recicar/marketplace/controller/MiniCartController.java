@@ -5,6 +5,7 @@ import com.recicar.marketplace.dto.CartItemDto;
 import com.recicar.marketplace.repository.UserRepository;
 import com.recicar.marketplace.service.CartService;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 
+@Slf4j
 @Controller
 public class MiniCartController {
 
@@ -52,8 +54,7 @@ public class MiniCartController {
             }
             return "fragments/_mini_cart :: miniCart";
         } catch (Exception e) {
-            System.err.println("Error loading mini cart: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Error loading mini cart", e);
             
             // Return empty cart on error
             CartDto emptyCart = new CartDto();

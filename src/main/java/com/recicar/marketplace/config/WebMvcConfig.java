@@ -2,6 +2,7 @@ package com.recicar.marketplace.config;
 
 import com.recicar.marketplace.service.CategoryService;
 import com.recicar.marketplace.entity.Category;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
@@ -55,6 +56,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     }
 }
 
+@Slf4j
 @Component
 class CategoryInterceptor implements HandlerInterceptor {
 
@@ -72,12 +74,11 @@ class CategoryInterceptor implements HandlerInterceptor {
                 // Add categories to all models for navigation
                 List<Category> categories = categoryService.findRootCategories();
                 modelAndView.addObject("categories", categories != null ? categories : new ArrayList<>());
-                System.out.println("Added " + (categories != null ? categories.size() : 0) + " categories to model");
+                log.debug("Added {} categories to model", categories != null ? categories.size() : 0);
             }
         } catch (Exception e) {
             // Log error but don't fail the request
-            System.err.println("Error adding categories to model: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Error adding categories to model", e);
             if (modelAndView != null && modelAndView.getModel() != null) {
                 modelAndView.addObject("categories", new ArrayList<>());
             }

@@ -9,13 +9,14 @@ import com.recicar.marketplace.entity.User;
 import com.recicar.marketplace.repository.CartRepository;
 import com.recicar.marketplace.repository.ProductRepository;
 import com.recicar.marketplace.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class CartServiceImpl implements CartService {
 
@@ -32,16 +33,15 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional(readOnly = true)
     public CartDto getCart(Long userId) {
-        System.out.println("=== CartService.getCart called with userId: " + userId + " ===");
+        log.debug("=== CartService.getCart called with userId: {} ===", userId);
         try {
             Cart cart = getCartForUser(userId);
-            System.out.println("Cart retrieved successfully, items count: " + cart.getItems().size());
+            log.debug("Cart retrieved successfully, items count: {}", cart.getItems().size());
             CartDto dto = toDto(cart);
-            System.out.println("CartDto created successfully");
+            log.debug("CartDto created successfully");
             return dto;
         } catch (Exception e) {
-            System.err.println("Error in CartService.getCart: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Error in CartService.getCart for userId: {}", userId, e);
             throw e;
         }
     }

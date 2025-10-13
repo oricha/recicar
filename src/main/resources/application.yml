@@ -19,12 +19,11 @@ management:
       show-details: when-authorized
 
 logging:
+  file:
+    name: logs/application.log
   level:
     com.recicar.marketplace: INFO
     org.springframework.security: DEBUG
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
 ---
 spring:
@@ -62,6 +61,8 @@ server:
     include-stacktrace: on_param
 
 logging:
+  file:
+    name: logs/recicar-dev.log
   level:
     org.springframework.web: DEBUG
     org.hibernate.SQL: DEBUG
@@ -101,6 +102,8 @@ server:
     include-stacktrace: never
 
 logging:
+  file:
+    name: logs/recicar-test.log
   level:
     com.recicar.marketplace: INFO
 
@@ -178,11 +181,10 @@ management:
       enabled: true
 
 logging:
+  file:
+    name: logs/recicar-prod.log
   level:
     com.recicar.marketplace: WARN
     org.springframework.security: WARN
     org.springframework.web: WARN
     org.hibernate.SQL: WARN
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

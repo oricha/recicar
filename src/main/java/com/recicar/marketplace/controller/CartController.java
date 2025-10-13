@@ -7,6 +7,7 @@ import com.recicar.marketplace.repository.UserRepository;
 import com.recicar.marketplace.repository.ProductRepository;
 import com.recicar.marketplace.entity.User;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @Controller
 @RequestMapping("/cart")
 public class CartController {
@@ -33,21 +35,15 @@ public class CartController {
 
     @GetMapping
     public String getCartPage(@AuthenticationPrincipal UserDetails userDetails, HttpSession session, Model model) {
-        System.out.println("=== CartController.getCartPage START ===");
         try {
-            System.out.println("=== CartController.getCartPage called ===");
-            System.out.println("UserDetails: " + userDetails);
-            System.out.println("Session: " + session.getId());
-            
             Long userId = resolveUserId(userDetails);
-            System.out.println("Resolved userId: " + userId);
+            log.debug("Resolved userId: {}", userId);
             
             CartDto cart;
             if (userId != null) {
-                System.out.println("Getting cart for authenticated user");
                 cart = cartService.getCart(userId);
             } else {
-                System.out.println("Getting cart for anonymous user");
+                log.debug("Getting cart for anonymous user");
                 // Anonymous user - get cart from session
                 List<CartItemDto> sessionCart = getSessionCart(session);
                 // Ensure each item has id set to productId for consistency
@@ -64,18 +60,12 @@ public class CartController {
                         .map(item -> item.getPrice().multiply(java.math.BigDecimal.valueOf(item.getQuantity())))
                         .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add));
             }
-            
-            System.out.println("Cart items count: " + (cart.getItems() != null ? cart.getItems().size() : "null"));
-            System.out.println("Cart subtotal: " + cart.getSubtotal());
-            
             model.addAttribute("cart", cart);
-            System.out.println("Returning 'cart' template");
             return "cart";
         } catch (Exception e) {
             // Log the error and return a safe fallback
-            System.err.println("Error loading cart page: " + e.getMessage());
-            e.printStackTrace();
-            
+            log.error("Error loading cart page", e);
+
             // Create an empty cart as fallback
             CartDto emptyCart = new CartDto();
             emptyCart.setItems(new java.util.ArrayList<>());
@@ -199,28 +189,26 @@ public class CartController {
                 cart.add(newItem);
             }
         } catch (Exception e) {
-            System.err.println("Error adding item to session cart: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Error adding item to session cart", e);
         }
     }
 
     private Long resolveUserId(UserDetails userDetails) {
-        System.out.println("=== resolveUserId called ===");
+        log.debug("=== resolveUserId called ===");
         if (userDetails == null) {
-            System.out.println("UserDetails is null, returning null");
+            log.debug("UserDetails is null, returning null");
             return null;
         }
         String email = userDetails.getUsername();
-        System.out.println("Email: " + email);
+        log.debug("Email: {}", email);
         try {
             Long userId = userRepository.findByEmailIgnoreCase(email)
                     .map(User::getId)
                     .orElse(null);
-            System.out.println("Resolved userId: " + userId);
+            log.debug("Resolved userId: {}", userId);
             return userId;
         } catch (Exception e) {
-            System.err.println("Error resolving userId: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Error resolving userId", e);
             return null;
         }
     }

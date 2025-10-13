@@ -3,11 +3,13 @@ package com.recicar.marketplace.controller;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+@Slf4j
 @Controller
 public class CustomErrorController implements ErrorController {
 
@@ -22,9 +24,8 @@ public class CustomErrorController implements ErrorController {
         }
 
         // Log the error for debugging
-        System.err.println("Error occurred with status code: " + statusCode);
-        System.err.println("Request URI: " + request.getRequestURI());
-        System.err.println("Error message: " + request.getAttribute(RequestDispatcher.ERROR_MESSAGE));
+        log.error("Error occurred with status code: {}, Request URI: {}, Error message: {}", 
+                statusCode, request.getRequestURI(), request.getAttribute(RequestDispatcher.ERROR_MESSAGE));
         
         // Don't set status if response is already committed
         if (!response.isCommitted()) {

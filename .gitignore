@@ -73,6 +73,7 @@ Desktop.ini
 *.pid
 *.log
 *.log.*
+logs/
 
 # Application specific
 application-local.yml
