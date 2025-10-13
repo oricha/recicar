@@ -59,6 +59,9 @@ spring:
 server:
   error:
     include-stacktrace: on_param
+  servlet:
+    session:
+      persistent: false
 
 logging:
   file:

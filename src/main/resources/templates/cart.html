@@ -264,32 +264,36 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr th:if="${cart == null || cart.items == null || cart.items.isEmpty()}">
-                                            <td colspan="6" class="text-center">Tu carrito está vacío.</td>
-                                        </tr>
-                                        <tr th:each="item : ${cart.items}" th:if="${cart != null && cart.items != null && !cart.items.isEmpty()}">
-                                            <td class="product_remove">
-                                                <a th:href="@{/cart/remove/{id}(id=${item.id})}"><i class="fa fa-trash-o"></i></a>
-                                            </td>
-                                            <td class="product_thumb">
-                                                <a th:href="@{/product-details(id=${item.productId})}">
-                                                    <img th:src="${item.imageUrl != null ? item.imageUrl : '/assets/img/product/product1.jpg'}" alt="">
-                                                </a>
-                                            </td>
-                                            <td class="product_name">
-                                                <a th:href="@{/product-details(id=${item.productId})}" th:text="${item.productName}">Product</a>
-                                            </td>
-                                            <td class="product-price" th:text="${#numbers.formatCurrency(item.price)}">€0.00</td>
-                                            <td class="product_quantity">
-                                                <form th:action="@{/cart/update}" method="post" class="d-flex align-items-center gap-2">
-                                                    <input type="hidden" name="itemId" th:value="${item.id}">
-                                                    <label class="me-2">Cantidad</label>
-                                                    <input name="quantity" min="1" max="100" th:value="${item.quantity}" type="number">
-                                                    <button type="submit" class="btn btn-sm btn-outline-primary ms-2">Actualizar</button>
-                                                </form>
-                                            </td>
-                                            <td class="product_total" th:text="${#numbers.formatCurrency(item.price.multiply(T(java.math.BigDecimal).valueOf(item.quantity)))}">€0.00</td>
-                                        </tr>
+                                        <th:block th:if="${cart == null || cart.items == null || cart.items.isEmpty()}">
+                                            <tr>
+                                                <td colspan="6" class="text-center">Tu carrito está vacío.</td>
+                                            </tr>
+                                        </th:block>
+                                        <th:block th:if="${cart != null && cart.items != null && !cart.items.isEmpty()}">
+                                            <tr th:each="item : ${cart.items}">
+                                                <td class="product_remove">
+                                                    <a th:href="@{/cart/remove/{id}(id=${item.id})}"><i class="fa fa-trash-o"></i></a>
+                                                </td>
+                                                <td class="product_thumb">
+                                                    <a th:href="@{/product-details(id=${item.productId})}">
+                                                        <img th:src="${item.imageUrl != null && !item.imageUrl.isEmpty() ? item.imageUrl : '/assets/img/product/product1.jpg'}" alt="">
+                                                    </a>
+                                                </td>
+                                                <td class="product_name">
+                                                    <a th:href="@{/product-details(id=${item.productId})}" th:text="${item.productName ?: 'Product'}">Product</a>
+                                                </td>
+                                                <td class="product-price" th:text="${item.price != null ? #numbers.formatCurrency(item.price) : '€0.00'}">€0.00</td>
+                                                <td class="product_quantity">
+                                                    <form th:action="@{/cart/update}" method="post" class="d-flex align-items-center gap-2">
+                                                        <input type="hidden" name="itemId" th:value="${item.id}">
+                                                        <label class="me-2">Cantidad</label>
+                                                        <input name="quantity" min="1" max="100" th:value="${item.quantity}" type="number">
+                                                        <button type="submit" class="btn btn-sm btn-outline-primary ms-2">Actualizar</button>
+                                                    </form>
+                                                </td>
+                                                <td class="product_total" th:text="${item.price != null && item.quantity != null ? #numbers.formatCurrency(item.price.multiply(T(java.math.BigDecimal).valueOf(item.quantity.longValue()))) : '€0.00'}">€0.00</td>
+                                            </tr>
+                                        </th:block>
                                     </tbody>
                                 </table>
                             </div>
@@ -318,7 +322,7 @@
                                 <div class="coupon_inner">
                                     <div class="cart_subtotal">
                                         <p>Subtotal</p>
-                                        <p class="cart_amount" th:text="${#numbers.formatCurrency(cart.subtotal)}">€0.00</p>
+                                        <p class="cart_amount" th:text="${cart != null && cart.subtotal != null ? #numbers.formatCurrency(cart.subtotal) : '€0.00'}">€0.00</p>
                                     </div>
                                     <div class="cart_subtotal ">
                                         <p>Envío</p>
@@ -328,7 +332,7 @@
 
                                     <div class="cart_subtotal">
                                         <p>Total</p>
-                                        <p class="cart_amount" th:text="${#numbers.formatCurrency(cart.subtotal.add(T(java.math.BigDecimal).valueOf(25)))}">€25.00</p>
+                                        <p class="cart_amount" th:text="${cart != null && cart.subtotal != null ? #numbers.formatCurrency(cart.subtotal.add(T(java.math.BigDecimal).valueOf(25L))) : '€25.00'}">€25.00</p>
                                     </div>
                                     <div class="checkout_btn">
                                         <a href="/checkout">Proceder al Pago</a>
@@ -345,117 +349,11 @@
     <!--shopping cart area end -->
 
 <!--call to action start-->
-<section class="call_to_action">
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <div class="call_action_inner">
-                    <div class="call_text">
-                        <h3>Tenemos <span>Recomendaciones</span> para Ti</h3>
-                        <p>Obtén un 30% de descuento al gastar $150 o más con el código Recicar11</p>
-                    </div>
-                    <div class="discover_now">
-                        <a href="#">descúbrelo ahora</a>
-                    </div>
-                    <div class="link_follow">
-                        <ul>
-                            <li><a href="#"><i class="ion-social-facebook"></i></a></li>
-                            <li><a href="#"><i class="ion-social-twitter"></i></a></li>
-                            <li><a href="#"><i class="ion-social-googleplus"></i></a></li>
-                            <li><a href="#"><i class="ion-social-youtube"></i></a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+<div th:replace="~{fragments/_calltoaction :: calltoaction}"></div>
 <!--call to action end-->
 
 <!--footer area start-->
-<footer class="footer_widgets">
-    <div class="container">
-        <div class="footer_top">
-            <div class="row">
-                <div class="col-lg-4 col-md-6">
-                    <div class="widgets_container contact_us">
-                        <div class="footer_logo">
-                            <a href="#"><img src="/img/logo/logo.png" alt=""></a>
-                        </div>
-                        <div class="footer_contact">
-                            <p>Somos un equipo de diseñadores y desarrolladores que crean Magento, Prestashop, Opencart de alta calidad...</p>
-                            <p><span>Dirección</span> 4710-4890 Breckinridge St, UK Burlington, VT 05401</p>
-                            <p><span>¿Necesitas ayuda?</span>Llama: <a href="tel:1-800-345-6789">1-800-345-6789</a></p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-6 col-sm-6">
-                    <div class="widgets_container widget_menu">
-                        <h3>Información</h3>
-                        <div class="footer_menu">
-                            <ul>
-                                <li><a href="/about">Sobre Nosotros</a></li>
-                                <li><a href="#">Información de Entrega</a></li>
-                                <li><a href="/privacy-policy">Política de Privacidad</a></li>
-                                <li><a href="/coming-soon">Próximamente</a></li>
-                                <li><a href="#">Términos y Condiciones</a></li>
-                                <li><a href="#">Devoluciones</a></li>
-                                <li><a href="#">Tarjetas de Regalo</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-6 col-sm-6">
-                    <div class="widgets_container widget_menu">
-                        <h3>Extras</h3>
-                        <div class="footer_menu">
-                            <ul>
-                                <li><a href="#">Devoluciones</a></li>
-                                <li><a href="#">Historial de Pedidos</a></li>
-                                <li><a href="/wishlist">Lista de Deseos</a></li>
-                                <li><a href="#">Boletín</a></li>
-                                <li><a href="#">Afiliados</a></li>
-                                <li><a href="#">Ofertas Especiales</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="widgets_container">
-                        <h3>Suscríbete al Boletín</h3>
-                        <p>Nunca compartiremos tu dirección de correo electrónico con terceros.</p>
-                        <div class="subscribe_form">
-                            <form id="mc-form" class="mc-form footer-newsletter">
-                                <input id="mc-email" type="email" autocomplete="off" placeholder="Introduce tu dirección de correo electrónico aquí..." />
-                                <button id="mc-submit">Suscribirse</button>
-                            </form>
-                            <!-- mailchimp-alerts Start -->
-                            <div class="mailchimp-alerts text-centre">
-                                <div class="mailchimp-submitting"></div><!-- mailchimp-submitting end -->
-                                <div class="mailchimp-success"></div><!-- mailchimp-success end -->
-                                <div class="mailchimp-error"></div><!-- mailchimp-error end -->
-                            </div><!-- mailchimp-alerts end -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="footer_bottom">
-            <div class="row">
-                <div class="col-lg-6 col-md-6">
-                    <div class="copyright_area">
-                        <p>Copyright &copy; 2021 <a href="#">Recicar</a> All Right Reserved.</p>
-                    </div>
-                </div>
-                <div class="col-lg-6 col-md-6">
-                    <div class="footer_payment text-right">
-                        <a href="#"><img src="/img/icon/payment.png" alt=""></a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</footer>
+<div th:replace="~{fragments/_footer :: footer}"></div>
 <!--footer area end-->
 
 <!-- JS
