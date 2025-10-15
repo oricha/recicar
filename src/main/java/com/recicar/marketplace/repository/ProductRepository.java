@@ -51,10 +51,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT p FROM Product p WHERE p.price BETWEEN :minPrice AND :maxPrice")
     Page<Product> findByPriceRange(@Param("minPrice") BigDecimal minPrice, @Param("maxPrice") BigDecimal maxPrice, Pageable pageable);
 
-    @Query("SELECT p FROM Product p WHERE p.stockQuantity < 5")
+    @Query("SELECT p FROM Product p JOIN FETCH p.vendor v JOIN FETCH v.user WHERE p.stockQuantity < 5")
     List<Product> findLowStockProducts();
 
-    @Query("SELECT p FROM Product p WHERE p.vendor = :vendor AND p.stockQuantity < 5")
+    @Query("SELECT p FROM Product p JOIN FETCH p.vendor v JOIN FETCH v.user WHERE p.vendor = :vendor AND p.stockQuantity < 5")
     List<Product> findLowStockProductsByVendor(@Param("vendor") Vendor vendor);
 
     long countByVendorAndActiveTrue(Vendor vendor);

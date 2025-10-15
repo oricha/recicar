@@ -1,6 +1,8 @@
 package com.recicar.marketplace.config;
 
+import com.recicar.marketplace.service.CartService;
 import com.recicar.marketplace.service.CustomUserDetailsService;
+import com.recicar.marketplace.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,9 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import java.time.Duration;
 
 @Configuration
 @EnableWebSecurity
@@ -24,9 +23,13 @@ import java.time.Duration;
 public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
+    private final CartService cartService;
+    private final UserRepository userRepository;
 
-    public SecurityConfig(CustomUserDetailsService userDetailsService) {
+    public SecurityConfig(CustomUserDetailsService userDetailsService, CartService cartService, UserRepository userRepository) {
         this.userDetailsService = userDetailsService;
+        this.cartService = cartService;
+        this.userRepository = userRepository;
     }
 
     @Bean
@@ -49,7 +52,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationSuccessHandler customAuthenticationSuccessHandler() {
-        return new CustomAuthenticationSuccessHandler();
+        return new CustomAuthenticationSuccessHandler(cartService, userRepository);
     }
 
     @Bean

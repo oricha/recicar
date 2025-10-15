@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "cart_items")
@@ -26,4 +27,7 @@ public class CartItem {
     private Product product;
 
     private int quantity;
+
+    @Column(nullable = false)
+    private BigDecimal price;
 }
