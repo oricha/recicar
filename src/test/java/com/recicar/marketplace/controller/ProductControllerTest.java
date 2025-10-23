@@ -1,6 +1,8 @@
 package com.recicar.marketplace.controller;
 
+import com.recicar.marketplace.entity.Category;
 import com.recicar.marketplace.entity.Product;
+import com.recicar.marketplace.service.CategoryService;
 import com.recicar.marketplace.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,12 +10,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -24,6 +31,9 @@ public class ProductControllerTest {
 
     @Mock
     private ProductService productService;
+    
+    @Mock
+    private CategoryService categoryService;
 
     @InjectMocks
     private ProductController productController;
@@ -41,6 +51,36 @@ public class ProductControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(productController)
                 .setViewResolvers(viewResolver)
                 .build();
+    }
+
+    @Test
+    void productList_shouldReturnShopListWithProductsAndCategories() throws Exception {
+        // Given
+        List<Product> products = new ArrayList<>();
+        Product product = new Product();
+        product.setId(1L);
+        product.setName("Test Product");
+        product.setPrice(BigDecimal.TEN);
+        products.add(product);
+        
+        Page<Product> productPage = new PageImpl<>(products);
+        
+        List<Category> categories = new ArrayList<>();
+        Category category = new Category("Test Category", "test-category");
+        category.setId(1L);
+        categories.add(category);
+        
+        when(productService.findActiveProducts(anyInt(), anyInt())).thenReturn(productPage);
+        when(categoryService.findAllActive()).thenReturn(categories);
+
+        // When & Then
+        mockMvc.perform(get("/shop-list"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("shop-list"))
+                .andExpect(model().attributeExists("products"))
+                .andExpect(model().attributeExists("page"))
+                .andExpect(model().attributeExists("categories"))
+                .andExpect(model().attribute("categories", categories));
     }
 
     @Test

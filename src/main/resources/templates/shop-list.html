@@ -114,6 +114,60 @@
             font-weight: 600;
         }
         
+        /* Category Arrow */
+        .category-arrow {
+            margin-left: auto;
+            font-size: 12px;
+            transition: transform 0.3s ease;
+        }
+        
+        .parts-catalog__items.expanded .category-arrow {
+            transform: rotate(180deg);
+        }
+        
+        /* Subcategories List */
+        .subcategories-list {
+            list-style: none;
+            padding: 0;
+            margin: 8px 0 0 40px;
+            background-color: #f8f9fa;
+            border-left: 3px solid #ff6b35;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .subcategories-list li {
+            margin-bottom: 4px;
+        }
+        
+        .subcategory-link {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #666;
+            background-color: #fff;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .subcategory-link:hover {
+            background-color: #fff3e0;
+            color: #ff6b35;
+            text-decoration: none;
+        }
+        
+        .subcategory-name {
+            flex: 1;
+            font-size: 13px;
+            font-weight: 400;
+        }
+        
+        .subcategory-count {
+            color: #999;
+            font-size: 11px;
+            margin-left: 8px;
+        }
+        
         /* Checkbox Styling */
         .cat-checkbox-js {
             position: absolute;
@@ -328,7 +382,31 @@
                             <div class="widget_list widget_categories">
                                 <h2>Categorías</h2>
                                 <ul class="parts-catalog cat clearfix">
-                                    <!-- Categories will be added here -->
+                                    <!-- Dynamic Categories from Backend -->
+                                    <th:block th:each="category : ${categories}">
+                                        <th:block th:if="${category.parent == null}">
+                                            <li class="parts-catalog__items" th:attr="data-category=${category.slug}">
+                                                <input type="checkbox" class="cat-checkbox-js" th:id="'cat-' + ${category.slug}">
+                                                <a th:href="@{/search/category(slug=${category.slug})}" 
+                                                   class="parts-catalog__title cat-links-js"
+                                                   onclick="event.preventDefault();">
+                                                    <i class="fa fa-cog"></i>
+                                                    <span class="cat__links__name" th:text="${category.name}">Category Name</span>
+                                                    <span class="cat__links__count" th:text="${category.products.size()}">0</span>
+                                                    <i class="fa fa-chevron-down category-arrow" th:if="${!category.children.isEmpty()}"></i>
+                                                </a>
+                                                <!-- Subcategories -->
+                                                <ul class="subcategories-list" th:if="${!category.children.isEmpty()}" style="display: none;">
+                                                    <li th:each="subcategory : ${category.children}">
+                                                        <a th:href="@{/search/category(slug=${subcategory.slug})}" class="subcategory-link">
+                                                            <span class="subcategory-name" th:text="${subcategory.name}">Subcategory Name</span>
+                                                            <span class="subcategory-count" th:text="${subcategory.products.size()}">0</span>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                        </th:block>
+                                    </th:block>
                                 </ul>
                             </div>
 
@@ -1093,10 +1171,33 @@
                     categoryItems.forEach(item => {
                         const categoryName = item.querySelector('.cat__links__name').textContent.toLowerCase();
                         const categoryLink = item.querySelector('.parts-catalog__title');
+                        const subcategoriesList = item.querySelector('.subcategories-list');
                         
-                        if (categoryName.includes(searchTerm)) {
+                        // Check if category name matches
+                        let categoryMatches = categoryName.includes(searchTerm);
+                        
+                        // Check if any subcategory matches
+                        let subcategoryMatches = false;
+                        if (subcategoriesList) {
+                            const subcategoryLinks = subcategoriesList.querySelectorAll('.subcategory-link');
+                            subcategoryLinks.forEach(subLink => {
+                                const subName = subLink.querySelector('.subcategory-name').textContent.toLowerCase();
+                                if (subName.includes(searchTerm)) {
+                                    subcategoryMatches = true;
+                                }
+                            });
+                        }
+                        
+                        // Show/hide based on matches
+                        if (categoryMatches || subcategoryMatches) {
                             item.style.display = 'block';
                             categoryLink.style.backgroundColor = searchTerm ? '#fff3e0' : '';
+                            
+                            // Expand if search term exists and there are subcategories
+                            if (searchTerm && subcategoriesList && subcategoryMatches) {
+                                item.classList.add('expanded');
+                                subcategoriesList.style.display = 'block';
+                            }
                         } else {
                             item.style.display = searchTerm ? 'none' : 'block';
                         }
@@ -1112,18 +1213,35 @@
                     e.preventDefault();
                     
                     const parentItem = this.closest('.parts-catalog__items');
-                    const checkbox = parentItem.querySelector('.cat-checkbox-js');
+                    const subcategoriesList = parentItem.querySelector('.subcategories-list');
                     
-                    // Toggle checkbox
-                    if (checkbox) {
-                        checkbox.checked = !checkbox.checked;
-                        
-                        // Update active state
-                        if (checkbox.checked) {
-                            parentItem.classList.add('active');
-                        } else {
-                            parentItem.classList.remove('active');
+                    // If there are no subcategories, redirect to category search
+                    if (!subcategoriesList) {
+                        window.location.href = this.getAttribute('href');
+                        return;
+                    }
+                    
+                    // Toggle expanded state
+                    const isExpanded = parentItem.classList.contains('expanded');
+                    
+                    // Close all other categories
+                    document.querySelectorAll('.parts-catalog__items').forEach(item => {
+                        if (item !== parentItem) {
+                            item.classList.remove('expanded');
+                            const subList = item.querySelector('.subcategories-list');
+                            if (subList) {
+                                subList.style.display = 'none';
+                            }
                         }
+                    });
+                    
+                    // Toggle current category
+                    if (isExpanded) {
+                        parentItem.classList.remove('expanded');
+                        subcategoriesList.style.display = 'none';
+                    } else {
+                        parentItem.classList.add('expanded');
+                        subcategoriesList.style.display = 'block';
                     }
                 });
             });

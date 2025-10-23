@@ -1,6 +1,8 @@
 package com.recicar.marketplace.controller;
 
+import com.recicar.marketplace.entity.Category;
 import com.recicar.marketplace.entity.Product;
+import com.recicar.marketplace.service.CategoryService;
 import com.recicar.marketplace.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,12 +19,18 @@ import java.util.Optional;
 public class ProductController {
 
     private final ProductService productService;
+    private final CategoryService categoryService;
 
     @GetMapping("/shop-list")
     public String productList(@RequestParam(value = "page", defaultValue = "0") int page, Model model) {
         Page<Product> productPage = productService.findActiveProducts(page, 12);
         model.addAttribute("products", productPage.getContent());
         model.addAttribute("page", productPage);
+        
+        // Add categories for sidebar
+        List<Category> categories = categoryService.findAllActive();
+        model.addAttribute("categories", categories);
+        
         return "shop-list";
     }
 
