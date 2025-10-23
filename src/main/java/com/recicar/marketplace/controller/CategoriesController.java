@@ -29,17 +29,12 @@ public class CategoriesController {
     }
 
     /**
-     * Display products in a specific category
+     * Redirect to search page for specific category
      */
     @GetMapping("/categories/{slug}")
-    public String categoryProducts(@PathVariable String slug, Model model) {
-        return categoryService.findBySlug(slug)
-                .map(category -> {
-                    model.addAttribute("category", category);
-                    model.addAttribute("products", category.getProducts());
-                    return "category-products";
-                })
-                .orElse("redirect:/categories");
+    public String categoryProducts(@PathVariable String slug) {
+        // Redirect to search controller with category parameter
+        return "redirect:/search/category?slug=" + slug;
     }
 
 }

@@ -163,4 +163,40 @@ public class SearchController {
         modelAttr.addAttribute("categories", categoryService.findRootCategories());
         return "shop-list";
     }
+
+    /**
+     * Search by category slug
+     */
+    @GetMapping("/category")
+    public String searchByCategory(
+            @RequestParam("slug") String slug,
+            @RequestParam(defaultValue = "0") int page,
+            Model model
+    ) {
+        if (slug == null || slug.trim().isEmpty()) {
+            model.addAttribute("errorMessage", "Category is required");
+            model.addAttribute("products", Collections.emptyList());
+            model.addAttribute("categories", categoryService.findRootCategories());
+            return "shop-list";
+        }
+
+        return categoryService.findBySlug(slug)
+                .map(category -> {
+                    Page<Product> productPage = productService.findByCategory(category, PageRequest.of(page, 12));
+                    model.addAttribute("products", productPage.getContent());
+                    model.addAttribute("page", productPage);
+                    model.addAttribute("category", category);
+                    model.addAttribute("categorySlug", slug);
+                    model.addAttribute("searchType", "category");
+                    model.addAttribute("totalElements", productPage.getTotalElements());
+                    model.addAttribute("categories", categoryService.findRootCategories());
+                    return "shop-list";
+                })
+                .orElseGet(() -> {
+                    model.addAttribute("errorMessage", "Category not found");
+                    model.addAttribute("products", Collections.emptyList());
+                    model.addAttribute("categories", categoryService.findRootCategories());
+                    return "shop-list";
+                });
+    }
 }
