@@ -695,9 +695,13 @@
                     <div class="mb-3" th:if="${errorMessage != null}">
                         <div class="alert alert-warning" role="alert" th:text="${errorMessage}">There was a problem with your search.</div>
                     </div>
-                    <div class="mb-3" th:if="${searchQuery != null || vehicleMake != null}">
+                    <div class="mb-3" th:if="${searchQuery != null || vehicleMake != null || category != null}">
                         <div class="alert alert-info" role="status">
                             <span th:if="${searchQuery != null}">Results for “<span th:text="${searchQuery}">query</span>”. </span>
+                            <span th:if="${category != null}">
+                                Category: <strong th:text="${category.name}">Category</strong>
+                                <span th:if="${category.parent != null}"> (Subcategory of <strong th:text="${category.parent.name}">Parent</strong>)</span>
+                            </span>
                             <span th:if="${vehicleMake != null}">
                                 Vehicle: <strong th:text="${vehicleMake}">Make</strong>
                                 <span th:if="${vehicleModel != null}"> / <strong th:text="${vehicleModel}">Model</strong></span>
@@ -851,6 +855,9 @@
                             <ul>
                                 <!-- Previous link -->
                                 <li th:if="${page.hasPrevious()}">
+                                    <!-- Category search pagination -->
+                                    <a th:if="${searchType == 'category'}"
+                                       th:href="@{/search/category(slug=${categorySlug}, page=${page.number-1})}">Previous</a>
                                     <!-- Vehicle search pagination -->
                                     <a th:if="${searchType == 'vehicle'}"
                                        th:href="@{/search/vehicle(make=${vehicleMake}, model=${vehicleModel}, engineType=${vehicleEngine}, partName=${partName}, page=${page.number-1})}">Previous</a>
@@ -861,12 +868,16 @@
                                     <a th:if="${searchQuery != null and (searchType == 'general' or searchType == 'partNumberContaining' or searchType == 'oemNumberContaining')}"
                                        th:href="@{/search(query=${searchQuery}, page=${page.number-1})}">Previous</a>
                                     <!-- Default shop list pagination -->
-                                    <a th:if="${searchType == null and searchQuery == null and partName == null and vehicleMake == null}"
+                                    <a th:if="${searchType == null and searchQuery == null and partName == null and vehicleMake == null and categorySlug == null}"
                                        th:href="@{/shop-list(page=${page.number-1})}">Previous</a>
                                 </li>
 
                                 <!-- Page number links -->
                                 <li th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}" th:class="${i == page.number ? 'current' : ''}">
+                                    <!-- Category search -->
+                                    <a th:if="${searchType == 'category'}"
+                                       th:href="@{/search/category(slug=${categorySlug}, page=${i})}"
+                                       th:text="${i + 1}">1</a>
                                     <!-- Vehicle search -->
                                     <a th:if="${searchType == 'vehicle'}"
                                        th:href="@{/search/vehicle(make=${vehicleMake}, model=${vehicleModel}, engineType=${vehicleEngine}, partName=${partName}, page=${i})}"
@@ -880,13 +891,16 @@
                                        th:href="@{/search(query=${searchQuery}, page=${i})}"
                                        th:text="${i + 1}">1</a>
                                     <!-- Default shop list -->
-                                    <a th:if="${searchType == null and searchQuery == null and partName == null and vehicleMake == null}"
+                                    <a th:if="${searchType == null and searchQuery == null and partName == null and vehicleMake == null and categorySlug == null}"
                                        th:href="@{/shop-list(page=${i})}"
                                        th:text="${i + 1}">1</a>
                                 </li>
 
                                 <!-- Next link -->
                                 <li th:if="${page.hasNext()}">
+                                    <!-- Category search pagination -->
+                                    <a th:if="${searchType == 'category'}"
+                                       th:href="@{/search/category(slug=${categorySlug}, page=${page.number+1})}">Next</a>
                                     <!-- Vehicle search pagination -->
                                     <a th:if="${searchType == 'vehicle'}"
                                        th:href="@{/search/vehicle(make=${vehicleMake}, model=${vehicleModel}, engineType=${vehicleEngine}, partName=${partName}, page=${page.number+1})}">Next</a>
@@ -897,7 +911,7 @@
                                     <a th:if="${searchQuery != null and (searchType == 'general' or searchType == 'partNumberContaining' or searchType == 'oemNumberContaining')}"
                                        th:href="@{/search(query=${searchQuery}, page=${page.number+1})}">Next</a>
                                     <!-- Default shop list pagination -->
-                                    <a th:if="${searchType == null and searchQuery == null and partName == null and vehicleMake == null}"
+                                    <a th:if="${searchType == null and searchQuery == null and partName == null and vehicleMake == null and categorySlug == null}"
                                        th:href="@{/shop-list(page=${page.number+1})}">Next</a>
                                 </li>
                             </ul>
