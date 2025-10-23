@@ -12,7 +12,7 @@ version = '0.0.1-SNAPSHOT'
 java {
     // Use Java 17 toolchain to match local environment and ensure tests compile
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
