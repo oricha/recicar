@@ -48,6 +48,22 @@ public class Vendor {
     @Column(name = "commission_rate", nullable = false, precision = 5, scale = 4)
     private BigDecimal commissionRate = new BigDecimal("0.1000");
 
+    @Size(max = 500)
+    @Column(name = "logo_url", length = 500)
+    private String logoUrl;
+
+    @Size(max = 500)
+    @Column(name = "banner_url", length = 500)
+    private String bannerUrl;
+
+    @Size(max = 20)
+    @Column(name = "contact_phone", length = 20)
+    private String contactPhone;
+
+    @Size(max = 255)
+    @Column(name = "contact_email", length = 255)
+    private String contactEmail;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -167,6 +183,38 @@ public class Vendor {
 
     public void setMetrics(List<VendorMetric> metrics) {
         this.metrics = metrics;
+    }
+
+    public String getLogoUrl() {
+        return logoUrl;
+    }
+
+    public void setLogoUrl(String logoUrl) {
+        this.logoUrl = logoUrl;
+    }
+
+    public String getBannerUrl() {
+        return bannerUrl;
+    }
+
+    public void setBannerUrl(String bannerUrl) {
+        this.bannerUrl = bannerUrl;
+    }
+
+    public String getContactPhone() {
+        return contactPhone;
+    }
+
+    public void setContactPhone(String contactPhone) {
+        this.contactPhone = contactPhone;
+    }
+
+    public String getContactEmail() {
+        return contactEmail;
+    }
+
+    public void setContactEmail(String contactEmail) {
+        this.contactEmail = contactEmail;
     }
 
     // Helper methods
