@@ -55,6 +55,11 @@ public interface ProductService {
     Page<Product> findByCategory(Category category, int page);
 
     /**
+     * Find products by multiple category IDs
+     */
+    Page<Product> findByCategoryIds(List<Long> categoryIds, Pageable pageable);
+
+    /**
      * Find products by vendor
      */
     Page<Product> findByVendor(Vendor vendor, Pageable pageable);

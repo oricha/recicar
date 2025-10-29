@@ -41,48 +41,71 @@
     
     <!-- Custom CSS for Filter Sidebar -->
     <style>
-        /* Category Search Box */
-        .category-search-box {
-            position: relative;
-            margin-bottom: 20px;
+        /* Sidebar Container */
+        .sidebar_widget {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
         }
         
-        .category-search-box .search-icon {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #999;
-            z-index: 2;
+        .widget_inner {
+            padding: 0;
         }
         
-        .category-search-input {
-            width: 100%;
-            padding: 12px 12px 12px 40px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
+        /* Widget Sections */
+        .widget_list {
+            border-bottom: 1px solid #f0f0f0;
+            margin-bottom: 0;
+            background: #fff;
+            padding: 0;
         }
         
-        .category-search-input:focus {
-            outline: none;
-            border-color: #007bff;
+        .widget_list:last-child {
+            border-bottom: none;
+        }
+        
+        .widget_list h2 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0;
+            padding: 20px 20px 15px 20px;
+            color: #333;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .widget_list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .widget_list li {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        
+        .widget_list li:last-child {
+            border-bottom: none;
         }
         
         /* Category Items */
         .parts-catalog__items {
-            margin-bottom: 8px;
+            margin: 0;
             position: relative;
         }
         
         .parts-catalog__title {
             display: flex;
             align-items: center;
-            padding: 12px 0;
+            padding: 15px 20px;
             text-decoration: none;
             color: #333;
-            border-bottom: 1px solid #f0f0f0;
             transition: all 0.3s ease;
+            border-bottom: 1px solid #f0f0f0;
         }
         
         .parts-catalog__title:hover {
@@ -95,105 +118,134 @@
             width: 20px;
             text-align: center;
             color: #666;
+            font-size: 16px;
         }
         
         .cat__links__name {
             flex: 1;
-            font-size: 14px;
             font-weight: 500;
+            font-size: 14px;
         }
         
         .cat__links__count {
-            color: #999;
+            margin-left: auto;
+            background-color: #e9ecef;
+            color: #666;
+            padding: 4px 8px;
+            border-radius: 12px;
             font-size: 12px;
+            margin-right: 8px;
+            font-weight: 500;
+        }
+        
+        .category-arrow {
+            margin-left: 8px;
+            transition: transform 0.3s ease;
+            color: #666;
+            font-size: 12px;
+        }
+        
+        .parts-catalog__title:hover .category-arrow {
+            transform: rotate(180deg);
+        }
+        
+        /* Subcategories */
+        .parts-catalog__block {
+            background: #f8f9fa;
+            padding-left: 0;
+        }
+        
+        .cat__sub_items {
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .cat__sub_items:last-child {
+            border-bottom: none;
+        }
+        
+        .cat__sub_links {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px 12px 40px;
+            text-decoration: none;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+        
+        .cat__sub_links:hover {
+            color: #007bff;
+            background-color: #fff;
+        }
+        
+        .cat__sub_links__name {
+            flex: 1;
+            font-size: 13px;
+        }
+        
+        .cat__sub_links__count {
+            background-color: #e9ecef;
+            color: #666;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 11px;
             margin-left: 8px;
         }
         
-        .parts-catalog__items.active .cat__links__name {
-            color: #ff6b35;
-            font-weight: 600;
-        }
-        
         /* Checkbox Styling */
-        .cat-checkbox-js {
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            margin: 0;
-            opacity: 0;
-            z-index: 1;
-        }
-        
-        .cat-checkbox-js + .parts-catalog__title {
-            padding-left: 30px;
-        }
-        
-        .cat-checkbox-js:checked + .parts-catalog__title {
-            background-color: #fff3e0;
-            color: #ff6b35;
-        }
-        
-        /* Filter Sections */
-        .widget_list h2 {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: #333;
-            border-bottom: 2px solid #f0f0f0;
-            padding-bottom: 8px;
-        }
-        
-        .widget_list ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .widget_list li {
-            margin-bottom: 8px;
-            position: relative;
-        }
-        
         .widget_list input[type="checkbox"] {
-            margin-right: 10px;
-            transform: scale(1.1);
+            margin-right: 12px;
+            transform: scale(1.2);
+            accent-color: #007bff;
         }
         
         .widget_list label {
             display: flex;
             align-items: center;
+            justify-content: space-between;
+            width: 100%;
             cursor: pointer;
+            padding: 12px 20px;
             font-size: 14px;
             color: #333;
-            padding: 8px 0;
-            transition: color 0.3s ease;
+            transition: all 0.3s ease;
         }
         
         .widget_list label:hover {
+            background-color: #f8f9fa;
             color: #007bff;
         }
         
         .widget_list .count {
-            margin-left: auto;
-            color: #999;
+            background-color: #e9ecef;
+            color: #666;
+            padding: 4px 8px;
+            border-radius: 12px;
             font-size: 12px;
-        }
-        
-        .widget_list li.checked label {
-            color: #ff6b35;
+            margin-left: auto;
             font-weight: 500;
         }
         
-        .widget_list li.checked .count {
-            color: #ff6b35;
+        /* Show More Links */
+        .show-more-link {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 12px 20px;
+            display: block;
+            transition: all 0.3s ease;
         }
         
-        /* Range Filters */
-        .range-filter {
+        .show-more-link:hover {
+            text-decoration: underline;
+            background-color: #f8f9fa;
+        }
+        
+        /* Range Inputs */
+        .filter-range {
             display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 15px;
+            padding: 20px;
         }
         
         .range-input {
@@ -202,27 +254,35 @@
         
         .range-input label {
             display: block;
-            font-size: 12px;
+            margin-bottom: 8px;
+            font-size: 13px;
             color: #666;
-            margin-bottom: 5px;
+            font-weight: 500;
         }
         
         .range-input select {
             width: 100%;
-            padding: 8px;
+            padding: 10px 12px;
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 14px;
+            background-color: #fff;
+            transition: border-color 0.3s ease;
+        }
+        
+        .range-input select:focus {
+            outline: none;
+            border-color: #007bff;
         }
         
         /* Clear Filter Button */
         .clear-filter-btn {
             width: 100%;
-            background: linear-gradient(135deg, #ff6b35, #ff8c42);
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 6px;
+            padding: 15px 20px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 0;
+            color: #666;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
@@ -230,49 +290,51 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
         }
         
         .clear-filter-btn:hover {
-            background: linear-gradient(135deg, #e55a2b, #ff7a35);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(255, 107, 53, 0.3);
+            background-color: #e9ecef;
+            color: #333;
         }
         
         .clear-icon {
+            margin-right: 8px;
             font-size: 16px;
-            font-weight: bold;
         }
         
-        /* Show More Link */
-        .show-more {
-            text-align: center;
-            margin-top: 10px;
+        /* Active/Selected States */
+        .widget_list li.checked {
+            background-color: #fff3e0;
         }
         
-        .show-more-link {
-            color: #007bff;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        
-        .show-more-link:hover {
-            text-decoration: underline;
+        .widget_list li.checked label {
+            color: #ff9800;
+            font-weight: 600;
         }
         
         /* Responsive Design */
         @media (max-width: 768px) {
-            .range-filter {
+            .sidebar_widget {
+                margin-bottom: 20px;
+            }
+            
+            .filter-range {
                 flex-direction: column;
+                gap: 10px;
             }
             
+            .widget_list h2 {
+                padding: 15px 15px 10px 15px;
+                font-size: 15px;
+            }
+            
+            .widget_list label,
             .parts-catalog__title {
-                padding: 10px 0;
+                padding: 12px 15px;
             }
             
-            .cat__links__name {
-                font-size: 13px;
+            .cat__sub_links {
+                padding: 10px 15px 10px 30px;
             }
         }
     </style>
@@ -316,19 +378,48 @@
                    <!--sidebar widget start-->
                     <aside class="sidebar_widget">
                         <div class="widget_inner">
-                            <!-- Quick Category Search -->
-                            <div class="widget_list widget_filter">
-                                <div class="category-search-box">
-                                    <i class="fa fa-search search-icon"></i>
-                                    <input type="text" placeholder="Búsqueda rápida de categoría" id="category-filter" class="category-search-input">
-                                </div>
-                            </div>
-
                             <!-- Main Categories -->
                             <div class="widget_list widget_categories">
                                 <h2>Categorías</h2>
                                 <ul class="parts-catalog cat clearfix">
-                                    <!-- Categories will be added here -->
+                                    <!-- Dynamic Categories from Backend -->
+                                    <th:block th:each="category : ${categories}">
+                                        <th:block th:if="${category.parent == null}">
+                                            <li class="parts-catalog__items cat__items cat-items-js" th:attr="data-category=${category.slug}">
+                                                <a th:href="@{/shop-list(category=${category.slug})}" 
+                                                   class="parts-catalog__title cat__links cat-links-js"
+                                                   th:id="'cat-link-' + ${category.id}">
+                                                    <i class="fa fa-cog"></i>
+                                                    <span class="cat__links__name" th:text="${category.name}">Category Name</span>
+                                                    <span class="cat__links__count" th:text="${category.products.size()}">0</span>
+                                                    <i class="fa fa-plus category-arrow" th:if="${!category.children.isEmpty()}"></i>
+                                                </a>
+                                                <!-- Subcategories -->
+                                                <ul class="parts-catalog__block cat__sub cat-sub-js" th:if="${!category.children.isEmpty()}" style="display: none;">
+                                                    <li class="cat__sub_items cat-sub-items-js" th:each="subcategory : ${category.children}">
+                                                        <a th:href="@{/shop-list(category=${subcategory.slug})}" 
+                                                           class="cat__sub_links cat-sub-links-js"
+                                                           th:id="'cat-link-' + ${subcategory.id}">
+                                                            <span class="cat__sub_links__name" th:text="${subcategory.name}">Subcategory Name</span>
+                                                            <span class="cat__sub_links__count" th:text="${subcategory.products.size()}">0</span>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                        </th:block>
+                                    </th:block>
+                                </ul>
+                            </div>
+
+                            <!-- Tipo de anuncio -->
+                            <div class="widget_list widget_categories">
+                                <h2>Tipo de anuncio</h2>
+                                <ul>
+                                    <li>
+                                        <input type="checkbox" name="ad-type-disassembled" value="disassembled" id="ad-type-disassembled">
+                                        <label for="ad-type-disassembled">Piezas desmontadas <span class="count">3893</span></label>
+                                    </li>
+                                    <li><a href="#" class="show-more-link">Mostrar más</a></li>
                                 </ul>
                             </div>
 
@@ -695,9 +786,13 @@
                     <div class="mb-3" th:if="${errorMessage != null}">
                         <div class="alert alert-warning" role="alert" th:text="${errorMessage}">There was a problem with your search.</div>
                     </div>
-                    <div class="mb-3" th:if="${searchQuery != null || vehicleMake != null}">
+                    <div class="mb-3" th:if="${searchQuery != null || vehicleMake != null || category != null}">
                         <div class="alert alert-info" role="status">
                             <span th:if="${searchQuery != null}">Results for “<span th:text="${searchQuery}">query</span>”. </span>
+                            <span th:if="${category != null}">
+                                Category: <strong th:text="${category.name}">Category</strong>
+                                <span th:if="${category.parent != null}"> (Subcategory of <strong th:text="${category.parent.name}">Parent</strong>)</span>
+                            </span>
                             <span th:if="${vehicleMake != null}">
                                 Vehicle: <strong th:text="${vehicleMake}">Make</strong>
                                 <span th:if="${vehicleModel != null}"> / <strong th:text="${vehicleModel}">Model</strong></span>
@@ -708,12 +803,6 @@
                     </div>
                     <!--shop wrapper start-->
                     <!--shop toolbar start-->
-                     <div class="shop_banner">
-                         <img src="img/bg/banner8.jpg" alt="">
-                     </div>
-                    <div class="shop_title">
-                        <h1>tienda</h1>
-                    </div>
                     <div class="shop_toolbar_wrapper">
                         <div class="shop_toolbar_btn">
 
@@ -851,6 +940,12 @@
                             <ul>
                                 <!-- Previous link -->
                                 <li th:if="${page.hasPrevious()}">
+                                    <!-- Category search pagination -->
+                                    <a th:if="${searchType == 'category'}"
+                                       th:href="@{/search/category(slug=${categorySlug}, page=${page.number-1})}">Previous</a>
+                                    <!-- Shop list category pagination -->
+                                    <a th:if="${categorySlug != null and searchType == null}"
+                                       th:href="@{/shop-list(category=${categorySlug}, page=${page.number-1})}">Previous</a>
                                     <!-- Vehicle search pagination -->
                                     <a th:if="${searchType == 'vehicle'}"
                                        th:href="@{/search/vehicle(make=${vehicleMake}, model=${vehicleModel}, engineType=${vehicleEngine}, partName=${partName}, page=${page.number-1})}">Previous</a>
@@ -861,12 +956,20 @@
                                     <a th:if="${searchQuery != null and (searchType == 'general' or searchType == 'partNumberContaining' or searchType == 'oemNumberContaining')}"
                                        th:href="@{/search(query=${searchQuery}, page=${page.number-1})}">Previous</a>
                                     <!-- Default shop list pagination -->
-                                    <a th:if="${searchType == null and searchQuery == null and partName == null and vehicleMake == null}"
+                                    <a th:if="${searchType == null and searchQuery == null and partName == null and vehicleMake == null and categorySlug == null}"
                                        th:href="@{/shop-list(page=${page.number-1})}">Previous</a>
                                 </li>
 
                                 <!-- Page number links -->
                                 <li th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}" th:class="${i == page.number ? 'current' : ''}">
+                                    <!-- Category search -->
+                                    <a th:if="${searchType == 'category'}"
+                                       th:href="@{/search/category(slug=${categorySlug}, page=${i})}"
+                                       th:text="${i + 1}">1</a>
+                                    <!-- Shop list category pagination -->
+                                    <a th:if="${categorySlug != null and searchType == null}"
+                                       th:href="@{/shop-list(category=${categorySlug}, page=${i})}"
+                                       th:text="${i + 1}">1</a>
                                     <!-- Vehicle search -->
                                     <a th:if="${searchType == 'vehicle'}"
                                        th:href="@{/search/vehicle(make=${vehicleMake}, model=${vehicleModel}, engineType=${vehicleEngine}, partName=${partName}, page=${i})}"
@@ -880,13 +983,19 @@
                                        th:href="@{/search(query=${searchQuery}, page=${i})}"
                                        th:text="${i + 1}">1</a>
                                     <!-- Default shop list -->
-                                    <a th:if="${searchType == null and searchQuery == null and partName == null and vehicleMake == null}"
+                                    <a th:if="${searchType == null and searchQuery == null and partName == null and vehicleMake == null and categorySlug == null}"
                                        th:href="@{/shop-list(page=${i})}"
                                        th:text="${i + 1}">1</a>
                                 </li>
 
                                 <!-- Next link -->
                                 <li th:if="${page.hasNext()}">
+                                    <!-- Category search pagination -->
+                                    <a th:if="${searchType == 'category'}"
+                                       th:href="@{/search/category(slug=${categorySlug}, page=${page.number+1})}">Next</a>
+                                    <!-- Shop list category pagination -->
+                                    <a th:if="${categorySlug != null and searchType == null}"
+                                       th:href="@{/shop-list(category=${categorySlug}, page=${page.number+1})}">Next</a>
                                     <!-- Vehicle search pagination -->
                                     <a th:if="${searchType == 'vehicle'}"
                                        th:href="@{/search/vehicle(make=${vehicleMake}, model=${vehicleModel}, engineType=${vehicleEngine}, partName=${partName}, page=${page.number+1})}">Next</a>
@@ -897,7 +1006,7 @@
                                     <a th:if="${searchQuery != null and (searchType == 'general' or searchType == 'partNumberContaining' or searchType == 'oemNumberContaining')}"
                                        th:href="@{/search(query=${searchQuery}, page=${page.number+1})}">Next</a>
                                     <!-- Default shop list pagination -->
-                                    <a th:if="${searchType == null and searchQuery == null and partName == null and vehicleMake == null}"
+                                    <a th:if="${searchType == null and searchQuery == null and partName == null and vehicleMake == null and categorySlug == null}"
                                        th:href="@{/shop-list(page=${page.number+1})}">Next</a>
                                 </li>
                             </ul>
@@ -1079,10 +1188,33 @@
                     categoryItems.forEach(item => {
                         const categoryName = item.querySelector('.cat__links__name').textContent.toLowerCase();
                         const categoryLink = item.querySelector('.parts-catalog__title');
+                        const subcategoriesList = item.querySelector('.subcategories-list');
                         
-                        if (categoryName.includes(searchTerm)) {
+                        // Check if category name matches
+                        let categoryMatches = categoryName.includes(searchTerm);
+                        
+                        // Check if any subcategory matches
+                        let subcategoryMatches = false;
+                        if (subcategoriesList) {
+                            const subcategoryLinks = subcategoriesList.querySelectorAll('.subcategory-link');
+                            subcategoryLinks.forEach(subLink => {
+                                const subName = subLink.querySelector('.subcategory-name').textContent.toLowerCase();
+                                if (subName.includes(searchTerm)) {
+                                    subcategoryMatches = true;
+                                }
+                            });
+                        }
+                        
+                        // Show/hide based on matches
+                        if (categoryMatches || subcategoryMatches) {
                             item.style.display = 'block';
                             categoryLink.style.backgroundColor = searchTerm ? '#fff3e0' : '';
+                            
+                            // Expand if search term exists and there are subcategories
+                            if (searchTerm && subcategoriesList && subcategoryMatches) {
+                                item.classList.add('expanded');
+                                subcategoriesList.style.display = 'block';
+                            }
                         } else {
                             item.style.display = searchTerm ? 'none' : 'block';
                         }
@@ -1098,18 +1230,35 @@
                     e.preventDefault();
                     
                     const parentItem = this.closest('.parts-catalog__items');
-                    const checkbox = parentItem.querySelector('.cat-checkbox-js');
+                    const subcategoriesList = parentItem.querySelector('.subcategories-list');
                     
-                    // Toggle checkbox
-                    if (checkbox) {
-                        checkbox.checked = !checkbox.checked;
-                        
-                        // Update active state
-                        if (checkbox.checked) {
-                            parentItem.classList.add('active');
-                        } else {
-                            parentItem.classList.remove('active');
+                    // If there are no subcategories, redirect to category search
+                    if (!subcategoriesList) {
+                        window.location.href = this.getAttribute('href');
+                        return;
+                    }
+                    
+                    // Toggle expanded state
+                    const isExpanded = parentItem.classList.contains('expanded');
+                    
+                    // Close all other categories
+                    document.querySelectorAll('.parts-catalog__items').forEach(item => {
+                        if (item !== parentItem) {
+                            item.classList.remove('expanded');
+                            const subList = item.querySelector('.subcategories-list');
+                            if (subList) {
+                                subList.style.display = 'none';
+                            }
                         }
+                    });
+                    
+                    // Toggle current category
+                    if (isExpanded) {
+                        parentItem.classList.remove('expanded');
+                        subcategoriesList.style.display = 'none';
+                    } else {
+                        parentItem.classList.add('expanded');
+                        subcategoriesList.style.display = 'block';
                     }
                 });
             });
@@ -1193,6 +1342,38 @@
                         parentLi.style.display = 'none';
                     }
                 }
+            }
+
+            // Category filtering functionality
+            const categoryCheckboxes = document.querySelectorAll('.filterCategories');
+            categoryCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const selectedCategories = Array.from(document.querySelectorAll('.filterCategories:checked'))
+                        .map(cb => cb.value);
+                    
+                    if (selectedCategories.length > 0) {
+                        // Redirect to categories search endpoint
+                        const url = `/search/categories?category=${selectedCategories.join(',')}`;
+                        window.location.href = url;
+                    } else {
+                        // If no categories selected, go back to main shop list
+                        window.location.href = '/shop-list';
+                    }
+                });
+            });
+
+            // Initialize category states based on URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const selectedCategories = urlParams.get('category');
+            
+            if (selectedCategories) {
+                const categoryIds = selectedCategories.split(',');
+                categoryIds.forEach(id => {
+                    const checkbox = document.getElementById('cpc-' + id);
+                    if (checkbox) {
+                        checkbox.checked = true;
+                    }
+                });
             }
         });
      </script>

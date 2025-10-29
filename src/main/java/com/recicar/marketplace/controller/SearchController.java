@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/search")
@@ -162,5 +164,81 @@ public class SearchController {
         modelAttr.addAttribute("totalElements", productPage.getTotalElements());
         modelAttr.addAttribute("categories", categoryService.findRootCategories());
         return "shop-list";
+    }
+
+    /**
+     * Search by category slug
+     */
+    @GetMapping("/category")
+    public String searchByCategory(
+            @RequestParam("slug") String slug,
+            @RequestParam(defaultValue = "0") int page,
+            Model model
+    ) {
+        if (slug == null || slug.trim().isEmpty()) {
+            model.addAttribute("errorMessage", "Category is required");
+            model.addAttribute("products", Collections.emptyList());
+            model.addAttribute("categories", categoryService.findRootCategories());
+            return "shop-list";
+        }
+
+        return categoryService.findBySlug(slug)
+                .map(category -> {
+                    Page<Product> productPage = productService.findByCategory(category, PageRequest.of(page, 12));
+                    model.addAttribute("products", productPage.getContent());
+                    model.addAttribute("page", productPage);
+                    model.addAttribute("category", category);
+                    model.addAttribute("categorySlug", slug);
+                    model.addAttribute("searchType", "category");
+                    model.addAttribute("totalElements", productPage.getTotalElements());
+                    model.addAttribute("categories", categoryService.findRootCategories());
+                    return "shop-list";
+                })
+                .orElseGet(() -> {
+                    model.addAttribute("errorMessage", "Category not found");
+                    model.addAttribute("products", Collections.emptyList());
+                    model.addAttribute("categories", categoryService.findRootCategories());
+                    return "shop-list";
+                });
+    }
+
+    /**
+     * Search by multiple categories (for advanced filtering)
+     */
+    @GetMapping("/categories")
+    public String searchByCategories(
+            @RequestParam("category") String categoryIds,
+            @RequestParam(defaultValue = "0") int page,
+            Model model
+    ) {
+        if (categoryIds == null || categoryIds.trim().isEmpty()) {
+            model.addAttribute("errorMessage", "At least one category must be selected");
+            model.addAttribute("products", Collections.emptyList());
+            model.addAttribute("categories", categoryService.findRootCategories());
+            return "shop-list";
+        }
+
+        try {
+            List<Long> categoryIdList = Arrays.stream(categoryIds.split(","))
+                    .map(String::trim)
+                    .map(Long::parseLong)
+                    .collect(Collectors.toList());
+
+            Page<Product> productPage = productService.findByCategoryIds(categoryIdList, PageRequest.of(page, 12));
+            
+            model.addAttribute("products", productPage.getContent());
+            model.addAttribute("page", productPage);
+            model.addAttribute("selectedCategoryIds", categoryIdList);
+            model.addAttribute("searchType", "categories");
+            model.addAttribute("totalElements", productPage.getTotalElements());
+            model.addAttribute("categories", categoryService.findRootCategories());
+            
+            return "shop-list";
+        } catch (NumberFormatException e) {
+            model.addAttribute("errorMessage", "Invalid category selection");
+            model.addAttribute("products", Collections.emptyList());
+            model.addAttribute("categories", categoryService.findRootCategories());
+            return "shop-list";
+        }
     }
 }

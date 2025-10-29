@@ -46,6 +46,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Page<Product> findByCategoryAndActiveTrue(Category category, Pageable pageable);
 
+    Page<Product> findByCategoryIdInAndActiveTrue(List<Long> categoryIds, Pageable pageable);
+
     Page<Product> findByConditionAndActiveTrue(ProductCondition condition, Pageable pageable);
 
     @Query("SELECT p FROM Product p WHERE p.price BETWEEN :minPrice AND :maxPrice")

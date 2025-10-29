@@ -175,6 +175,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public Page<Product> findByCategoryIds(List<Long> categoryIds, Pageable pageable) {
+        return productRepository.findByCategoryIdInAndActiveTrue(categoryIds, pageable);
+    }
+
+    @Override
     public Page<Product> findByVendor(Vendor vendor, Pageable pageable) {
         return productRepository.findByVendorAndActiveTrue(vendor, pageable);
     }

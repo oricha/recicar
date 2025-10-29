@@ -211,6 +211,146 @@
             color: #6c757d;
             margin-right: 12px;
         }
+        
+        /* Products Section Styles */
+        .products-section {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 30px;
+            margin-top: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .products-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .products-header h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333333;
+            margin: 0 0 10px 0;
+        }
+        
+        .products-count p {
+            color: #6c757d;
+            font-size: 14px;
+            margin: 0;
+        }
+        
+        .products-grid {
+            margin-bottom: 30px;
+        }
+        
+        .product-card {
+            background-color: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        
+        .product-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .product-image {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .product-image img {
+            max-width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        
+        .product-info {
+            text-align: center;
+        }
+        
+        .product-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+        }
+        
+        .product-name a {
+            color: #333333;
+            text-decoration: none;
+        }
+        
+        .product-name a:hover {
+            color: #007bff;
+        }
+        
+        .product-category {
+            font-size: 14px;
+            color: #6c757d;
+            margin: 0 0 10px 0;
+        }
+        
+        .product-price {
+            margin-top: 10px;
+        }
+        
+        .current-price {
+            font-size: 18px;
+            font-weight: 600;
+            color: #28a745;
+        }
+        
+        .old-price {
+            font-size: 14px;
+            color: #6c757d;
+            text-decoration: line-through;
+            margin-left: 8px;
+        }
+        
+        .no-products {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+        
+        .pagination-wrapper {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .pagination {
+            margin: 0;
+        }
+        
+        .page-item.active .page-link {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        
+        .page-link {
+            color: #007bff;
+            border: 1px solid #dee2e6;
+            padding: 8px 12px;
+        }
+        
+        .page-link:hover {
+            color: #0056b3;
+            background-color: #e9ecef;
+            border-color: #dee2e6;
+        }
+        
+        .page-item.disabled .page-link {
+            color: #6c757d;
+            background-color: #fff;
+            border-color: #dee2e6;
+        }
     </style>
 </head>
 
@@ -240,388 +380,126 @@
             
             <!-- Categories List -->
             <div class="categories-list">
-                <!-- Caja de cambios/embrague/transmisión -->
-                <div class="category-item" data-category="caja-cambios-embrague-transmision">
-                    <div class="category-icon">
-                        <i class="fa fa-cogs"></i>
-                    </div>
-                    <h3 class="category-name">Caja de cambios/embrague/transmisión</h3>
-                    <span class="category-count">6276</span>
-                    <div class="category-expand">+</div>
-                </div>
-                <div class="subcategories" id="subcategories-caja-cambios-embrague-transmision">
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Caja de cambios manual de 5 velocidades</span>
-                        <span class="subcategory-count">142</span>
-                    </a>
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Caja de cambios manual de 6 velocidades</span>
-                        <span class="subcategory-count">9</span>
-                    </a>
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Caja de cambios automática</span>
-                        <span class="subcategory-count">265</span>
-                    </a>
-                </div>
+                <!-- Dynamic Categories from Backend -->
+                <th:block th:each="category : ${categories}">
+                    <th:block th:if="${category.parent == null}">
+                        <a th:href="@{/categories(category=${category.slug})}" class="category-item" th:attr="data-category=${category.slug}">
+                            <div class="category-icon">
+                                <i class="fa fa-cog"></i>
+                            </div>
+                            <h3 class="category-name" th:text="${category.name}">Category Name</h3>
+                            <span class="category-count" th:text="${category.products.size()}">0</span>
+                            <div class="category-expand" th:if="${!category.children.isEmpty()}">+</div>
+                        </a>
+                        <div class="subcategories" th:if="${!category.children.isEmpty()}" th:id="'subcategories-' + ${category.slug}">
+                            <a th:each="subcategory : ${category.children}" 
+                               th:href="@{/categories(category=${subcategory.slug})}" 
+                               class="subcategory-item">
+                                <span class="subcategory-name" th:text="${subcategory.name}">Subcategory Name</span>
+                                <span class="subcategory-count" th:text="${subcategory.products.size()}">0</span>
+                            </a>
+                        </div>
+                    </th:block>
+                </th:block>
 
-                <!-- Carrocería/repuestos de carrocería/gancho -->
-                <div class="category-item" data-category="carroceria-repuestos-gancho">
-                    <div class="category-icon">
-                        <i class="fa fa-car"></i>
+                <!-- Fallback if no categories (keep one example for styling) -->
+                <th:block th:if="${categories == null or categories.isEmpty()}">
+                    <div class="category-item" data-category="caja-cambios-embrague-transmision">
+                        <div class="category-icon">
+                            <i class="fa fa-cogs"></i>
+                        </div>
+                        <h3 class="category-name">Caja de cambios/embrague/transmisión</h3>
+                        <span class="category-count">6276</span>
+                        <div class="category-expand">+</div>
                     </div>
-                    <h3 class="category-name">Carrocería/repuestos de carrocería/gancho</h3>
-                    <span class="category-count">16936</span>
-                    <div class="category-expand">+</div>
-                </div>
-                <div class="subcategories" id="subcategories-carroceria-repuestos-gancho">
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Parachoques delantero</span>
-                        <span class="subcategory-count">1250</span>
-                    </a>
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Parachoques trasero</span>
-                        <span class="subcategory-count">980</span>
-                    </a>
-                </div>
-
-                <!-- Dispositivos/interruptores/sistema electrónico -->
-                <div class="category-item" data-category="dispositivos-interruptores-electronico">
-                    <div class="category-icon">
-                        <i class="fa fa-tachometer"></i>
+                    <div class="subcategories" id="subcategories-caja-cambios-embrague-transmision">
+                        <a href="#" class="subcategory-item">
+                            <span class="subcategory-name">Caja de cambios manual de 5 velocidades</span>
+                            <span class="subcategory-count">142</span>
+                        </a>
+                        <a href="#" class="subcategory-item">
+                            <span class="subcategory-name">Caja de cambios manual de 6 velocidades</span>
+                            <span class="subcategory-count">9</span>
+                        </a>
+                        <a href="#" class="subcategory-item">
+                            <span class="subcategory-name">Caja de cambios automática</span>
+                            <span class="subcategory-count">265</span>
+                        </a>
                     </div>
-                    <h3 class="category-name">Dispositivos/interruptores/sistema electrónico</h3>
-                    <span class="category-count">93737</span>
-                    <div class="category-expand">+</div>
-                </div>
-                <div class="subcategories" id="subcategories-dispositivos-interruptores-electronico">
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Centralitas</span>
-                        <span class="subcategory-count">2500</span>
-                    </a>
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Sensores</span>
-                        <span class="subcategory-count">1800</span>
-                    </a>
-                </div>
-
-                <!-- Eje delantero -->
-                <div class="category-item" data-category="eje-delantero">
-                    <div class="category-icon">
-                        <i class="fa fa-circle-o"></i>
+                </th:block>
+            </div>
+            
+            <!-- Products Section (shown when category is selected) -->
+            <div th:if="${showProducts}" class="products-section">
+                <div class="products-header">
+                    <h2 th:if="${selectedCategory != null}" th:text="'Productos en ' + ${selectedCategory.name}">Productos en categoría</h2>
+                    <div class="products-count" th:if="${page != null}">
+                        <p th:text="'Mostrando ' + ${page.numberOfElements} + ' de ' + ${page.totalElements} + ' resultados'">
+                            Mostrando 0 de 0 resultados
+                        </p>
                     </div>
-                    <h3 class="category-name">Eje delantero</h3>
-                    <span class="category-count">16236</span>
-                    <div class="category-expand">+</div>
                 </div>
-                <div class="subcategories" id="subcategories-eje-delantero">
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Amortiguadores delanteros</span>
-                        <span class="subcategory-count">850</span>
-                    </a>
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Brazos de suspensión</span>
-                        <span class="subcategory-count">1200</span>
-                    </a>
+                
+                <!-- Error Message -->
+                <div th:if="${errorMessage != null}" class="alert alert-warning" role="alert" th:text="${errorMessage}">
+                    There was a problem with your search.
                 </div>
-
-                <!-- Eje trasero -->
-                <div class="category-item" data-category="eje-trasero">
-                    <div class="category-icon">
-                        <i class="fa fa-circle-o"></i>
+                
+                <!-- Products Grid -->
+                <div class="row products-grid" th:if="${!products.isEmpty()}">
+                    <div class="col-lg-4 col-md-6 col-sm-6" th:each="product : ${products}">
+                        <div class="product-card">
+                            <div class="product-image">
+                                <a th:href="@{/product-details(id=${product.id})}">
+                                    <img th:src="${product.primaryImage != null ? product.primaryImage.url : '/img/product/product10.jpg'}" 
+                                         th:alt="${product.name}" class="img-fluid">
+                                </a>
+                            </div>
+                            <div class="product-info">
+                                <h3 class="product-name">
+                                    <a th:href="@{/product-details(id=${product.id})}" th:text="${product.name}">Product Name</a>
+                                </h3>
+                                <p class="product-category" th:text="${product.category.name}">Category</p>
+                                <div class="product-price">
+                                    <span class="current-price" th:text="${product.formattedPrice}">$160.00</span>
+                                    <span class="old-price" th:if="${product.oldPrice != null}" th:text="${#numbers.formatCurrency(product.oldPrice)}">$320.00</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <h3 class="category-name">Eje trasero</h3>
-                    <span class="category-count">15751</span>
-                    <div class="category-expand">+</div>
                 </div>
-                <div class="subcategories" id="subcategories-eje-trasero">
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Amortiguadores traseros</span>
-                        <span class="subcategory-count">750</span>
-                    </a>
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Muelles traseros</span>
-                        <span class="subcategory-count">600</span>
-                    </a>
+                
+                <!-- No Products Message -->
+                <div th:if="${products.isEmpty()}" class="no-products">
+                    <p>No se encontraron productos en esta categoría.</p>
                 </div>
-
-                <!-- Habitáculo/interior -->
-                <div class="category-item" data-category="habitaculo-interior">
-                    <div class="category-icon">
-                        <i class="fa fa-user"></i>
-                    </div>
-                    <h3 class="category-name">Habitáculo/interior</h3>
-                    <span class="category-count">62979</span>
-                    <div class="category-expand">+</div>
-                </div>
-                <div class="subcategories" id="subcategories-habitaculo-interior">
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Asientos delanteros</span>
-                        <span class="subcategory-count">1200</span>
-                    </a>
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Asientos traseros</span>
-                        <span class="subcategory-count">800</span>
-                    </a>
-                </div>
-
-                <!-- Lunas -->
-                <div class="category-item" data-category="lunas">
-                    <div class="category-icon">
-                        <i class="fa fa-square-o"></i>
-                    </div>
-                    <h3 class="category-name">Lunas</h3>
-                    <span class="category-count">3784</span>
-                    <div class="category-expand">+</div>
-                </div>
-                <div class="subcategories" id="subcategories-lunas">
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Luna delantera</span>
-                        <span class="subcategory-count">450</span>
-                    </a>
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Luna trasera</span>
-                        <span class="subcategory-count">380</span>
-                    </a>
-                </div>
-
-                <!-- Motor -->
-                <div class="category-item" data-category="motor">
-                    <div class="category-icon">
-                        <i class="fa fa-cog"></i>
-                    </div>
-                    <h3 class="category-name">Motor</h3>
-                    <span class="category-count">8202</span>
-                    <div class="category-expand">+</div>
-                </div>
-                <div class="subcategories" id="subcategories-motor">
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Culata</span>
-                        <span class="subcategory-count">320</span>
-                    </a>
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Bloque motor</span>
-                        <span class="subcategory-count">180</span>
-                    </a>
-                </div>
-
-                <!-- Otros repuestos -->
-                <div class="category-item" data-category="otros-repuestos">
-                    <div class="category-icon">
-                        <i class="fa fa-wrench"></i>
-                    </div>
-                    <h3 class="category-name">Otros repuestos</h3>
-                    <span class="category-count">16888</span>
-                    <div class="category-expand">+</div>
-                </div>
-                <div class="subcategories" id="subcategories-otros-repuestos">
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Accesorios varios</span>
-                        <span class="subcategory-count">2500</span>
-                    </a>
-                </div>
-
-                <!-- Puerta -->
-                <div class="category-item" data-category="puerta">
-                    <div class="category-icon">
-                        <i class="fa fa-square"></i>
-                    </div>
-                    <h3 class="category-name">Puerta</h3>
-                    <span class="category-count">33084</span>
-                    <div class="category-expand">+</div>
-                </div>
-                <div class="subcategories" id="subcategories-puerta">
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Puerta delantera izquierda</span>
-                        <span class="subcategory-count">1200</span>
-                    </a>
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Puerta delantera derecha</span>
-                        <span class="subcategory-count">1200</span>
-                    </a>
-                </div>
-
-                <!-- Radiador de calefacción/aire acondicionado -->
-                <div class="category-item" data-category="radiador-calefaccion-aire-acondicionado">
-                    <div class="category-icon">
-                        <i class="fa fa-thermometer-half"></i>
-                    </div>
-                    <h3 class="category-name">Radiador de calefacción/aire acondicionado</h3>
-                    <span class="category-count">42061</span>
-                    <div class="category-expand">+</div>
-                </div>
-                <div class="subcategories" id="subcategories-radiador-calefaccion-aire-acondicionado">
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Radiador de calefacción</span>
-                        <span class="subcategory-count">850</span>
-                    </a>
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Compresor aire acondicionado</span>
-                        <span class="subcategory-count">420</span>
-                    </a>
-                </div>
-
-                <!-- Repuestos de carrocería delantera exterior -->
-                <div class="category-item" data-category="repuestos-carroceria-delantera-exterior">
-                    <div class="category-icon">
-                        <i class="fa fa-car"></i>
-                    </div>
-                    <h3 class="category-name">Repuestos de carrocería delantera exterior</h3>
-                    <span class="category-count">24343</span>
-                    <div class="category-expand">+</div>
-                </div>
-                <div class="subcategories" id="subcategories-repuestos-carroceria-delantera-exterior">
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Capó delantero</span>
-                        <span class="subcategory-count">650</span>
-                    </a>
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Guardabarros delanteros</span>
-                        <span class="subcategory-count">800</span>
-                    </a>
-                </div>
-
-                <!-- Repuestos de la carrocería exterior trasera -->
-                <div class="category-item" data-category="repuestos-carroceria-exterior-trasera">
-                    <div class="category-icon">
-                        <i class="fa fa-car"></i>
-                    </div>
-                    <h3 class="category-name">Repuestos de la carrocería exterior trasera</h3>
-                    <span class="category-count">19104</span>
-                    <div class="category-expand">+</div>
-                </div>
-                <div class="subcategories" id="subcategories-repuestos-carroceria-exterior-trasera">
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Maletero</span>
-                        <span class="subcategory-count">450</span>
-                    </a>
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Guardabarros traseros</span>
-                        <span class="subcategory-count">600</span>
-                    </a>
-                </div>
-
-                <!-- Ruedas/neumáticos/tapacubos -->
-                <div class="category-item" data-category="ruedas-neumaticos-tapacubos">
-                    <div class="category-icon">
-                        <i class="fa fa-circle"></i>
-                    </div>
-                    <h3 class="category-name">Ruedas/neumáticos/tapacubos</h3>
-                    <span class="category-count">3112</span>
-                    <div class="category-expand">+</div>
-                </div>
-                <div class="subcategories" id="subcategories-ruedas-neumaticos-tapacubos">
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Neumáticos</span>
-                        <span class="subcategory-count">800</span>
-                    </a>
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Tapacubos</span>
-                        <span class="subcategory-count">300</span>
-                    </a>
-                </div>
-
-                <!-- Sistema de frenos -->
-                <div class="category-item" data-category="sistema-frenos">
-                    <div class="category-icon">
-                        <i class="fa fa-stop-circle"></i>
-                    </div>
-                    <h3 class="category-name">Sistema de frenos</h3>
-                    <span class="category-count">14190</span>
-                    <div class="category-expand">+</div>
-                </div>
-                <div class="subcategories" id="subcategories-sistema-frenos">
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Pastillas de freno</span>
-                        <span class="subcategory-count">1200</span>
-                    </a>
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Discos de freno</span>
-                        <span class="subcategory-count">800</span>
-                    </a>
-                </div>
-
-                <!-- Sistema de iluminación (Highlighted) -->
-                <div class="category-item active" data-category="sistema-iluminacion">
-                    <div class="category-icon">
-                        <i class="fa fa-lightbulb-o"></i>
-                    </div>
-                    <h3 class="category-name">Sistema de iluminación</h3>
-                    <span class="category-count">15367</span>
-                    <div class="category-expand">+</div>
-                </div>
-                <div class="subcategories show" id="subcategories-sistema-iluminacion">
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Faros delanteros</span>
-                        <span class="subcategory-count">1200</span>
-                    </a>
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Luces traseras</span>
-                        <span class="subcategory-count">950</span>
-                    </a>
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Luces de señalización</span>
-                        <span class="subcategory-count">600</span>
-                    </a>
-                </div>
-
-                <!-- Sistema de limpiado/lavado del faro -->
-                <div class="category-item" data-category="sistema-limpiado-lavado-faro">
-                    <div class="category-icon">
-                        <i class="fa fa-shower"></i>
-                    </div>
-                    <h3 class="category-name">Sistema de limpiado/lavado del faro</h3>
-                    <span class="category-count">6370</span>
-                    <div class="category-expand">+</div>
-                </div>
-                <div class="subcategories" id="subcategories-sistema-limpiado-lavado-faro">
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Limpiaparabrisas</span>
-                        <span class="subcategory-count">400</span>
-                    </a>
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Bomba de agua</span>
-                        <span class="subcategory-count">200</span>
-                    </a>
-                </div>
-
-                <!-- Sistema de mezcla de combustible -->
-                <div class="category-item" data-category="sistema-mezcla-combustible">
-                    <div class="category-icon">
-                        <i class="fa fa-tint"></i>
-                    </div>
-                    <h3 class="category-name">Sistema de mezcla de combustible</h3>
-                    <span class="category-count">3450</span>
-                    <div class="category-expand">+</div>
-                </div>
-                <div class="subcategories" id="subcategories-sistema-mezcla-combustible">
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Inyectores</span>
-                        <span class="subcategory-count">300</span>
-                    </a>
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Bomba de combustible</span>
-                        <span class="subcategory-count">150</span>
-                    </a>
-                </div>
-
-                <!-- Sistema del tubo de escape -->
-                <div class="category-item" data-category="sistema-tubo-escape">
-                    <div class="category-icon">
-                        <i class="fa fa-pipe"></i>
-                    </div>
-                    <h3 class="category-name">Sistema del tubo de escape</h3>
-                    <span class="category-count">631</span>
-                    <div class="category-expand">+</div>
-                </div>
-                <div class="subcategories" id="subcategories-sistema-tubo-escape">
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Silenciador</span>
-                        <span class="subcategory-count">200</span>
-                    </a>
-                    <a href="#" class="subcategory-item">
-                        <span class="subcategory-name">Catalizador</span>
-                        <span class="subcategory-count">150</span>
-                    </a>
+                
+                <!-- Pagination -->
+                <div class="pagination-wrapper" th:if="${page != null and page.totalPages > 1}">
+                    <nav aria-label="Product pagination">
+                        <ul class="pagination">
+                            <!-- Previous link -->
+                            <li class="page-item" th:classappend="${!page.hasPrevious()} ? 'disabled' : ''">
+                                <a class="page-link" th:if="${page.hasPrevious()}" 
+                                   th:href="@{/categories(category=${categorySlug}, page=${page.number-1})}">Anterior</a>
+                                <span class="page-link" th:if="${!page.hasPrevious()}">Anterior</span>
+                            </li>
+                            
+                            <!-- Page numbers -->
+                            <li th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}" 
+                                class="page-item" th:classappend="${i == page.number} ? 'active' : ''">
+                                <a class="page-link" th:href="@{/categories(category=${categorySlug}, page=${i})}" 
+                                   th:text="${i + 1}">1</a>
+                            </li>
+                            
+                            <!-- Next link -->
+                            <li class="page-item" th:classappend="${!page.hasNext()} ? 'disabled' : ''">
+                                <a class="page-link" th:if="${page.hasNext()}" 
+                                   th:href="@{/categories(category=${categorySlug}, page=${page.number+1})}">Siguiente</a>
+                                <span class="page-link" th:if="${!page.hasNext()}">Siguiente</span>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
             </div>
         </div>
