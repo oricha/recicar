@@ -174,7 +174,7 @@ public class VendorServiceImpl implements VendorService {
         try {
             // Validate directory parameter - only allow specific values
             if (!directory.equals("logos") && !directory.equals("banners")) {
-                throw new IllegalArgumentException("Invalid directory: " + directory);
+                throw new IllegalArgumentException("Invalid directory");
             }
             
             // Validate file extension
@@ -183,14 +183,25 @@ public class VendorServiceImpl implements VendorService {
                 throw new IllegalArgumentException("Invalid filename");
             }
             
-            // Only allow image files
-            String lowerFilename = originalFilename.toLowerCase();
-            if (!lowerFilename.endsWith(".jpg") && !lowerFilename.endsWith(".jpeg") && 
-                !lowerFilename.endsWith(".png") && !lowerFilename.endsWith(".gif")) {
+            // Get the file extension from the last dot
+            int lastDotIndex = originalFilename.lastIndexOf(".");
+            if (lastDotIndex == -1 || lastDotIndex == originalFilename.length() - 1) {
+                throw new IllegalArgumentException("File must have a valid extension");
+            }
+            
+            String extension = originalFilename.substring(lastDotIndex).toLowerCase();
+            
+            // Only allow specific image extensions
+            if (!extension.equals(".jpg") && !extension.equals(".jpeg") && 
+                !extension.equals(".png") && !extension.equals(".gif")) {
                 throw new IllegalArgumentException("Only image files are allowed");
             }
             
-            String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            // Validate MIME type
+            String contentType = file.getContentType();
+            if (contentType == null || (!contentType.startsWith("image/"))) {
+                throw new IllegalArgumentException("Invalid file type");
+            }
             
             // Create upload directory if it doesn't exist
             Path uploadPath = Paths.get("uploads", directory);
@@ -204,7 +215,7 @@ public class VendorServiceImpl implements VendorService {
             // Resolve path and ensure it's within the upload directory
             Path filePath = uploadPath.resolve(filename).normalize();
             if (!filePath.startsWith(uploadPath.normalize())) {
-                throw new SecurityException("Path traversal attempt detected");
+                throw new SecurityException("Invalid file path");
             }
             
             // Save file
@@ -213,7 +224,7 @@ public class VendorServiceImpl implements VendorService {
             // Return URL path
             return "/uploads/" + directory + "/" + filename;
         } catch (IOException e) {
-            throw new RuntimeException("Failed to save file: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to upload file", e);
         }
     }
 }
