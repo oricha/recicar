@@ -172,21 +172,42 @@ public class VendorServiceImpl implements VendorService {
 
     private String saveFile(MultipartFile file, String directory) {
         try {
+            // Validate directory parameter - only allow specific values
+            if (!directory.equals("logos") && !directory.equals("banners")) {
+                throw new IllegalArgumentException("Invalid directory: " + directory);
+            }
+            
+            // Validate file extension
+            String originalFilename = file.getOriginalFilename();
+            if (originalFilename == null || originalFilename.isEmpty()) {
+                throw new IllegalArgumentException("Invalid filename");
+            }
+            
+            // Only allow image files
+            String lowerFilename = originalFilename.toLowerCase();
+            if (!lowerFilename.endsWith(".jpg") && !lowerFilename.endsWith(".jpeg") && 
+                !lowerFilename.endsWith(".png") && !lowerFilename.endsWith(".gif")) {
+                throw new IllegalArgumentException("Only image files are allowed");
+            }
+            
+            String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            
             // Create upload directory if it doesn't exist
             Path uploadPath = Paths.get("uploads", directory);
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
             
-            // Generate unique filename
-            String originalFilename = file.getOriginalFilename();
-            String extension = originalFilename != null && originalFilename.contains(".") 
-                ? originalFilename.substring(originalFilename.lastIndexOf(".")) 
-                : "";
+            // Generate unique filename with validated extension
             String filename = UUID.randomUUID().toString() + extension;
             
+            // Resolve path and ensure it's within the upload directory
+            Path filePath = uploadPath.resolve(filename).normalize();
+            if (!filePath.startsWith(uploadPath.normalize())) {
+                throw new SecurityException("Path traversal attempt detected");
+            }
+            
             // Save file
-            Path filePath = uploadPath.resolve(filename);
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
             
             // Return URL path
