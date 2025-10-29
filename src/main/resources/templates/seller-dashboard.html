@@ -1,0 +1,541 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" class="no-js" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>ReciCar - Seller Dashboard</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="/assets/img/favicon.ico">
+
+     <!-- CSS 
+    ========================= -->
+     <!--bootstrap min css-->
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+    <!--owl carousel min css-->
+    <link rel="stylesheet" href="/assets/css/owl.carousel.min.css">
+    <!--slick min css-->
+    <link rel="stylesheet" href="/assets/css/slick.css">
+    <!--magnific popup min css-->
+    <link rel="stylesheet" href="/assets/css/magnific-popup.css">
+    <!--font awesome css-->
+    <link rel="stylesheet" href="/assets/css/font.awesome.css">
+    <!--ionicons min css-->
+    <link rel="stylesheet" href="/assets/css/ionicons.min.css">
+    <!--animate css-->
+    <link rel="stylesheet" href="/assets/css/animate.css">
+    <!--jquery ui min css-->
+    <link rel="stylesheet" href="/assets/css/jquery-ui.min.css">
+    <!--slinky menu css-->
+    <link rel="stylesheet" href="/assets/css/slinky.menu.css">
+    <!-- Plugins CSS -->
+    <link rel="stylesheet" href="/assets/css/plugins.css">
+    
+    <!-- Main Style CSS -->
+    <link rel="stylesheet" href="/assets/css/style.css">
+    
+    <!--modernizr min js here-->
+    <script src="/assets/js/vendor/modernizr-3.7.1.min.js"></script>
+
+    <!-- Custom CSS for Seller Dashboard -->
+    <style>
+        body {
+            background-color: #ffffff !important;
+        }
+        
+        .seller_dashboard_area {
+            background-color: #ffffff;
+            padding: 32px 0 55px;
+        }
+        
+        .breadcrumbs_area {
+            background-color: #ffffff;
+            padding: 15px 0;
+        }
+        
+        .seller_sidebar {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+        
+        .seller_profile {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e9e9e9;
+            margin-bottom: 20px;
+        }
+        
+        .seller_avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            border: 2px solid #e9e9e9;
+        }
+        
+        .seller_name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .seller_email {
+            font-size: 14px;
+            color: #999;
+        }
+        
+        .seller_nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .seller_nav li {
+            margin-bottom: 5px;
+        }
+        
+        .seller_nav li a {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: #333;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+        
+        .seller_nav li a i {
+            margin-right: 10px;
+            font-size: 16px;
+            width: 20px;
+        }
+        
+        .seller_nav li a:hover {
+            background-color: #f5f5f5;
+            color: #ffd54c;
+        }
+        
+        .seller_nav li a.active {
+            background-color: #ffd54c;
+            color: #333;
+        }
+        
+        .message_badge {
+            background-color: #e53935;
+            color: #ffffff;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: auto;
+        }
+        
+        .dashboard_metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .metric_card {
+            background-color: #ffffff;
+            border: 1px solid #e9e9e9;
+            border-radius: 5px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .metric_icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 24px;
+            color: #ffffff;
+        }
+        
+        .metric_icon.purple {
+            background-color: #9c27b0;
+        }
+        
+        .metric_icon.teal {
+            background-color: #009688;
+        }
+        
+        .metric_icon.green {
+            background-color: #4caf50;
+        }
+        
+        .metric_icon.pink {
+            background-color: #e91e63;
+        }
+        
+        .metric_content h3 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            margin: 0 0 5px 0;
+        }
+        
+        .metric_content p {
+            font-size: 14px;
+            color: #999;
+            margin: 0;
+        }
+        
+        .recent_listings {
+            background-color: #ffffff;
+            border: 1px solid #e9e9e9;
+            border-radius: 5px;
+            padding: 20px;
+        }
+        
+        .recent_listings h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .listings_table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .listings_table thead {
+            background-color: #f5f5f5;
+            border-bottom: 2px solid #e9e9e9;
+        }
+        
+        .listings_table thead th {
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            text-transform: uppercase;
+        }
+        
+        .listings_table tbody tr {
+            border-bottom: 1px solid #e9e9e9;
+        }
+        
+        .listings_table tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .listings_table tbody td {
+            padding: 15px 12px;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .car_info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .car_image {
+            width: 50px;
+            height: 50px;
+            background-color: #e9e9e9;
+            border-radius: 3px;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .car_details h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #333;
+            margin: 0 0 5px 0;
+        }
+        
+        .car_details p {
+            font-size: 12px;
+            color: #999;
+            margin: 0;
+        }
+        
+        .brand_name {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .publish_date {
+            color: #999;
+        }
+        
+        .price {
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .views {
+            font-weight: 500;
+            color: #333;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <!--header area start-->
+    <th:block th:replace="fragments/_header :: header"></th:block>
+    <!--header area end-->
+
+    <!--Offcanvas menu area start-->
+    <th:block th:replace="fragments/_offcanvasmenu :: offcanvasmenu"></th:block>
+    <!--Offcanvas menu area end-->
+
+    <!--breadcrumbs area start-->
+    <div class="breadcrumbs_area">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="breadcrumb_content">
+                        <ul>
+                            <li><a href="/">Home</a></li>
+                            <li>Seller Dashboard</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs area end-->
+
+    <!-- Seller Dashboard start  -->
+    <section class="seller_dashboard_area">
+        <div class="container">
+            <div class="row">
+                <!-- Left Sidebar -->
+                <div class="col-sm-12 col-md-3 col-lg-3">
+                    <div class="seller_sidebar">
+                        <!-- User Profile -->
+                        <div class="seller_profile">
+                            <div class="seller_avatar">AJ</div>
+                            <div class="seller_name">Antoni Jonson</div>
+                            <div class="seller_email">antoni@example.com</div>
+                        </div>
+                        
+                        <!-- Navigation Menu -->
+                        <ul class="seller_nav">
+                            <li><a href="/seller-dashboard" class="active"><i class="ion-grid"></i> Dashboard</a></li>
+                            <li><a href="#"><i class="ion-person"></i> My Profile</a></li>
+                            <li><a href="#"><i class="ion-document-text"></i> My Listing</a></li>
+                            <li><a href="#"><i class="ion-plus"></i> Add Listing</a></li>
+                            <li><a href="#"><i class="ion-heart"></i> My Favorites</a></li>
+                            <li><a href="#"><i class="ion-email"></i> Messages <span class="message_badge">02</span></a></li>
+                            <li><a href="#"><i class="ion-gear-a"></i> Settings</a></li>
+                            <li><a href="/login"><i class="ion-log-out"></i> Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Right Main Content -->
+                <div class="col-sm-12 col-md-9 col-lg-9">
+                    <!-- Dashboard Metrics -->
+                    <div class="dashboard_metrics">
+                        <div class="metric_card">
+                            <div class="metric_icon purple">
+                                <i class="ion-checkmark-round"></i>
+                            </div>
+                            <div class="metric_content">
+                                <h3>450</h3>
+                                <p>Active Listing</p>
+                            </div>
+                        </div>
+                        
+                        <div class="metric_card">
+                            <div class="metric_icon teal">
+                                <i class="ion-eye"></i>
+                            </div>
+                            <div class="metric_content">
+                                <h3>18.6k</h3>
+                                <p>Total Views</p>
+                            </div>
+                        </div>
+                        
+                        <div class="metric_card">
+                            <div class="metric_icon green">
+                                <i class="ion-checkmark-circled"></i>
+                            </div>
+                            <div class="metric_content">
+                                <h3>1560</h3>
+                                <p>Total Listing</p>
+                            </div>
+                        </div>
+                        
+                        <div class="metric_card">
+                            <div class="metric_icon pink">
+                                <i class="ion-close-circled"></i>
+                            </div>
+                            <div class="metric_content">
+                                <h3>128</h3>
+                                <p>Expired Listing</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Listings -->
+                    <div class="recent_listings">
+                        <h3>Recent Listing</h3>
+                        <table class="listings_table">
+                            <thead>
+                                <tr>
+                                    <th>CAR INFO</th>
+                                    <th>BRAND</th>
+                                    <th>PUBLISH</th>
+                                    <th>PRICE</th>
+                                    <th>VIEWS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="car_info">
+                                            <div class="car_image"></div>
+                                            <div class="car_details">
+                                                <h4>Mercedes Benz Car</h4>
+                                                <p>Car ID: Oricha/Recicar#123456</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="brand_name">Ferrari</td>
+                                    <td class="publish_date">5 Days Ago</td>
+                                    <td class="price">$50,650</td>
+                                    <td class="views">350k+</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="car_info">
+                                            <div class="car_image"></div>
+                                            <div class="car_details">
+                                                <h4>Mercedes Benz Car</h4>
+                                                <p>Car ID: Oricha/Recicar#123456</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="brand_name">Ferrari</td>
+                                    <td class="publish_date">5 Days Ago</td>
+                                    <td class="price">$50,650</td>
+                                    <td class="views">350k+</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="car_info">
+                                            <div class="car_image"></div>
+                                            <div class="car_details">
+                                                <h4>Mercedes Benz Car</h4>
+                                                <p>Car ID: Oricha/Recicar#123456</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="brand_name">Ferrari</td>
+                                    <td class="publish_date">5 Days Ago</td>
+                                    <td class="price">$50,650</td>
+                                    <td class="views">350k+</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="car_info">
+                                            <div class="car_image"></div>
+                                            <div class="car_details">
+                                                <h4>Mercedes Benz Car</h4>
+                                                <p>Car ID: Oricha/Recicar#123456</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="brand_name">Ferrari</td>
+                                    <td class="publish_date">5 Days Ago</td>
+                                    <td class="price">$50,650</td>
+                                    <td class="views">350k+</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="car_info">
+                                            <div class="car_image"></div>
+                                            <div class="car_details">
+                                                <h4>Mercedes Benz Car</h4>
+                                                <p>Car ID: Oricha/Recicar#123456</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="brand_name">Ferrari</td>
+                                    <td class="publish_date">5 Days Ago</td>
+                                    <td class="price">$50,650</td>
+                                    <td class="views">350k+</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Seller Dashboard end   -->
+
+    <!--call to action start-->
+    <th:block th:replace="fragments/_calltoaction :: calltoaction"></th:block>
+    <!--call to action end-->
+
+    <!--footer area start-->
+    <th:block th:replace="fragments/_footer :: footer"></th:block>
+    <!--footer area end-->
+
+    <!-- JS
+    ============================================ -->
+    <!--jquery min js-->
+    <script src="/assets/js/vendor/jquery-3.4.1.min.js"></script>
+    <!--popper min js-->
+    <script src="/assets/js/popper.js"></script>
+    <!--bootstrap min js-->
+    <script src="/assets/js/bootstrap.min.js"></script>
+    <!--owl carousel min js-->
+    <script src="/assets/js/owl.carousel.min.js"></script>
+    <!--slick min js-->
+    <script src="/assets/js/slick.min.js"></script>
+    <!--magnific popup min js-->
+    <script src="/assets/js/jquery.magnific-popup.min.js"></script>
+    <!--jquery countdown min js-->
+    <script src="/assets/js/jquery.countdown.js"></script>
+    <!--jquery ui min js-->
+    <script src="/assets/js/jquery.ui.js"></script>
+    <!--jquery elevatezoom min js-->
+    <script src="/assets/js/jquery.elevatezoom.js"></script>
+    <!--isotope packaged min js-->
+    <script src="/assets/js/isotope.pkgd.min.js"></script>
+    <!--slinky menu js-->
+    <script src="/assets/js/slinky.menu.js"></script>
+    <!-- Plugins JS -->
+    <script src="/assets/js/plugins.js"></script>
+
+    <!-- Main JS -->
+    <script src="/assets/js/main.js"></script>
+
+</body>
+
+</html>
+
