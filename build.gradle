@@ -1,3 +1,5 @@
+import org.springframework.boot.gradle.tasks.run.BootRun
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.2.0'
@@ -135,7 +137,7 @@ application {
 apply from: 'gradle/cucumber.gradle'
 
 // Convenience run tasks for each environment that source values from .env
-tasks.register('runLocal', org.springframework.boot.gradle.tasks.run.BootRun) {
+tasks.register('runLocal', BootRun) {
     group = 'application'
     description = 'Run app with dev profile and local PostgreSQL'
     dependsOn 'classes'
@@ -145,7 +147,7 @@ tasks.register('runLocal', org.springframework.boot.gradle.tasks.run.BootRun) {
     mainClass.set(application.mainClass)
 }
 
-tasks.register('runTest', org.springframework.boot.gradle.tasks.run.BootRun) {
+tasks.register('runTest', BootRun) {
     group = 'application'
     description = 'Run app with test profile in container against Neon DB (from .env TEST_*)'
     dependsOn 'classes'
@@ -160,7 +162,7 @@ tasks.register('runTest', org.springframework.boot.gradle.tasks.run.BootRun) {
     mainClass.set(application.mainClass)
 }
 
-tasks.register('runProd', org.springframework.boot.gradle.tasks.run.BootRun) {
+tasks.register('runProd', BootRun) {
     group = 'application'
     description = 'Run app with prod profile in container against Neon DB (from .env PROD_*)'
     dependsOn 'classes'

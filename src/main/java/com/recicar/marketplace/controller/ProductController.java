@@ -22,8 +22,32 @@ public class ProductController {
     private final CategoryService categoryService;
 
     @GetMapping("/shop-list")
-    public String productList(@RequestParam(value = "page", defaultValue = "0") int page, Model model) {
-        Page<Product> productPage = productService.findActiveProducts(page, 12);
+    public String productList(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "category", required = false) String categorySlug,
+            Model model) {
+        
+        Page<Product> productPage;
+        Category selectedCategory = null;
+        
+        if (categorySlug != null && !categorySlug.trim().isEmpty()) {
+            // Filter by category
+            Optional<Category> categoryOptional = categoryService.findBySlug(categorySlug);
+            if (categoryOptional.isPresent()) {
+                selectedCategory = categoryOptional.get();
+                productPage = productService.findByCategory(selectedCategory, page);
+                model.addAttribute("selectedCategory", selectedCategory);
+                model.addAttribute("categorySlug", categorySlug);
+            } else {
+                // Category not found, show all products
+                productPage = productService.findActiveProducts(page, 12);
+                model.addAttribute("errorMessage", "Category not found");
+            }
+        } else {
+            // Show all products
+            productPage = productService.findActiveProducts(page, 12);
+        }
+        
         model.addAttribute("products", productPage.getContent());
         model.addAttribute("page", productPage);
         

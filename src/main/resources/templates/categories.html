@@ -211,6 +211,146 @@
             color: #6c757d;
             margin-right: 12px;
         }
+        
+        /* Products Section Styles */
+        .products-section {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 30px;
+            margin-top: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .products-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .products-header h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333333;
+            margin: 0 0 10px 0;
+        }
+        
+        .products-count p {
+            color: #6c757d;
+            font-size: 14px;
+            margin: 0;
+        }
+        
+        .products-grid {
+            margin-bottom: 30px;
+        }
+        
+        .product-card {
+            background-color: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        
+        .product-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .product-image {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .product-image img {
+            max-width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        
+        .product-info {
+            text-align: center;
+        }
+        
+        .product-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+        }
+        
+        .product-name a {
+            color: #333333;
+            text-decoration: none;
+        }
+        
+        .product-name a:hover {
+            color: #007bff;
+        }
+        
+        .product-category {
+            font-size: 14px;
+            color: #6c757d;
+            margin: 0 0 10px 0;
+        }
+        
+        .product-price {
+            margin-top: 10px;
+        }
+        
+        .current-price {
+            font-size: 18px;
+            font-weight: 600;
+            color: #28a745;
+        }
+        
+        .old-price {
+            font-size: 14px;
+            color: #6c757d;
+            text-decoration: line-through;
+            margin-left: 8px;
+        }
+        
+        .no-products {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+        
+        .pagination-wrapper {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .pagination {
+            margin: 0;
+        }
+        
+        .page-item.active .page-link {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        
+        .page-link {
+            color: #007bff;
+            border: 1px solid #dee2e6;
+            padding: 8px 12px;
+        }
+        
+        .page-link:hover {
+            color: #0056b3;
+            background-color: #e9ecef;
+            border-color: #dee2e6;
+        }
+        
+        .page-item.disabled .page-link {
+            color: #6c757d;
+            background-color: #fff;
+            border-color: #dee2e6;
+        }
     </style>
 </head>
 
@@ -243,7 +383,7 @@
                 <!-- Dynamic Categories from Backend -->
                 <th:block th:each="category : ${categories}">
                     <th:block th:if="${category.parent == null}">
-                        <a th:href="@{/search/category(slug=${category.slug})}" class="category-item" th:attr="data-category=${category.slug}">
+                        <a th:href="@{/categories(category=${category.slug})}" class="category-item" th:attr="data-category=${category.slug}">
                             <div class="category-icon">
                                 <i class="fa fa-cog"></i>
                             </div>
@@ -253,7 +393,7 @@
                         </a>
                         <div class="subcategories" th:if="${!category.children.isEmpty()}" th:id="'subcategories-' + ${category.slug}">
                             <a th:each="subcategory : ${category.children}" 
-                               th:href="@{/search/category(slug=${subcategory.slug})}" 
+                               th:href="@{/categories(category=${subcategory.slug})}" 
                                class="subcategory-item">
                                 <span class="subcategory-name" th:text="${subcategory.name}">Subcategory Name</span>
                                 <span class="subcategory-count" th:text="${subcategory.products.size()}">0</span>
@@ -287,6 +427,80 @@
                         </a>
                     </div>
                 </th:block>
+            </div>
+            
+            <!-- Products Section (shown when category is selected) -->
+            <div th:if="${showProducts}" class="products-section">
+                <div class="products-header">
+                    <h2 th:if="${selectedCategory != null}" th:text="'Productos en ' + ${selectedCategory.name}">Productos en categoría</h2>
+                    <div class="products-count" th:if="${page != null}">
+                        <p th:text="'Mostrando ' + ${page.numberOfElements} + ' de ' + ${page.totalElements} + ' resultados'">
+                            Mostrando 0 de 0 resultados
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Error Message -->
+                <div th:if="${errorMessage != null}" class="alert alert-warning" role="alert" th:text="${errorMessage}">
+                    There was a problem with your search.
+                </div>
+                
+                <!-- Products Grid -->
+                <div class="row products-grid" th:if="${!products.isEmpty()}">
+                    <div class="col-lg-4 col-md-6 col-sm-6" th:each="product : ${products}">
+                        <div class="product-card">
+                            <div class="product-image">
+                                <a th:href="@{/product-details(id=${product.id})}">
+                                    <img th:src="${product.primaryImage != null ? product.primaryImage.url : '/img/product/product10.jpg'}" 
+                                         th:alt="${product.name}" class="img-fluid">
+                                </a>
+                            </div>
+                            <div class="product-info">
+                                <h3 class="product-name">
+                                    <a th:href="@{/product-details(id=${product.id})}" th:text="${product.name}">Product Name</a>
+                                </h3>
+                                <p class="product-category" th:text="${product.category.name}">Category</p>
+                                <div class="product-price">
+                                    <span class="current-price" th:text="${product.formattedPrice}">$160.00</span>
+                                    <span class="old-price" th:if="${product.oldPrice != null}" th:text="${#numbers.formatCurrency(product.oldPrice)}">$320.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- No Products Message -->
+                <div th:if="${products.isEmpty()}" class="no-products">
+                    <p>No se encontraron productos en esta categoría.</p>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="pagination-wrapper" th:if="${page != null and page.totalPages > 1}">
+                    <nav aria-label="Product pagination">
+                        <ul class="pagination">
+                            <!-- Previous link -->
+                            <li class="page-item" th:classappend="${!page.hasPrevious()} ? 'disabled' : ''">
+                                <a class="page-link" th:if="${page.hasPrevious()}" 
+                                   th:href="@{/categories(category=${categorySlug}, page=${page.number-1})}">Anterior</a>
+                                <span class="page-link" th:if="${!page.hasPrevious()}">Anterior</span>
+                            </li>
+                            
+                            <!-- Page numbers -->
+                            <li th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}" 
+                                class="page-item" th:classappend="${i == page.number} ? 'active' : ''">
+                                <a class="page-link" th:href="@{/categories(category=${categorySlug}, page=${i})}" 
+                                   th:text="${i + 1}">1</a>
+                            </li>
+                            
+                            <!-- Next link -->
+                            <li class="page-item" th:classappend="${!page.hasNext()} ? 'disabled' : ''">
+                                <a class="page-link" th:if="${page.hasNext()}" 
+                                   th:href="@{/categories(category=${categorySlug}, page=${page.number+1})}">Siguiente</a>
+                                <span class="page-link" th:if="${!page.hasNext()}">Siguiente</span>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
             </div>
         </div>
     </div>
