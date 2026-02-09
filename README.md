@@ -126,7 +126,6 @@ The project includes Docker Compose configuration for local development:
 
 This project is licensed under the MIT License.
 
-## 🆘 Support
+## 🆘 Reference API CAR
 
-For support and questions, please open an issue in the GitHub repository.
-You can write to me at linkedin.com/in/oricha or email me at oricha@gmmail.com
+https://smartcar.com/docs/getting-started/introduction
