@@ -386,7 +386,7 @@
                                     <th:block th:each="category : ${categories}">
                                         <th:block th:if="${category.parent == null}">
                                             <li class="parts-catalog__items cat__items cat-items-js" th:attr="data-category=${category.slug}">
-                                                <a th:href="@{/shop-list(category=${category.slug})}" 
+                                                <a th:href="@{/search(category=${category.slug})}" 
                                                    class="parts-catalog__title cat__links cat-links-js"
                                                    th:id="'cat-link-' + ${category.id}">
                                                     <i class="fa fa-cog"></i>
@@ -395,9 +395,9 @@
                                                     <i class="fa fa-plus category-arrow" th:if="${!category.children.isEmpty()}"></i>
                                                 </a>
                                                 <!-- Subcategories -->
-                                                <ul class="parts-catalog__block cat__sub cat-sub-js" th:if="${!category.children.isEmpty()}" style="display: none;">
+                                                <ul class="parts-catalog__block cat__sub cat-sub-js" th:if="${!category.children.isEmpty()}">
                                                     <li class="cat__sub_items cat-sub-items-js" th:each="subcategory : ${category.children}">
-                                                        <a th:href="@{/shop-list(category=${subcategory.slug})}" 
+                                                        <a th:href="@{/search(category=${subcategory.slug})}" 
                                                            class="cat__sub_links cat-sub-links-js"
                                                            th:id="'cat-link-' + ${subcategory.id}">
                                                             <span class="cat__sub_links__name" th:text="${subcategory.name}">Subcategory Name</span>
@@ -942,7 +942,7 @@
                                 <li th:if="${page.hasPrevious()}">
                                     <!-- Category search pagination -->
                                     <a th:if="${searchType == 'category'}"
-                                       th:href="@{/search/category(slug=${categorySlug}, page=${page.number-1})}">Previous</a>
+                                       th:href="@{/search(category=${categorySlug}, page=${page.number-1})}">Previous</a>
                                     <!-- Shop list category pagination -->
                                     <a th:if="${categorySlug != null and searchType == null}"
                                        th:href="@{/shop-list(category=${categorySlug}, page=${page.number-1})}">Previous</a>
@@ -964,7 +964,7 @@
                                 <li th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}" th:class="${i == page.number ? 'current' : ''}">
                                     <!-- Category search -->
                                     <a th:if="${searchType == 'category'}"
-                                       th:href="@{/search/category(slug=${categorySlug}, page=${i})}"
+                                       th:href="@{/search(category=${categorySlug}, page=${i})}"
                                        th:text="${i + 1}">1</a>
                                     <!-- Shop list category pagination -->
                                     <a th:if="${categorySlug != null and searchType == null}"
@@ -992,7 +992,7 @@
                                 <li th:if="${page.hasNext()}">
                                     <!-- Category search pagination -->
                                     <a th:if="${searchType == 'category'}"
-                                       th:href="@{/search/category(slug=${categorySlug}, page=${page.number+1})}">Next</a>
+                                       th:href="@{/search(category=${categorySlug}, page=${page.number+1})}">Next</a>
                                     <!-- Shop list category pagination -->
                                     <a th:if="${categorySlug != null and searchType == null}"
                                        th:href="@{/shop-list(category=${categorySlug}, page=${page.number+1})}">Next</a>

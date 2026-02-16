@@ -383,7 +383,7 @@
                 <!-- Dynamic Categories from Backend -->
                 <th:block th:each="category : ${categories}">
                     <th:block th:if="${category.parent == null}">
-                        <a th:href="@{/categories(category=${category.slug})}" class="category-item" th:attr="data-category=${category.slug}">
+                        <a th:href="@{/search(category=${category.slug})}" class="category-item" th:attr="data-category=${category.slug}">
                             <div class="category-icon">
                                 <i class="fa fa-cog"></i>
                             </div>
@@ -393,7 +393,7 @@
                         </a>
                         <div class="subcategories" th:if="${!category.children.isEmpty()}" th:id="'subcategories-' + ${category.slug}">
                             <a th:each="subcategory : ${category.children}" 
-                               th:href="@{/categories(category=${subcategory.slug})}" 
+                               th:href="@{/search(category=${subcategory.slug})}" 
                                class="subcategory-item">
                                 <span class="subcategory-name" th:text="${subcategory.name}">Subcategory Name</span>
                                 <span class="subcategory-count" th:text="${subcategory.products.size()}">0</span>
@@ -481,21 +481,21 @@
                             <!-- Previous link -->
                             <li class="page-item" th:classappend="${!page.hasPrevious()} ? 'disabled' : ''">
                                 <a class="page-link" th:if="${page.hasPrevious()}" 
-                                   th:href="@{/categories(category=${categorySlug}, page=${page.number-1})}">Anterior</a>
+                                   th:href="@{/search(category=${categorySlug}, page=${page.number-1})}">Anterior</a>
                                 <span class="page-link" th:if="${!page.hasPrevious()}">Anterior</span>
                             </li>
                             
                             <!-- Page numbers -->
                             <li th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}" 
                                 class="page-item" th:classappend="${i == page.number} ? 'active' : ''">
-                                <a class="page-link" th:href="@{/categories(category=${categorySlug}, page=${i})}" 
+                                <a class="page-link" th:href="@{/search(category=${categorySlug}, page=${i})}" 
                                    th:text="${i + 1}">1</a>
                             </li>
                             
                             <!-- Next link -->
                             <li class="page-item" th:classappend="${!page.hasNext()} ? 'disabled' : ''">
                                 <a class="page-link" th:if="${page.hasNext()}" 
-                                   th:href="@{/categories(category=${categorySlug}, page=${page.number+1})}">Siguiente</a>
+                                   th:href="@{/search(category=${categorySlug}, page=${page.number+1})}">Siguiente</a>
                                 <span class="page-link" th:if="${!page.hasNext()}">Siguiente</span>
                             </li>
                         </ul>
