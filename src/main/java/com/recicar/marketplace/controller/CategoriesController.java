@@ -8,7 +8,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
@@ -61,8 +60,7 @@ public class CategoriesController {
     @GetMapping("/categories/{slug}")
     public String categoryBySlug(
             @PathVariable("slug") String slug,
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            RedirectAttributes redirectAttributes) {
+            @RequestParam(value = "page", defaultValue = "0") int page) {
         
         // Redirect to the search controller for category-based product search
         UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/search/category")
