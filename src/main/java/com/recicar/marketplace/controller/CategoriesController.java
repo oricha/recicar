@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
@@ -35,7 +36,15 @@ public class CategoriesController {
         
         // If a specific category is selected, redirect to search endpoint
         if (categorySlug != null && !categorySlug.trim().isEmpty()) {
-            return "redirect:/search/category?slug=" + categorySlug + (page > 0 ? "&page=" + page : "");
+            UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/search/category")
+                    .queryParam("slug", categorySlug);
+            
+            if (page > 0) {
+                builder.queryParam("page", page);
+            }
+            
+            String redirectUrl = builder.build().toUriString();
+            return "redirect:" + redirectUrl;
         }
         
         // Otherwise, show the categories listing page
@@ -56,7 +65,15 @@ public class CategoriesController {
             RedirectAttributes redirectAttributes) {
         
         // Redirect to the search controller for category-based product search
-        return "redirect:/search/category?slug=" + slug + (page > 0 ? "&page=" + page : "");
+        UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/search/category")
+                .queryParam("slug", slug);
+        
+        if (page > 0) {
+            builder.queryParam("page", page);
+        }
+        
+        String redirectUrl = builder.build().toUriString();
+        return "redirect:" + redirectUrl;
     }
 
 }
