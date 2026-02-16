@@ -332,26 +332,7 @@
             <div class="row">
                 <!-- Left Sidebar -->
                 <div class="col-sm-12 col-md-3 col-lg-3">
-                    <div class="seller_sidebar">
-                        <!-- User Profile -->
-                        <div class="seller_profile">
-                            <div class="seller_avatar">AJ</div>
-                            <div class="seller_name">Antoni Jonson</div>
-                            <div class="seller_email">antoni@example.com</div>
-                        </div>
-                        
-                        <!-- Navigation Menu -->
-                        <ul class="seller_nav">
-                            <li><a href="/seller-dashboard" class="active"><i class="ion-grid"></i> Dashboard</a></li>
-                            <li><a href="#"><i class="ion-person"></i> My Profile</a></li>
-                            <li><a href="#"><i class="ion-document-text"></i> My Listing</a></li>
-                            <li><a href="#"><i class="ion-plus"></i> Add Listing</a></li>
-                            <li><a href="#"><i class="ion-heart"></i> My Favorites</a></li>
-                            <li><a href="#"><i class="ion-email"></i> Messages <span class="message_badge">02</span></a></li>
-                            <li><a href="#"><i class="ion-gear-a"></i> Settings</a></li>
-                            <li><a href="/login"><i class="ion-log-out"></i> Logout</a></li>
-                        </ul>
-                    </div>
+                    <th:block th:replace="fragments/_seller_sidebar :: seller_sidebar('dashboard')"></th:block>
                 </div>
                 
                 <!-- Right Main Content -->

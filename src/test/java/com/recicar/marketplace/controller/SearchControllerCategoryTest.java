@@ -13,10 +13,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -63,6 +65,31 @@ class SearchControllerCategoryTest {
                 .andExpect(model().attribute("category", category))
                 .andExpect(model().attribute("categorySlug", "motor"))
                 .andExpect(model().attribute("searchType", "category"));
+    }
+
+    @Test
+    public void testSearchByCategoryThroughMainSearchEndpoint_Success() throws Exception {
+        Category category = new Category();
+        category.setId(1L);
+        category.setName("Motor");
+        category.setSlug("motor");
+
+        Product product = new Product();
+        product.setId(1L);
+        product.setName("Engine Part");
+        product.setCategory(category);
+
+        when(categoryService.findBySlug("motor")).thenReturn(Optional.of(category));
+        when(productService.findByCategory(eq(category), any(PageRequest.class)))
+                .thenReturn(new PageImpl<>(Collections.singletonList(product)));
+        when(categoryService.findRootCategories()).thenReturn(Collections.emptyList());
+        when(categoryService.getCategoryHierarchy(category)).thenReturn(List.of(category));
+
+        mockMvc.perform(get("/search").param("category", "motor"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("shop-list"))
+                .andExpect(model().attribute("searchType", "category"))
+                .andExpect(model().attribute("categorySlug", "motor"));
     }
 
     @Test
@@ -143,6 +170,7 @@ class SearchControllerCategoryTest {
         when(productService.findByCategory(eq(subcategory), any(PageRequest.class)))
                 .thenReturn(new PageImpl<>(Collections.singletonList(product)));
         when(categoryService.findRootCategories()).thenReturn(Collections.emptyList());
+        when(categoryService.getCategoryHierarchy(subcategory)).thenReturn(List.of(parentCategory, subcategory));
 
         // Execute & Verify
         mockMvc.perform(get("/search/category").param("slug", "motor"))
@@ -151,6 +179,40 @@ class SearchControllerCategoryTest {
                 .andExpect(model().attributeExists("products"))
                 .andExpect(model().attribute("category", subcategory))
                 .andExpect(model().attribute("searchType", "category"));
+    }
+
+    @Test
+    public void testSearchByParentCategory_UsesHierarchySearch() throws Exception {
+        Category parentCategory = new Category();
+        parentCategory.setId(1L);
+        parentCategory.setName("Repuestos");
+        parentCategory.setSlug("repuestos");
+
+        Category childCategory = new Category();
+        childCategory.setId(2L);
+        childCategory.setName("Motor");
+        childCategory.setSlug("motor");
+        childCategory.setParent(parentCategory);
+        parentCategory.setChildren(List.of(childCategory));
+
+        Product product = new Product();
+        product.setId(1L);
+        product.setName("Engine Part");
+        product.setCategory(childCategory);
+
+        when(categoryService.findBySlug("repuestos")).thenReturn(Optional.of(parentCategory));
+        when(productService.findByCategoryIds(eq(List.of(1L, 2L)), any(PageRequest.class)))
+                .thenReturn(new PageImpl<>(Collections.singletonList(product)));
+        when(categoryService.findRootCategories()).thenReturn(Collections.emptyList());
+        when(categoryService.getCategoryHierarchy(parentCategory)).thenReturn(List.of(parentCategory));
+
+        mockMvc.perform(get("/search").param("category", "repuestos"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("shop-list"))
+                .andExpect(model().attribute("searchType", "category"))
+                .andExpect(model().attribute("selectedCategoryIds", List.of(1L, 2L)));
+
+        verify(productService).findByCategoryIds(eq(List.of(1L, 2L)), any(PageRequest.class));
     }
 
     @Test
@@ -165,6 +227,7 @@ class SearchControllerCategoryTest {
         when(productService.findByCategory(eq(category), any(PageRequest.class)))
                 .thenReturn(new PageImpl<>(Collections.emptyList()));
         when(categoryService.findRootCategories()).thenReturn(Collections.emptyList());
+        when(categoryService.getCategoryHierarchy(category)).thenReturn(List.of(category));
 
         // Execute & Verify
         mockMvc.perform(get("/search/category").param("slug", "motor"))

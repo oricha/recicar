@@ -2,6 +2,7 @@ package com.recicar.marketplace.controller;
 
 import com.recicar.marketplace.entity.Category;
 import com.recicar.marketplace.entity.Product;
+import com.recicar.marketplace.entity.ProductCondition;
 import com.recicar.marketplace.entity.Vendor;
 import com.recicar.marketplace.repository.CategoryRepository;
 import com.recicar.marketplace.repository.ProductRepository;
@@ -23,7 +24,7 @@ import static org.hamcrest.Matchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@TestPropertySource(locations = "classpath:application-test.properties")
+@TestPropertySource(locations = "classpath:application-test.yml")
 @Transactional
 class SearchControllerCategoryIntegrationTest {
 
@@ -78,6 +79,7 @@ class SearchControllerCategoryIntegrationTest {
         testProduct.setName("Test Product");
         testProduct.setPartNumber("TEST-001");
         testProduct.setPrice(BigDecimal.valueOf(99.99));
+        testProduct.setCondition(ProductCondition.USED);
         testProduct.setStockQuantity(10);
         testProduct.setActive(true);
         testProduct.setCategory(testCategory);
@@ -89,6 +91,7 @@ class SearchControllerCategoryIntegrationTest {
         subProduct.setName("Test Subproduct");
         subProduct.setPartNumber("TEST-002");
         subProduct.setPrice(BigDecimal.valueOf(49.99));
+        subProduct.setCondition(ProductCondition.USED);
         subProduct.setStockQuantity(5);
         subProduct.setActive(true);
         subProduct.setCategory(testSubcategory);
@@ -98,8 +101,8 @@ class SearchControllerCategoryIntegrationTest {
 
     @Test
     public void testSearchByCategory_IntegrationSuccess() throws Exception {
-        mockMvc.perform(get("/search/category")
-                        .param("slug", testCategory.getSlug()))
+        mockMvc.perform(get("/search")
+                        .param("category", testCategory.getSlug()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("shop-list"))
                 .andExpect(model().attributeExists("products"))
@@ -110,8 +113,8 @@ class SearchControllerCategoryIntegrationTest {
 
     @Test
     public void testSearchBySubcategory_IntegrationSuccess() throws Exception {
-        mockMvc.perform(get("/search/category")
-                        .param("slug", testSubcategory.getSlug()))
+        mockMvc.perform(get("/search")
+                        .param("category", testSubcategory.getSlug()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("shop-list"))
                 .andExpect(model().attributeExists("products"))
@@ -123,13 +126,13 @@ class SearchControllerCategoryIntegrationTest {
     public void testCategoriesPageRedirect_Integration() throws Exception {
         mockMvc.perform(get("/categories/" + testCategory.getSlug()))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/search/category?slug=" + testCategory.getSlug()));
+                .andExpect(redirectedUrl("/search?category=" + testCategory.getSlug()));
     }
 
     @Test
     public void testSearchByCategory_WithPagination_Integration() throws Exception {
-        mockMvc.perform(get("/search/category")
-                        .param("slug", testCategory.getSlug())
+        mockMvc.perform(get("/search")
+                        .param("category", testCategory.getSlug())
                         .param("page", "0"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("shop-list"))
@@ -139,8 +142,8 @@ class SearchControllerCategoryIntegrationTest {
 
     @Test
     public void testSearchByCategory_InvalidSlug_Integration() throws Exception {
-        mockMvc.perform(get("/search/category")
-                        .param("slug", "invalid-category-slug"))
+        mockMvc.perform(get("/search")
+                        .param("category", "invalid-category-slug"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("shop-list"))
                 .andExpect(model().attributeExists("errorMessage"));

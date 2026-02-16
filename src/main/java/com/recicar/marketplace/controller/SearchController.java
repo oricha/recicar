@@ -1,5 +1,6 @@
 package com.recicar.marketplace.controller;
 
+import com.recicar.marketplace.entity.Category;
 import com.recicar.marketplace.entity.Product;
 import com.recicar.marketplace.service.CategoryService;
 import com.recicar.marketplace.service.ProductService;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -33,9 +35,14 @@ public class SearchController {
     public String search(
             @RequestParam(value = "query", required = false) String query,
             @RequestParam(value = "q", required = false) String q,
+            @RequestParam(value = "category", required = false) String categorySlug,
             @RequestParam(defaultValue = "0") int page,
             Model model
     ) {
+        if (categorySlug != null && !categorySlug.trim().isEmpty()) {
+            return searchByCategorySlug(categorySlug, page, model);
+        }
+
         // Use 'query' parameter if available, otherwise fall back to 'q'
         String searchTerm = query != null ? query : q;
         
@@ -175,6 +182,10 @@ public class SearchController {
             @RequestParam(defaultValue = "0") int page,
             Model model
     ) {
+        return searchByCategorySlug(slug, page, model);
+    }
+
+    private String searchByCategorySlug(String slug, int page, Model model) {
         if (slug == null || slug.trim().isEmpty()) {
             model.addAttribute("errorMessage", "Category is required");
             model.addAttribute("products", Collections.emptyList());
@@ -184,11 +195,22 @@ public class SearchController {
 
         return categoryService.findBySlug(slug)
                 .map(category -> {
-                    Page<Product> productPage = productService.findByCategory(category, PageRequest.of(page, 12));
+                    Page<Product> productPage;
+
+                    if (!category.getChildren().isEmpty()) {
+                        List<Long> categoryIds = new ArrayList<>();
+                        collectCategoryAndChildrenIds(category, categoryIds);
+                        productPage = productService.findByCategoryIds(categoryIds, PageRequest.of(page, 12));
+                        model.addAttribute("selectedCategoryIds", categoryIds);
+                    } else {
+                        productPage = productService.findByCategory(category, PageRequest.of(page, 12));
+                    }
+
                     model.addAttribute("products", productPage.getContent());
                     model.addAttribute("page", productPage);
                     model.addAttribute("category", category);
                     model.addAttribute("categorySlug", slug);
+                    model.addAttribute("categoryHierarchy", categoryService.getCategoryHierarchy(category));
                     model.addAttribute("searchType", "category");
                     model.addAttribute("totalElements", productPage.getTotalElements());
                     model.addAttribute("categories", categoryService.findRootCategories());
@@ -200,6 +222,13 @@ public class SearchController {
                     model.addAttribute("categories", categoryService.findRootCategories());
                     return "shop-list";
                 });
+    }
+
+    private void collectCategoryAndChildrenIds(Category category, List<Long> categoryIds) {
+        categoryIds.add(category.getId());
+        for (Category child : category.getChildren()) {
+            collectCategoryAndChildrenIds(child, categoryIds);
+        }
     }
 
     /**

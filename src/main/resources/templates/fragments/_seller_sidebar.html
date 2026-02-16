@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+
+<!-- Seller Sidebar Fragment -->
+<div th:fragment="seller_sidebar(activePage)" class="seller_sidebar">
+    <!-- User Profile -->
+    <div class="seller_profile">
+        <div class="seller_avatar">AJ</div>
+        <div class="seller_name">Antoni Jonson</div>
+        <div class="seller_email">antoni@example.com</div>
+    </div>
+    
+    <!-- Navigation Menu -->
+    <ul class="seller_nav">
+        <li>
+            <a href="/seller-dashboard" th:classappend="${activePage == 'dashboard'} ? 'active' : ''">
+                <i class="ion-grid"></i> Dashboard
+            </a>
+        </li>
+        <li>
+            <a href="/my-profile" th:classappend="${activePage == 'my-profile'} ? 'active' : ''">
+                <i class="ion-person"></i> My Profile
+            </a>
+        </li>
+        <li>
+            <a href="#" th:classappend="${activePage == 'my-listing'} ? 'active' : ''">
+                <i class="ion-document-text"></i> My Listing
+            </a>
+        </li>
+        <li>
+            <a href="#" th:classappend="${activePage == 'add-listing'} ? 'active' : ''">
+                <i class="ion-plus"></i> Add Listing
+            </a>
+        </li>
+        <li>
+            <a href="#" th:classappend="${activePage == 'my-favorites'} ? 'active' : ''">
+                <i class="ion-heart"></i> My Favorites
+            </a>
+        </li>
+        <li>
+            <a href="#" th:classappend="${activePage == 'messages'} ? 'active' : ''">
+                <i class="ion-email"></i> Messages <span class="message_badge">02</span>
+            </a>
+        </li>
+        <li>
+            <a href="#" th:classappend="${activePage == 'settings'} ? 'active' : ''">
+                <i class="ion-gear-a"></i> Settings
+            </a>
+        </li>
+        <li>
+            <a href="/login">
+                <i class="ion-log-out"></i> Logout
+            </a>
+        </li>
+    </ul>
+</div>
+
+</body>
+</html>
