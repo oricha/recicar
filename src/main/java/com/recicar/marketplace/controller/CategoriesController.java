@@ -1,17 +1,16 @@
 package com.recicar.marketplace.controller;
 
 import com.recicar.marketplace.entity.Category;
-import com.recicar.marketplace.entity.Product;
 import com.recicar.marketplace.service.CategoryService;
 import com.recicar.marketplace.service.ProductService;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 public class CategoriesController {
@@ -25,7 +24,8 @@ public class CategoriesController {
     }
 
     /**
-     * Display the categories page with optional category filtering
+     * Display the categories page with all categories listed
+     * If a category parameter is provided, redirect to search
      */
     @GetMapping("/categories")
     public String categories(
@@ -33,27 +33,45 @@ public class CategoriesController {
             @RequestParam(value = "page", defaultValue = "0") int page,
             Model model) {
         
+        // If a specific category is selected, redirect to search endpoint
+        if (categorySlug != null && !categorySlug.trim().isEmpty()) {
+            UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/search/category")
+                    .queryParam("slug", categorySlug);
+            
+            if (page > 0) {
+                builder.queryParam("page", page);
+            }
+            
+            String redirectUrl = builder.build().toUriString();
+            return "redirect:" + redirectUrl;
+        }
+        
+        // Otherwise, show the categories listing page
         List<Category> categories = categoryService.findAllActive();
         model.addAttribute("categories", categories);
         
-        // If a specific category is selected, show products for that category
-        if (categorySlug != null && !categorySlug.trim().isEmpty()) {
-            Optional<Category> categoryOptional = categoryService.findBySlug(categorySlug);
-            if (categoryOptional.isPresent()) {
-                Category selectedCategory = categoryOptional.get();
-                Page<Product> productPage = productService.findByCategory(selectedCategory, page);
-                
-                model.addAttribute("products", productPage.getContent());
-                model.addAttribute("page", productPage);
-                model.addAttribute("selectedCategory", selectedCategory);
-                model.addAttribute("categorySlug", categorySlug);
-                model.addAttribute("showProducts", true);
-            } else {
-                model.addAttribute("errorMessage", "Category not found");
-            }
+        return "categories";
+    }
+
+    /**
+     * Handle /categories/{slug} URL pattern - redirect to search
+     * This supports direct category URL access and redirects to the search endpoint
+     */
+    @GetMapping("/categories/{slug}")
+    public String categoryBySlug(
+            @PathVariable("slug") String slug,
+            @RequestParam(value = "page", defaultValue = "0") int page) {
+        
+        // Redirect to the search controller for category-based product search
+        UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/search/category")
+                .queryParam("slug", slug);
+        
+        if (page > 0) {
+            builder.queryParam("page", page);
         }
         
-        return "categories";
+        String redirectUrl = builder.build().toUriString();
+        return "redirect:" + redirectUrl;
     }
 
 }
