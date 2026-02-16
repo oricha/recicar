@@ -383,7 +383,7 @@
                 <!-- Dynamic Categories from Backend -->
                 <th:block th:each="category : ${categories}">
                     <th:block th:if="${category.parent == null}">
-                        <a th:href="@{/categories(category=${category.slug})}" class="category-item" th:attr="data-category=${category.slug}">
+                        <a th:href="@{/search/category(slug=${category.slug})}" class="category-item" th:attr="data-category=${category.slug}">
                             <div class="category-icon">
                                 <i class="fa fa-cog"></i>
                             </div>
@@ -393,7 +393,7 @@
                         </a>
                         <div class="subcategories" th:if="${!category.children.isEmpty()}" th:id="'subcategories-' + ${category.slug}">
                             <a th:each="subcategory : ${category.children}" 
-                               th:href="@{/categories(category=${subcategory.slug})}" 
+                               th:href="@{/search/category(slug=${subcategory.slug})}" 
                                class="subcategory-item">
                                 <span class="subcategory-name" th:text="${subcategory.name}">Subcategory Name</span>
                                 <span class="subcategory-count" th:text="${subcategory.products.size()}">0</span>
