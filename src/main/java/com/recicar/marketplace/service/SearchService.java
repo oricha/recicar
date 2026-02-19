@@ -23,6 +23,10 @@ public class SearchService {
         this.productRepository = productRepository;
     }
 
+    private static final int MIN_SEARCH_LENGTH = 2;
+    private static final int MAX_SEARCH_LENGTH = 100;
+    private static final String XSS_PATTERN = ".*[<>\"'`].*";
+
     /**
      * Search products by name or part number
      */
@@ -31,7 +35,15 @@ public class SearchService {
         if (searchTerm == null || searchTerm.trim().isEmpty()) {
             throw new IllegalArgumentException("Search term cannot be empty");
         }
-        return productRepository.searchByNameOrPartNumber(searchTerm.trim(), pageable);
+        String trimmed = searchTerm.trim();
+        if (trimmed.length() < MIN_SEARCH_LENGTH) {
+            throw new IllegalArgumentException("Search term must be at least " + MIN_SEARCH_LENGTH + " characters");
+        }
+        if (trimmed.matches(XSS_PATTERN)) {
+            throw new IllegalArgumentException("Invalid search term");
+        }
+        String toSearch = trimmed.length() > MAX_SEARCH_LENGTH ? trimmed.substring(0, MAX_SEARCH_LENGTH) : trimmed;
+        return productRepository.searchByNameOrPartNumber(toSearch, pageable);
     }
 
     /**
@@ -55,7 +67,10 @@ public class SearchService {
      */
     @Transactional(readOnly = true)
     public List<Product> searchByPartNumber(String partNumber) {
-        return findByPartNumber(partNumber);
+        if (partNumber == null || partNumber.trim().isEmpty()) {
+            throw new IllegalArgumentException("Part number cannot be empty");
+        }
+        return findByPartNumber(partNumber.trim());
     }
 
     /**
@@ -66,12 +81,25 @@ public class SearchService {
         return findByOemNumber(oemNumber);
     }
 
+    private static final int MIN_YEAR = 1900;
+    private static final int MAX_YEAR = 2100;
+
     /**
      * Search by vehicle compatibility
      */
     @Transactional(readOnly = true)
     public Page<Product> searchByVehicleCompatibility(String make, String model, String engine, Integer year, Pageable pageable) {
-        return productRepository.findByVehicleCompatibility(make, model, engine, year, pageable);
+        if (make == null || make.trim().isEmpty()) {
+            throw new IllegalArgumentException("Make is required");
+        }
+        if (model == null || model.trim().isEmpty()) {
+            throw new IllegalArgumentException("Model is required");
+        }
+        if (year == null || year < MIN_YEAR || year > MAX_YEAR) {
+            throw new IllegalArgumentException("Invalid year");
+        }
+        return productRepository.findByVehicleCompatibility(make.trim(), model.trim(),
+                engine != null ? engine.trim() : null, year, pageable);
     }
 
     /**
@@ -80,6 +108,9 @@ public class SearchService {
     @Transactional(readOnly = true)
     public Page<Product> searchWithFilters(String searchTerm, Category category, ProductCondition condition,
                                          BigDecimal minPrice, BigDecimal maxPrice, Vendor vendor, Pageable pageable) {
+        if (minPrice != null && maxPrice != null && minPrice.compareTo(maxPrice) > 0) {
+            throw new IllegalArgumentException("Min price cannot be greater than max price");
+        }
         return productRepository.findWithFilters(searchTerm, category, condition, minPrice, maxPrice, vendor, pageable);
     }
 
@@ -91,9 +122,8 @@ public class SearchService {
         if (partialTerm == null || partialTerm.trim().length() < 2) {
             return List.of();
         }
-        // This is a simplified implementation - in a real application you might want to use
-        // a more sophisticated search suggestion system
-        return List.of(partialTerm + " suggestion 1", partialTerm + " suggestion 2");
+        // Simplified implementation - returns empty list; can be extended with actual suggestions
+        return List.of();
     }
 
     /**

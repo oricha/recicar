@@ -519,7 +519,8 @@ class ProductServiceTest {
         product2.setVendor(otherVendor);
 
         when(productRepository.findById(1L)).thenReturn(Optional.of(product1));
-        when(productRepository.findByPartNumberIgnoreCase("PN123")).thenReturn(Arrays.asList(product1, product2));
+        when(productRepository.findByPartNumberContaining(eq("PN123"), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(Arrays.asList(product1, product2)));
 
         // When
         List<Vendor> vendors = productService.findOtherVendorsSellingProduct(1L);
@@ -528,6 +529,6 @@ class ProductServiceTest {
         assertThat(vendors).hasSize(1);
         assertThat(vendors.get(0)).isEqualTo(otherVendor);
         verify(productRepository).findById(1L);
-        verify(productRepository).findByPartNumberIgnoreCase("PN123");
+        verify(productRepository).findByPartNumberContaining(eq("PN123"), any(Pageable.class));
     }
 }

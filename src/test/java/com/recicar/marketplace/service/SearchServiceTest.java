@@ -357,10 +357,9 @@ class SearchServiceTest {
     void getSearchStatistics_WithValidSearchTerm_ShouldReturnStatistics() {
         // Arrange
         String searchTerm = "brake";
-        Page<Product> searchPage = new PageImpl<>(List.of(testProduct), PageRequest.of(0, 1), 1);
-        
-        when(productRepository.searchByNameOrPartNumber(anyString(), any(Pageable.class)))
-                .thenReturn(searchPage);
+        when(productRepository.countByNameContainingIgnoreCase(searchTerm)).thenReturn(1L);
+        when(productRepository.countByPartNumberContainingIgnoreCase(searchTerm)).thenReturn(0L);
+        when(productRepository.countByOemNumberContainingIgnoreCase(searchTerm)).thenReturn(0L);
 
         // Act
         SearchService.SearchStatistics result = searchService.getSearchStatistics(searchTerm);

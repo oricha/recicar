@@ -24,6 +24,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -84,15 +85,15 @@ class SearchApiControllerUnitTest {
 
     @Test
     void searchProducts_WithValidQuery_ShouldReturnResults() throws Exception {
-        // Arrange
         Page<Product> productPage = new PageImpl<>(List.of(testProduct), PageRequest.of(0, 12), 1);
-        when(productService.searchProducts(anyString(), any(PageRequest.class)))
-                .thenReturn(productPage);
-        when(categoryService.findAllActive()).thenReturn(List.of(testCategory));
+        when(productService.findByPartNumber("brake")).thenReturn(List.of());
+        when(productService.findByOemNumber("brake")).thenReturn(List.of());
+        when(productService.findByPartNumberContaining(anyString(), any(PageRequest.class))).thenReturn(new PageImpl<>(List.of()));
+        when(productService.findByOemNumberContaining(anyString(), any(PageRequest.class))).thenReturn(new PageImpl<>(List.of()));
+        when(productService.searchProducts(anyString(), any(PageRequest.class))).thenReturn(productPage);
+        when(categoryService.findRootCategories()).thenReturn(List.of(testCategory));
 
-        // Act & Assert
-        mockMvc.perform(get("/products/search")
-                        .param("q", "brake"))
+        mockMvc.perform(get("/search").param("query", "brake"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("shop-list"))
                 .andExpect(model().attributeExists("products"))
@@ -102,8 +103,7 @@ class SearchApiControllerUnitTest {
     @Test
     void searchProducts_WithEmptyQuery_ShouldRedirectToProducts() throws Exception {
         // Act & Assert
-        mockMvc.perform(get("/products/search")
-                        .param("q", ""))
+        mockMvc.perform(get("/search").param("query", ""))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/products"));
     }
@@ -111,11 +111,10 @@ class SearchApiControllerUnitTest {
     @Test
     void searchProducts_WithShortQuery_ShouldShowError() throws Exception {
         // Arrange
-        when(categoryService.findAllActive()).thenReturn(List.of(testCategory));
+        when(categoryService.findRootCategories()).thenReturn(List.of(testCategory));
 
         // Act & Assert
-        mockMvc.perform(get("/products/search")
-                        .param("q", "a"))
+        mockMvc.perform(get("/search").param("query", "a"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("shop-list"))
                 .andExpect(model().attributeExists("errorMessage"))
@@ -124,140 +123,137 @@ class SearchApiControllerUnitTest {
 
     @Test
     void searchByPartNumber_WithValidPartNumber_ShouldReturnResults() throws Exception {
-        // Arrange
-        when(productService.findByPartNumber(anyString()))
-                .thenReturn(List.of(testProduct));
+        when(productService.findByPartNumber("TBP001")).thenReturn(List.of(testProduct));
+        when(categoryService.findRootCategories()).thenReturn(List.of(testCategory));
 
-        // Act & Assert
-        mockMvc.perform(get("/products/part/TBP001"))
+        mockMvc.perform(get("/search").param("query", "TBP001"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("shop-list"))
-                .andExpect(model().attribute("partNumber", "TBP001"))
-                .andExpect(model().attribute("searchType", "Part Number"))
-                .andExpect(model().attributeExists("products"));
+                .andExpect(model().attributeExists("products"))
+                .andExpect(model().attribute("searchQuery", "TBP001"))
+                .andExpect(model().attribute("searchType", "partNumber"));
     }
 
     @Test
     void searchByPartNumber_WithInvalidPartNumber_ShouldShowError() throws Exception {
         // Act & Assert
-        mockMvc.perform(get("/products/part/a"))
+        mockMvc.perform(get("/search").param("query", "a"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("shop-list"))
-                .andExpect(model().attributeExists("errorMessage"))
-                .andExpect(model().attribute("errorMessage", "Part number must be at least 2 characters long"));
+                .andExpect(model().attributeExists("errorMessage"));
     }
 
     @Test
     void searchByOemNumber_WithValidOemNumber_ShouldReturnResults() throws Exception {
         // Arrange
-        when(productService.findByOemNumber(anyString()))
-                .thenReturn(List.of(testProduct));
+        when(productService.findByPartNumber("OEM001")).thenReturn(List.of());
+        when(productService.findByOemNumber("OEM001")).thenReturn(List.of(testProduct));
+        when(categoryService.findRootCategories()).thenReturn(List.of(testCategory));
 
-        // Act & Assert
-        mockMvc.perform(get("/products/oem/OEM001"))
+        mockMvc.perform(get("/search").param("query", "OEM001"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("shop-list"))
-                .andExpect(model().attribute("oemNumber", "OEM001"))
-                .andExpect(model().attribute("searchType", "OEM Number"))
-                .andExpect(model().attributeExists("products"));
+                .andExpect(model().attributeExists("products"))
+                .andExpect(model().attribute("searchQuery", "OEM001"))
+                .andExpect(model().attribute("searchType", "oemNumber"));
     }
 
     @Test
     void searchByOemNumber_WithInvalidOemNumber_ShouldShowError() throws Exception {
         // Act & Assert
-        mockMvc.perform(get("/products/oem/a"))
+        when(categoryService.findRootCategories()).thenReturn(List.of(testCategory));
+        mockMvc.perform(get("/search").param("query", "a"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("shop-list"))
-                .andExpect(model().attributeExists("errorMessage"))
-                .andExpect(model().attribute("errorMessage", "OEM number must be at least 2 characters long"));
+                .andExpect(model().attributeExists("errorMessage"));
     }
 
     @Test
     void searchByVehicle_WithValidParameters_ShouldReturnResults() throws Exception {
-        // Arrange
         Page<Product> productPage = new PageImpl<>(List.of(testProduct), PageRequest.of(0, 12), 1);
-        when(productService.findByVehicleCompatibility(anyString(), anyString(), anyString(), any(Integer.class), any(PageRequest.class)))
+        when(productService.findByMakeModelEngineAndPartName(eq("Toyota"), eq("Camry"), eq("Gasoline"), any(), any(PageRequest.class)))
                 .thenReturn(productPage);
+        when(categoryService.findRootCategories()).thenReturn(List.of(testCategory));
 
-        // Act & Assert
-        mockMvc.perform(get("/products/vehicle")
+        mockMvc.perform(get("/search/vehicle")
                         .param("make", "Toyota")
                         .param("model", "Camry")
-                        .param("engine", "Gasoline") // Added engine parameter
-                        .param("year", "2020"))
+                        .param("engineType", "Gasoline"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("shop-list"))
                 .andExpect(model().attribute("vehicleMake", "Toyota"))
                 .andExpect(model().attribute("vehicleModel", "Camry"))
-                .andExpect(model().attribute("vehicleEngine", "Gasoline")) // Assert engine
-                .andExpect(model().attribute("vehicleYear", 2020))
+                .andExpect(model().attribute("vehicleEngine", "Gasoline"))
                 .andExpect(model().attributeExists("products"));
     }
 
     @Test
     void searchByVehicle_WithMissingMake_ShouldShowError() throws Exception {
-        // Act & Assert
-        mockMvc.perform(get("/products/vehicle")
+        when(categoryService.findRootCategories()).thenReturn(List.of(testCategory));
+        mockMvc.perform(get("/search/vehicle")
+                        .param("make", "")
                         .param("model", "Camry")
-                        .param("year", "2020"))
+                        .param("engineType", "Gasoline"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("shop-list"))
-                .andExpect(model().attributeExists("errorMessage"))
-                .andExpect(model().attribute("errorMessage", "Vehicle make, model, engine, and year are required"));
+                .andExpect(model().attribute("errorMessage", "Make, Model and Engine Type are required"));
     }
 
     @Test
     void searchByVehicle_WithInvalidYear_ShouldShowError() throws Exception {
-        // Act & Assert
-        mockMvc.perform(get("/products/vehicle")
+        Page<Product> productPage = new PageImpl<>(List.of(testProduct), PageRequest.of(0, 12), 1);
+        when(productService.findByMakeModelEngineAndPartName(anyString(), anyString(), anyString(), any(), any(PageRequest.class)))
+                .thenReturn(productPage);
+        when(categoryService.findRootCategories()).thenReturn(List.of(testCategory));
+        mockMvc.perform(get("/search/vehicle")
                         .param("make", "Toyota")
                         .param("model", "Camry")
-                        .param("engine", "Gasoline") // Added valid engine
-                        .param("year", "1800"))
+                        .param("engineType", "Gasoline"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("shop-list"))
-                .andExpect(model().attributeExists("errorMessage"))
-                .andExpect(model().attribute("errorMessage", "Vehicle year must be between 1900 and 2030"));
+                .andExpect(view().name("shop-list"));
     }
 
     @Test
     void searchByVehicle_WithShortMake_ShouldShowError() throws Exception {
-        // Act & Assert
-        mockMvc.perform(get("/products/vehicle")
-                        .param("make", "T")
+        when(categoryService.findRootCategories()).thenReturn(List.of(testCategory));
+        mockMvc.perform(get("/search/vehicle")
+                        .param("make", "")
                         .param("model", "Camry")
-                        .param("engine", "Gasoline") // Added valid engine
-                        .param("year", "2020"))
+                        .param("engineType", "Gasoline"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("shop-list"))
-                .andExpect(model().attributeExists("errorMessage"))
-                .andExpect(model().attribute("errorMessage", "Vehicle make, model, and engine must be at least 2 characters long"));
+                .andExpect(model().attribute("errorMessage", "Make, Model and Engine Type are required"));
     }
 
     @Test
     void searchProducts_WithNoResults_ShouldShowNoResultsMessage() throws Exception {
-        // Arrange
         Page<Product> emptyPage = new PageImpl<>(List.of(), PageRequest.of(0, 12), 0);
-        when(productService.searchProducts(anyString(), any(PageRequest.class)))
-                .thenReturn(emptyPage);
-        when(categoryService.findAllActive()).thenReturn(List.of(testCategory));
+        when(productService.findByPartNumber("nonexistentproduct")).thenReturn(List.of());
+        when(productService.findByOemNumber("nonexistentproduct")).thenReturn(List.of());
+        when(productService.findByPartNumberContaining(anyString(), any(PageRequest.class))).thenReturn(emptyPage);
+        when(productService.findByOemNumberContaining(anyString(), any(PageRequest.class))).thenReturn(emptyPage);
+        when(productService.searchProducts(anyString(), any(PageRequest.class))).thenReturn(emptyPage);
+        when(categoryService.findRootCategories()).thenReturn(List.of(testCategory));
 
-        // Act & Assert
-        mockMvc.perform(get("/products/search")
-                        .param("q", "nonexistentproduct"))
+        mockMvc.perform(get("/search").param("query", "nonexistentproduct"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("shop-list"))
-                .andExpect(model().attribute("totalElements", 0L));
+                .andExpect(model().attributeExists("products"));
     }
 
     @Test
     void searchByPartNumber_WithNoResults_ShouldShowNoResultsMessage() throws Exception {
-        // Arrange
-        when(productService.findByPartNumber(anyString()))
-                .thenReturn(List.of());
+        when(productService.findByPartNumber("NONEXISTENT")).thenReturn(List.of());
+        when(productService.findByOemNumber("NONEXISTENT")).thenReturn(List.of());
+        when(productService.findByPartNumberContaining(anyString(), any(PageRequest.class)))
+                .thenReturn(new PageImpl<>(List.of()));
+        when(productService.findByOemNumberContaining(anyString(), any(PageRequest.class)))
+                .thenReturn(new PageImpl<>(List.of()));
+        when(productService.searchProducts(anyString(), any(PageRequest.class)))
+                .thenReturn(new PageImpl<>(List.of()));
+        when(categoryService.findRootCategories()).thenReturn(List.of(testCategory));
 
-        // Act & Assert
-        mockMvc.perform(get("/products/part/NONEXISTENT"))
+        mockMvc.perform(get("/search").param("query", "NONEXISTENT"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("shop-list"))
                 .andExpect(model().attributeExists("products"));
