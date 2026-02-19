@@ -40,6 +40,9 @@ class CartControllerIntegrationTest {
     @MockBean
     private UserRepository userRepository;
 
+    @MockBean
+    private com.recicar.marketplace.repository.ProductRepository productRepository;
+
     private User mockUser;
     private CartDto mockCart;
 
@@ -79,11 +82,12 @@ class CartControllerIntegrationTest {
     }
 
     @Test
-    void addItem_viaApi_requiresAuth() throws Exception {
+    void addItem_viaApi_asAnonymous_usesSessionCart() throws Exception {
+        // Anonymous users can add to session cart - returns 200 with cart
         mockMvc.perform(post("/api/cart/items")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .content("productId=100&quantity=1"))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isOk());
     }
 
     @Test

@@ -3,16 +3,20 @@ package com.recicar.marketplace.controller;
 import com.recicar.marketplace.entity.Category;
 import com.recicar.marketplace.entity.Product;
 import com.recicar.marketplace.entity.ProductCondition;
+import com.recicar.marketplace.entity.User;
 import com.recicar.marketplace.entity.Vendor;
+import com.recicar.marketplace.entity.VendorStatus;
+import com.recicar.marketplace.entity.UserRole;
 import com.recicar.marketplace.repository.CategoryRepository;
 import com.recicar.marketplace.repository.ProductRepository;
+import com.recicar.marketplace.repository.UserRepository;
 import com.recicar.marketplace.repository.VendorRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +28,7 @@ import static org.hamcrest.Matchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@TestPropertySource(locations = "classpath:application-test.yml")
+@ActiveProfiles("test")
 @Transactional
 class SearchControllerCategoryIntegrationTest {
 
@@ -40,6 +44,12 @@ class SearchControllerCategoryIntegrationTest {
     @Autowired
     private VendorRepository vendorRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+
     private Category testCategory;
     private Category testSubcategory;
     private Product testProduct;
@@ -54,9 +64,21 @@ class SearchControllerCategoryIntegrationTest {
         // Use existing vendor or create one with minimal setup
         testVendor = vendorRepository.findAll().stream().findFirst().orElse(null);
         if (testVendor == null) {
-            // Skip vendor creation as it requires User entity which is complex
-            // Instead, we'll use a mock vendor approach
-            return;
+            User vendorUser = new User();
+            vendorUser.setEmail("vendor-test-" + System.currentTimeMillis() + "@example.com");
+            vendorUser.setPasswordHash(passwordEncoder.encode("password123"));
+            vendorUser.setFirstName("Test");
+            vendorUser.setLastName("Vendor");
+            vendorUser.setRole(UserRole.VENDOR);
+            vendorUser.setActive(true);
+            vendorUser = userRepository.save(vendorUser);
+
+            testVendor = new Vendor();
+            testVendor.setUser(vendorUser);
+            testVendor.setBusinessName("Test Vendor");
+            testVendor.setTaxId("TAX" + System.currentTimeMillis());
+            testVendor.setStatus(VendorStatus.APPROVED);
+            testVendor = vendorRepository.save(testVendor);
         }
 
         // Create test parent category
