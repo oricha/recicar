@@ -216,6 +216,18 @@ kill -9 <PID>
 - Ensure database exists
 - Check firewall/network settings
 
+### `permission denied for schema public` (Flyway / PostgreSQL 15+)
+
+El usuario de la app debe poder crear tablas en el esquema `public`. Como `postgres`:
+
+```sql
+\c marketplace_dev
+GRANT CREATE, USAGE ON SCHEMA public TO marketplace_user;
+ALTER SCHEMA public OWNER TO marketplace_user;
+```
+
+Script de referencia: `docs/postgres-local-dev-setup.sql`
+
 ### Build Issues
 ```bash
 # Clean build

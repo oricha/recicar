@@ -127,11 +127,14 @@ ext.loadDotEnv = {
 }
 
 flyway {
-    // Default to local dev if environment variables are not set
+    // Local dev: esquema "recicar" (evita permission denied en public en PostgreSQL 15+)
     url = System.getenv('DATABASE_URL') ?: 'jdbc:postgresql://localhost:5432/marketplace_dev'
     user = System.getenv('DATABASE_USERNAME') ?: 'marketplace_user'
     password = System.getenv('DATABASE_PASSWORD') ?: 'marketplace_pass'
     locations = ['classpath:db/migration']
+    schemas = ['recicar']
+    defaultSchema = 'recicar'
+    createSchemas = true
 }
 
 application {
@@ -202,6 +205,10 @@ tasks.register('flywayMigrateTest') {
         project.extensions.flyway.url = envs['TEST_DATABASE_URL'] ?: System.getenv('TEST_DATABASE_URL')
         project.extensions.flyway.user = envs['TEST_DATABASE_USERNAME'] ?: System.getenv('TEST_DATABASE_USERNAME')
         project.extensions.flyway.password = envs['TEST_DATABASE_PASSWORD'] ?: System.getenv('TEST_DATABASE_PASSWORD')
+        // Neon / hosted: tablas en public (no usar esquema recicar de dev local)
+        project.extensions.flyway.schemas = ['public']
+        project.extensions.flyway.defaultSchema = 'public'
+        project.extensions.flyway.createSchemas = false
     }
     finalizedBy 'flywayMigrate'
 }
@@ -214,6 +221,9 @@ tasks.register('flywayMigrateProd') {
         project.extensions.flyway.url = envs['PROD_DATABASE_URL'] ?: System.getenv('PROD_DATABASE_URL')
         project.extensions.flyway.user = envs['PROD_DATABASE_USERNAME'] ?: System.getenv('PROD_DATABASE_USERNAME')
         project.extensions.flyway.password = envs['PROD_DATABASE_PASSWORD'] ?: System.getenv('PROD_DATABASE_PASSWORD')
+        project.extensions.flyway.schemas = ['public']
+        project.extensions.flyway.defaultSchema = 'public'
+        project.extensions.flyway.createSchemas = false
     }
     finalizedBy 'flywayMigrate'
 }
