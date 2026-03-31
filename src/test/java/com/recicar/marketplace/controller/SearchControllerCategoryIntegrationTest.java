@@ -141,7 +141,11 @@ class SearchControllerCategoryIntegrationTest {
                 .andExpect(view().name("shop-list"))
                 .andExpect(model().attributeExists("products"))
                 .andExpect(model().attributeExists("category"))
-                .andExpect(model().attribute("searchType", "category"));
+                .andExpect(model().attributeExists("categoryHierarchy"))
+                .andExpect(model().attribute("searchType", "category"))
+                .andExpect(content().string(containsString("Main Categories")))
+                .andExpect(content().string(containsString("/search?category=" + testCategory.getSlug())))
+                .andExpect(content().string(containsString("/search?category=" + testSubcategory.getSlug())));
     }
 
     @Test
