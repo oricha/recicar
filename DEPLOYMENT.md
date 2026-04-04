@@ -1,184 +1,129 @@
-# Deployment Guide - Recicar to Dokploy
+# Deployment Guide - Recicar to Dokploy (GitHub Container Registry)
 
-This guide explains how to deploy the Recicar application to Dokploy using GitHub Actions to build and push Docker images to Docker Hub.
+This guide explains how to deploy the Recicar application to Dokploy using GitHub Actions to build and push Docker images to **GitHub Container Registry (GHCR)** at `ghcr.io`.
 
 ## Why This Approach?
 
 Building Docker images directly on the Dokploy server can consume significant resources (RAM, CPU) and may cause:
+
 - Server timeouts
 - Server freezing
 - Downtime for other applications
 
-**Solution**: Build the Docker image in GitHub Actions and push it to Docker Hub. Dokploy will then pull the pre-built image for deployment.
+**Solution:** Build the Docker image in GitHub Actions and push it to **GHCR**. Dokploy pulls the pre-built image for deployment. No Docker Hub account is required.
 
 ## Prerequisites
 
-1. **Docker Hub Account**: Create one at [https://hub.docker.com](https://hub.docker.com)
-2. **Docker Hub Repository**: Create a repository named `recicar` in your Docker Hub account
-3. **GitHub Repository**: Your code should be in a GitHub repository
-4. **Dokploy Instance**: Have Dokploy installed and accessible
+1. **GitHub Repository** with this code
+2. **Workflow permissions** so Actions can publish packages (see Step 1)
+3. **Dokploy** instance installed and accessible
+4. **PostgreSQL** reachable from Dokploy (hosted DB, Neon, etc.)
 
-## Step 1: Configure Docker Hub
+## Step 1: GitHub repository settings
 
-### 1.1 Create Docker Hub Access Token
+Allow the workflow to push container images:
 
-1. Log in to [Docker Hub](https://hub.docker.com)
-2. Go to **Account Settings** → **Security** → **Access Tokens**
-3. Click **New Access Token**
-4. Give it a name (e.g., "GitHub Actions")
-5. Copy the token (you won't be able to see it again!)
+1. Open the repo → **Settings** → **Actions** → **General**
+2. Under **Workflow permissions**, select **Read and write permissions** (recommended for simplicity),  
+   _or_ keep read-only and use a **Personal Access Token (classic)** with `write:packages` stored as a secret (advanced).
 
-### 1.2 Create Docker Hub Repository
+The workflow in `.github/workflows/deploy.yml` uses `GITHUB_TOKEN` with `permissions: packages: write`.
 
-1. In Docker Hub, click **Create Repository**
-2. Name it: `recicar`
-3. Set visibility (Public or Private)
-4. Click **Create**
+## Step 2: GitHub Actions workflow
 
-## Step 2: Configure GitHub Secrets
+The workflow at `.github/workflows/deploy.yml`:
 
-1. Go to your GitHub repository
-2. Navigate to **Settings** → **Secrets and variables** → **Actions**
-3. Click **New repository secret**
-4. Add the following secrets:
+1. Triggers on every push to the `main` branch
+2. Checks out the repository
+3. Sets up Java 21 and builds the app (via Docker build using your `Dockerfile`)
+4. Logs in to **ghcr.io** with `GITHUB_TOKEN`
+5. Pushes the image as:
 
-   | Name | Value |
-   |------|-------|
-   | `DOCKERHUB_USERNAME` | Your Docker Hub username |
-   | `DOCKERHUB_TOKEN` | The access token you created |
+   `ghcr.io/<github_repository_owner_lowercase>/<github_repository_name_lowercase>:latest`  
+   and  
+   `ghcr.io/.../...:main-<commit-sha>`
 
-## Step 3: GitHub Actions Workflow
+**Example:** repository `MyOrg/Recicar` → image `ghcr.io/myorg/recicar:latest` (paths are lowercased for GHCR).
 
-The workflow file has already been created at `.github/workflows/deploy.yml`. It will:
+**No extra secrets** are required for publishing when `GITHUB_TOKEN` has package write access.
 
-1. Trigger on every push to the `main` branch
-2. Check out the repository
-3. Set up Java 21
-4. Log in to Docker Hub
-5. Build the Docker image using your Dockerfile
-6. Push the image to Docker Hub with tags:
-   - `latest` (always the latest version)
-   - `main-<commit-sha>` (specific version)
-
-## Step 4: Push to GitHub
-
-Once you commit and push to the `main` branch, GitHub Actions will automatically:
+## Step 3: Push to GitHub
 
 ```bash
-git add .github/workflows/deploy.yml .dockerignore DEPLOYMENT.md
-git commit -m "Add GitHub Actions workflow for Dokploy deployment"
 git push origin main
 ```
 
-Check the **Actions** tab in GitHub to monitor the build progress.
+Monitor **Actions** for the workflow run. After success, open **Packages** on the repo (or your org) to see the container package.
 
-## Step 5: Configure Dokploy
+### Private packages
 
-### 5.1 Create Application in Dokploy
+If the package visibility is **private**, Dokploy (or the host running Docker) must authenticate when pulling:
 
-1. Log in to your Dokploy instance
+- **Registry:** `ghcr.io`
+- **Username:** your GitHub username (or literal `token` with a PAT)
+- **Password / token:** PAT with at least **`read:packages`**
+
+Attach these credentials in Dokploy wherever registry auth is configured for private images.
+
+## Step 4: Configure Dokploy
+
+### 4.1 Create application
+
+1. Log in to Dokploy
 2. Create a new application
-3. **Source Type**: Select **Docker**
-4. **Docker Image**: Enter `YOUR_DOCKERHUB_USERNAME/recicar:latest`
-   - Replace `YOUR_DOCKERHUB_USERNAME` with your actual Docker Hub username
-5. Click **Save**
+3. **Source type:** **Docker**
+4. **Docker image:** `ghcr.io/YOUR_OWNER_LOWERCASE/YOUR_REPO_LOWERCASE:latest`  
+   (match the repository path on GitHub, all lowercase.)
 
-### 5.2 Configure Environment Variables
-
-Add the following environment variables in Dokploy:
+### 4.2 Environment variables
 
 ```
-# Database Configuration
 DATABASE_URL=jdbc:postgresql://your-db-host:5432/marketplace_prod
 DATABASE_USERNAME=your_db_user
 DATABASE_PASSWORD=your_db_password
-
-# Spring Profile
 SPRING_PROFILES_ACTIVE=prod
-
-# JWT Secret (generate a secure random string)
 JWT_SECRET=your_secure_jwt_secret_here
-
-# Server Port (if different from 8080)
 SERVER_PORT=8080
 ```
 
-### 5.3 Configure Domain
+### 4.3 Domain
 
-1. Go to **Domains** tab in Dokploy
-2. Click the **Dice icon** to generate a domain
-3. Set the port to `8080`
-4. Or add your custom domain
+- **Domains:** generated domain or custom
+- **Container port:** `8080`
 
-### 5.4 Deploy
+### 4.4 Deploy
 
-1. Click **Deploy** in Dokploy
-2. Wait for the deployment to complete
-3. Access your application via the configured domain
+Click **Deploy** and open the app URL when the deployment finishes.
 
-## Step 6: Enable Auto-Deploy (Optional)
+## Step 5: Auto-deploy (optional)
 
-To automatically deploy when you push to GitHub:
+GHCR does **not** offer the same “repository webhook after push” model as Docker Hub for triggering Dokploy.
 
-### Option A: Using Docker Hub Webhooks
+**Options:**
 
-1. In Dokploy, go to your application → **Deployments** tab
-2. Copy the **Webhook URL**
-3. Go to Docker Hub → Your repository → **Webhooks** tab
-4. Click **Create Webhook**
-5. Name: `Dokploy Auto Deploy`
-6. Webhook URL: Paste the URL from Dokploy
-7. Click **Create**
+1. **Dokploy webhook / API** — add a final step to `.github/workflows/deploy.yml` that `curl`s your Dokploy deploy URL or API (store URL/API key as GitHub secrets).
+2. **Manual or scheduled deploy** in Dokploy after you see a new image in GHCR.
 
-Now, every time GitHub Actions pushes a new image with the `latest` tag, Dokploy will automatically deploy it.
-
-### Option B: Using Dokploy API (Alternative)
-
-Update `.github/workflows/deploy.yml` to trigger deployment via API:
+Example pattern for a custom deploy hook (adjust URL and secrets to match your Dokploy version):
 
 ```yaml
-      - name: Trigger Dokploy Deployment
+      - name: Trigger Dokploy deployment
+        if: github.ref == 'refs/heads/main'
+        env:
+          DOKPLOY_DEPLOY_HOOK_URL: ${{ secrets.DOKPLOY_DEPLOY_HOOK_URL }}
         run: |
-          curl -X 'POST' \
-            'https://your-dokploy-domain/api/trpc/application.deploy' \
-            -H 'accept: application/json' \
-            -H 'x-api-key: YOUR-GENERATED-API-KEY' \
-            -H 'Content-Type: application/json' \
-            -d '{
-                "json":{
-                    "applicationId": "YOUR-APPLICATION-ID"
-                }
-            }'
+          if [ -n "$DOKPLOY_DEPLOY_HOOK_URL" ]; then
+            curl -fsS -X POST "$DOKPLOY_DEPLOY_HOOK_URL"
+          fi
 ```
 
-To get the API key:
-1. In Dokploy, go to **Settings** → **API Keys**
-2. Create a new API key
-3. Add it as a GitHub secret: `DOKPLOY_API_KEY`
+Add `DOKPLOY_DEPLOY_HOOK_URL` under **Settings → Secrets and variables → Actions** if you use this.
 
-## Step 7: Configure Health Check and Rollbacks (Recommended)
+## Step 6: Health check and rollbacks (recommended)
 
-### 7.1 Add Health Check Endpoint
+Spring Boot Actuator exposes `/actuator/health`.
 
-The application should have a health check endpoint. Spring Boot Actuator provides this at `/actuator/health`.
-
-Ensure it's enabled in `application.yml`:
-
-```yaml
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info
-  endpoint:
-    health:
-      show-details: always
-```
-
-### 7.2 Configure Dokploy Health Check
-
-1. In Dokploy, go to **Advanced** → **Cluster Settings** → **Swarm Settings**
-2. Add **Health Check** configuration:
+### Dokploy health check (example)
 
 ```json
 {
@@ -195,9 +140,7 @@ management:
 }
 ```
 
-### 7.3 Configure Update Config (Rollback)
-
-In **Update Config**, add:
+### Update config (rollback)
 
 ```json
 {
@@ -208,95 +151,49 @@ In **Update Config**, add:
 }
 ```
 
-This ensures:
-- **Zero downtime**: New container starts before old one stops
-- **Automatic rollback**: If health check fails, rolls back to previous version
-- **Safe deployments**: Deploys one instance at a time
+## Deployment workflow (summary)
 
-## Deployment Workflow
-
-Once everything is set up, your deployment workflow is:
-
-1. **Develop**: Make changes to your code locally
-2. **Commit**: Commit your changes
-3. **Push**: Push to `main` branch
-4. **GitHub Actions**: Automatically builds and pushes Docker image
-5. **Dokploy**: Automatically deploys the new image (if webhook configured)
-6. **Rollback**: If health check fails, automatically rolls back
+1. Develop and commit
+2. Push to `main`
+3. GitHub Actions builds and pushes to **ghcr.io**
+4. Dokploy pulls `...:latest` (or a specific tag) and runs the container
+5. Failed health checks can roll back if configured in Dokploy
 
 ## Monitoring
 
-- **GitHub Actions**: Check build status in GitHub Actions tab
-- **Docker Hub**: Verify image was pushed successfully
-- **Dokploy**: Monitor deployment logs and application status
-- **Application Logs**: Check logs in Dokploy for runtime issues
+- **Builds:** GitHub → **Actions**
+- **Images:** GitHub → **Packages** (`ghcr.io`)
+- **Runtime:** Dokploy logs and app logs
 
 ## Troubleshooting
 
-### Build Fails in GitHub Actions
+### Build fails in Actions
 
-- Check the Actions tab for error logs
-- Verify Dockerfile is correct
-- Ensure all dependencies are available
+- Read the failed job log
+- Confirm **Workflow permissions** allow **packages: write** (or use a PAT secret for `docker/login-action`)
+- Validate `Dockerfile` and Java/Gradle build
 
-### Deployment Fails in Dokploy
+### Dokploy cannot pull image
 
-- Check environment variables are set correctly
-- Verify database connection
-- Review application logs in Dokploy
-- Ensure Docker image was pushed successfully to Docker Hub
+- Image name must be **lowercase** (`ghcr.io/org/repo:tag`)
+- For **private** packages, configure **ghcr.io** credentials on Dokploy
+- Confirm the workflow run pushed the expected tag (`latest`)
 
-### Application Not Accessible
+### Roll back to a previous image
 
-- Check domain configuration
-- Verify port mapping (8080)
-- Check firewall rules
-- Review Dokploy logs
+Use an immutable tag from the same repository, for example:
 
-### Rollback to Previous Version
+`ghcr.io/your-org/recicar:main-abc1234` (replace with your commit SHA tag from the workflow)
 
-If auto-rollback doesn't work:
+## Security
 
-1. In Dokploy, go to **Deployments**
-2. Find a previous successful deployment
-3. Click **Redeploy**
+- Do not commit secrets; use GitHub Secrets and Dokploy env configuration
+- Rotate PATs used for private registry pull
+- Use strong `JWT_SECRET` and database credentials
+- Prefer HTTPS for the public URL (handled by Dokploy / reverse proxy)
 
-Or manually specify a previous image tag:
-- Change Docker image to: `YOUR_USERNAME/recicar:main-<previous-commit-sha>`
+## References
 
-## Benefits of This Approach
-
-✅ **No server resource exhaustion**: Builds happen on GitHub's infrastructure  
-✅ **Faster deployments**: Pre-built images download faster  
-✅ **Automated pipeline**: Push to `main` = automatic deployment  
-✅ **Zero downtime**: Rolling updates with health checks  
-✅ **Automatic rollbacks**: Failed deployments revert automatically  
-✅ **Version control**: Every deployment is tagged with commit SHA  
-✅ **Production ready**: Enterprise-grade deployment strategy  
-
-## Security Notes
-
-- Never commit secrets to the repository
-- Use GitHub Secrets for sensitive data
-- Regularly rotate Docker Hub access tokens
-- Use strong passwords for database
-- Keep dependencies updated
-- Enable HTTPS in production
-
-## Next Steps
-
-1. Set up monitoring and alerting
-2. Configure backup strategy for database
-3. Set up SSL/TLS certificates
-4. Configure CDN for static assets
-5. Implement CI/CD for staging environment
-6. Add automated testing before deployment
-
----
-
-**Need Help?**
-
-- Dokploy Documentation: [https://docs.dokploy.com](https://docs.dokploy.com)
-- GitHub Actions Documentation: [https://docs.github.com/actions](https://docs.github.com/actions)
-- Docker Hub Documentation: [https://docs.docker.com/docker-hub](https://docs.docker.com/docker-hub)
-
+- [Dokploy documentation](https://docs.dokploy.com)
+- [GitHub Actions](https://docs.github.com/actions)
+- [Working with the Container registry](https://docs.github.com/packages/working-with-a-github-packages-registry/working-with-the-container-registry)
