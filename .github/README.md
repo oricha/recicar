@@ -4,17 +4,17 @@ This directory contains the GitHub Actions workflow that builds the Docker image
 
 ## Files
 
-- **`workflows/deploy.yml`** — Build and push to `ghcr.io` on every push to `main`
-- **`DOKPLOY_SETUP.md`** — Short checklist for repo settings and Dokploy
-- **`../DEPLOYMENT.md`** — Full deployment guide
+- **`workflows/deploy.yml`** — On every **pull request** (→ `main` / `develop`) and **push** to `main`: run **Flyway** + **`./gradlew test`** against a **PostgreSQL 15 service container** (no external DB secrets). On **push** to `main` only, also **build and push** the image to `ghcr.io`
+
+### CI database
+
+El job `verify` levanta **Postgres 15 Alpine** en el runner (`recicar_test` / `marketplace_test`). No hace falta configurar secretos `TEST_DATABASE_*` en GitHub.
 
 ## What the workflow does
 
-1. **Triggers** on push to `main`
-2. **Builds** the image using the repo `Dockerfile`
-3. **Pushes** to GHCR with tags:
-   - `latest`
-   - `main-<commit-sha>`
+1. **Triggers** on push to `main` / PRs to `main` or `develop`
+2. **verify:** Postgres en servicio → `flywayMigrateTest` → `test`
+3. **build (solo push a `main`):** **Build** the image using the repo `Dockerfile` → **Push** to GHCR with tags `latest` and `main-<commit-sha>`
 4. **Image name:** `ghcr.io/<owner>/<repo>` (GitHub path, lowercased for the registry)
 
 ## Requirements
@@ -24,9 +24,20 @@ This directory contains the GitHub Actions workflow that builds the Docker image
 
 ## Dokploy
 
+### Producción
+
 - **Source type:** Docker  
 - **Image:** `ghcr.io/<your-lower-case-owner>/<your-lower-case-repo>:latest`  
 - For **private** packages, configure registry login on Dokploy (`ghcr.io` + GitHub username + PAT with `read:packages`)
+
+### Entorno test (PostgreSQL en Dokploy)
+
+Despliega un **servicio PostgreSQL** en el mismo proyecto/red que la app (plantilla de base de datos de Dokploy o stack Docker). Variables de la aplicación (perfil **`test`**):
+
+- `SPRING_PROFILES_ACTIVE=test`
+- `DATABASE_URL`, `DATABASE_USERNAME`, `DATABASE_PASSWORD` apuntando al hostname **interno** del Postgres del stack test.
+
+Detalle en **[../DEPLOYMENT.md](../DEPLOYMENT.md)** (sección entorno test).
 
 ## Documentation
 
@@ -38,7 +49,7 @@ This directory contains the GitHub Actions workflow that builds the Docker image
 ```mermaid
 graph LR
     A[Push to main] --> B[GitHub Actions]
-    B --> C[Build Docker Image]
+    B --> C[verify: PostgreSQL + tests]
     C --> D[Push to GHCR]
     D --> E[Deploy hook or manual]
     E --> F[Dokploy pull & deploy]

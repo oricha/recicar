@@ -201,7 +201,7 @@ logging:
   level:
     com.recicar.marketplace: INFO
 
-# Neon DB configuration - SSL is handled automatically by Neon
+# Test: PostgreSQL en la misma red que la app (p. ej. servicio Dokploy / Docker). Sin SSL interno suele bastar jdbc:postgresql://host:5432/db
 
 ---
 spring:
@@ -247,7 +247,7 @@ spring:
   security:
     require-ssl: false  # Northflank handles SSL termination
 
-# Neon DB configuration - SSL is handled automatically by Neon
+# Prod: PostgreSQL gestionado; si el proveedor exige TLS, añade sslmode=require (u otros parámetros) en DATABASE_URL
 
 server:
   port: ${SERVER_PORT:8080}

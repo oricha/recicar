@@ -126,6 +126,19 @@ ext.loadDotEnv = {
     return envMap
 }
 
+// Si existe TEST_* en .env / entorno, los tests usan ese PostgreSQL (p. ej. misma URL que el servicio de test en Dokploy o CI).
+tasks.named('test', Test) {
+    def envs = loadDotEnv()
+    def testUrl = envs['TEST_DATABASE_URL'] ?: System.getenv('TEST_DATABASE_URL')
+    if (testUrl) {
+        environment 'SPRING_DATASOURCE_URL', testUrl
+        environment 'SPRING_DATASOURCE_USERNAME', envs['TEST_DATABASE_USERNAME'] ?: System.getenv('TEST_DATABASE_USERNAME') ?: ''
+        environment 'SPRING_DATASOURCE_PASSWORD', envs['TEST_DATABASE_PASSWORD'] ?: System.getenv('TEST_DATABASE_PASSWORD') ?: ''
+        environment 'SPRING_FLYWAY_ENABLED', 'true'
+        environment 'SPRING_JPA_HIBERNATE_DDL_AUTO', 'validate'
+    }
+}
+
 flyway {
     // Local dev: esquema "recicar" (evita permission denied en public en PostgreSQL 15+)
     url = System.getenv('DATABASE_URL') ?: 'jdbc:postgresql://localhost:5432/marketplace_dev'
@@ -157,7 +170,7 @@ tasks.register('runLocal', BootRun) {
 
 tasks.register('runTest', BootRun) {
     group = 'application'
-    description = 'Run app with test profile in container against Neon DB (from .env TEST_*)'
+    description = 'Run app with test profile (PostgreSQL; credenciales TEST_* en .env o entorno, p. ej. BD en Dokploy test)'
     dependsOn 'classes'
     classpath = sourceSets.main.runtimeClasspath
     def envs = loadDotEnv()
@@ -172,7 +185,7 @@ tasks.register('runTest', BootRun) {
 
 tasks.register('runProd', BootRun) {
     group = 'application'
-    description = 'Run app with prod profile in container against Neon DB (from .env PROD_*)'
+    description = 'Run app with prod profile (PostgreSQL; credenciales PROD_* en .env o entorno)'
     dependsOn 'classes'
     classpath = sourceSets.main.runtimeClasspath
     def envs = loadDotEnv()
@@ -199,13 +212,13 @@ tasks.register('flywayMigrateDev') {
 
 tasks.register('flywayMigrateTest') {
     group = 'flyway'
-    description = 'Run Flyway migrate against TEST Neon DB using .env TEST_*'
+    description = 'Run Flyway migrate against PostgreSQL de test (.env TEST_* o variables de entorno)'
     doFirst {
         def envs = loadDotEnv()
         project.extensions.flyway.url = envs['TEST_DATABASE_URL'] ?: System.getenv('TEST_DATABASE_URL')
         project.extensions.flyway.user = envs['TEST_DATABASE_USERNAME'] ?: System.getenv('TEST_DATABASE_USERNAME')
         project.extensions.flyway.password = envs['TEST_DATABASE_PASSWORD'] ?: System.getenv('TEST_DATABASE_PASSWORD')
-        // Neon / hosted: tablas en public (no usar esquema recicar de dev local)
+        // Test/prod hosted: tablas en public (distinto del esquema recicar del dev local)
         project.extensions.flyway.schemas = ['public']
         project.extensions.flyway.defaultSchema = 'public'
         project.extensions.flyway.createSchemas = false
@@ -215,7 +228,7 @@ tasks.register('flywayMigrateTest') {
 
 tasks.register('flywayMigrateProd') {
     group = 'flyway'
-    description = 'Run Flyway migrate against PROD Neon DB using .env PROD_*'
+    description = 'Run Flyway migrate against PROD (.env PROD_* o variables de entorno)'
     doFirst {
         def envs = loadDotEnv()
         project.extensions.flyway.url = envs['PROD_DATABASE_URL'] ?: System.getenv('PROD_DATABASE_URL')

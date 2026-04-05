@@ -13,7 +13,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - marketplace-network
-    # Note: This is only for local development. Test and prod environments use Neon DB.
+    # Local dev. En Dokploy test suele usarse otro servicio Postgres en la misma red; prod suele ser PostgreSQL gestionado aparte.
 
   # redis:
   #   image: redis:7-alpine

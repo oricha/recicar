@@ -106,10 +106,10 @@ docker-compose up -d postgres
 # Run with dev profile (local PostgreSQL)
 ./gradlew runLocal
 
-# Run with test profile (Neon DB from .env)
+# Run with test profile (PostgreSQL test desde .env TEST_*; en Dokploy usa DATABASE_* hacia el Postgres del stack)
 ./gradlew runTest
 
-# Run with prod profile (Neon DB from .env)
+# Run with prod profile (PostgreSQL prod desde .env PROD_*)
 ./gradlew runProd
 ```
 

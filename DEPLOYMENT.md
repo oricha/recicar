@@ -17,7 +17,7 @@ Building Docker images directly on the Dokploy server can consume significant re
 1. **GitHub Repository** with this code
 2. **Workflow permissions** so Actions can publish packages (see Step 1)
 3. **Dokploy** instance installed and accessible
-4. **PostgreSQL** reachable from Dokploy (hosted DB, Neon, etc.)
+4. **PostgreSQL** para **producción** accesible desde Dokploy (servicio gestionado o VPS). Para **test**, se asume **PostgreSQL desplegado en el mismo entorno Dokploy** (servicio de base de datos en la misma red), no una BD alojada fuera del stack de test.
 
 ## Step 1: GitHub repository settings
 
@@ -33,19 +33,17 @@ The workflow in `.github/workflows/deploy.yml` uses `GITHUB_TOKEN` with `permiss
 
 The workflow at `.github/workflows/deploy.yml`:
 
-1. Triggers on every push to the `main` branch
-2. Checks out the repository
-3. Sets up Java 21 and builds the app (via Docker build using your `Dockerfile`)
-4. Logs in to **ghcr.io** with `GITHUB_TOKEN`
-5. Pushes the image as:
+1. En **pull requests** hacia `main` o `develop` y en **push** a `main`: job **`verify`** con un contenedor **PostgreSQL 15** efímero, `flywayMigrateTest` y `./gradlew test` (sin secretos de base de datos en GitHub).
+2. Solo en **push** a `main`, tras `verify`: checkout, JDK 21, build Docker y push a **ghcr.io** con `GITHUB_TOKEN`.
+3. Imagen publicada como:
 
    `ghcr.io/<github_repository_owner_lowercase>/<github_repository_name_lowercase>:latest`  
-   and  
+   y  
    `ghcr.io/.../...:main-<commit-sha>`
 
 **Example:** repository `MyOrg/Recicar` → image `ghcr.io/myorg/recicar:latest` (paths are lowercased for GHCR).
 
-**No extra secrets** are required for publishing when `GITHUB_TOKEN` has package write access.
+**No extra secrets** are required for publishing when `GITHUB_TOKEN` has package write access (ni para el Postgres del CI).
 
 ## Step 3: Push to GitHub
 
@@ -94,6 +92,27 @@ SERVER_PORT=8080
 ### 4.4 Deploy
 
 Click **Deploy** and open the app URL when the deployment finishes.
+
+### 4.5 Entorno **test** en Dokploy (PostgreSQL en la misma plataforma)
+
+Para **test**, evita una BD fuera de Dokploy si quieres mantener despliegue y datos en la misma plataforma:
+
+1. Crea un **servicio PostgreSQL** en Dokploy (plantilla “Postgres” / contenedor en el mismo proyecto o red Docker que la app).
+2. Anota usuario, contraseña, nombre de base y el **hostname interno** que Dokploy asigne al servicio (p. ej. nombre del servicio en la red overlay).
+3. Despliega la imagen de Recicar otra aplicación o el mismo proyecto con **Source type: Docker** y variables:
+
+```
+SPRING_PROFILES_ACTIVE=test
+DATABASE_URL=jdbc:postgresql://<HOST_INTERNO_POSTGRES>:5432/<NOMBRE_BD>
+DATABASE_USERNAME=<usuario>
+DATABASE_PASSWORD=<contraseña>
+JWT_SECRET=<secreto>
+SERVER_PORT=8080
+```
+
+4. Ejecuta migraciones una vez si hace falta (`flywayMigrateTest` apuntando a esa misma URL desde tu máquina o un job manual) o deja que la app arranque con Flyway (`repair-on-migrate` / `baseline-on-migrate` según tu estado).
+
+La URL JDBC **no** necesita `sslmode=require` si el tráfico es solo entre contenedores en la red interna de Dokploy.
 
 ## Step 5: Auto-deploy (optional)
 

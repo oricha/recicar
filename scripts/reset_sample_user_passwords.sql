@@ -12,7 +12,7 @@
 --   psql -U marketplace_user -d marketplace_dev -f scripts/reset_sample_user_passwords.sql
 --
 -- Dev local con esquema "recicar" (application.yml perfil dev): descomenta SET search_path.
--- Neon / tablas en public: comenta SET search_path o usa public explícitamente.
+-- Si las tablas están solo en public (test/prod estándar): comenta SET search_path.
 -- =============================================================================
 
 -- Descomenta si tus tablas están en el esquema recicar:

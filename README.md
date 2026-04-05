@@ -64,12 +64,13 @@ A comprehensive web application that connects customers with junkyards and auto 
 - **Local Development** (local PostgreSQL):
   - `./gradlew runLocal`
 
-- **Test Environment** (DEV profile + Neon DB):
-  - Add Neon DB creds in `.env` as `TEST_DATABASE_URL`, `TEST_DATABASE_USERNAME`, `TEST_DATABASE_PASSWORD`.
+- **Test Environment** (perfil `test` + PostgreSQL en Dokploy o local):
+  - En Dokploy test: Postgres en la misma red; `SPRING_PROFILES_ACTIVE=test` y `DATABASE_*` al servicio interno.
+  - Localmente: credenciales en `.env` como `TEST_DATABASE_*` (ver `.env.example`).  
   - `./gradlew runTest`
 
-- **Production Environment** (PROD profile + Neon DB):
-  - Add Neon DB creds in `.env` as `PROD_DATABASE_URL`, `PROD_DATABASE_USERNAME`, `PROD_DATABASE_PASSWORD`.
+- **Production Environment** (perfil `prod` + PostgreSQL gestionado):
+  - Credenciales en `.env` como `PROD_DATABASE_URL`, `PROD_DATABASE_USERNAME`, `PROD_DATABASE_PASSWORD`.
   - `./gradlew runProd`
 
 ### PostgreSQL local (dev) y esquema `recicar`
