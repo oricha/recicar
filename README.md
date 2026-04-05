@@ -64,13 +64,36 @@ A comprehensive web application that connects customers with junkyards and auto 
 - **Local Development** (local PostgreSQL):
   - `./gradlew runLocal`
 
-- **Test Environment** (DEV profile + Neon DB):
-  - Add Neon DB creds in `.env` as `TEST_DATABASE_URL`, `TEST_DATABASE_USERNAME`, `TEST_DATABASE_PASSWORD`.
+- **Test Environment** (perfil `test` + PostgreSQL en Dokploy o local):
+  - En Dokploy test: Postgres en la misma red; `SPRING_PROFILES_ACTIVE=test` y `DATABASE_*` al servicio interno.
+  - Localmente: credenciales en `.env` como `TEST_DATABASE_*` (ver `.env.example`).  
   - `./gradlew runTest`
 
-- **Production Environment** (PROD profile + Neon DB):
-  - Add Neon DB creds in `.env` as `PROD_DATABASE_URL`, `PROD_DATABASE_USERNAME`, `PROD_DATABASE_PASSWORD`.
+- **Production Environment** (perfil `prod` + PostgreSQL gestionado):
+  - Credenciales en `.env` como `PROD_DATABASE_URL`, `PROD_DATABASE_USERNAME`, `PROD_DATABASE_PASSWORD`.
   - `./gradlew runProd`
+
+### PostgreSQL local (dev) y esquema `recicar`
+
+En **PostgreSQL 15+** muchos usuarios no tienen `CREATE` en el esquema `public`. La app en perfil **dev** usa el esquema **`recicar`**: Flyway lo crea (`create-schemas`) y las migraciones/JPA escriben ahí. Requisito: **`marketplace_user` debe ser dueño de la base** (o tener `CREATE` en la base), por ejemplo:
+
+```sql
+CREATE DATABASE marketplace_dev OWNER marketplace_user;
+```
+
+Si defines `DATABASE_URL` en `.env`, añade el esquema en la URL, p. ej.  
+`...?currentSchema=recicar` (o `&currentSchema=recicar` si ya hay parámetros).
+
+### Si prefieres seguir usando solo `public`
+
+Conéctate como superusuario a `marketplace_dev` y ejecuta:
+
+```sql
+GRANT CREATE, USAGE ON SCHEMA public TO marketplace_user;
+ALTER SCHEMA public OWNER TO marketplace_user;
+```
+
+Script de referencia: `docs/postgres-local-dev-setup.sql` (ajusta si `CREATE USER` / `CREATE DATABASE` ya existen).
 
 ### Database Migrations
 
@@ -104,16 +127,6 @@ Run tests with:
 ```bash
 ./gradlew test
 ```
-
-## 🐳 Docker
-
-The project includes Docker Compose configuration for local development:
-- PostgreSQL 15 database
-- Redis cache (optional)
-- Automatic database initialization
-
-
-
 ## 🤝 Contributing
 
 1. Fork the repository

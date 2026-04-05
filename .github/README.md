@@ -1,117 +1,102 @@
 # GitHub Actions & Dokploy Deployment
 
-This directory contains the GitHub Actions workflow for automated Docker image building and deployment to Dokploy.
+This directory contains the GitHub Actions workflow that builds the Docker image and pushes it to **GitHub Container Registry (GHCR)** for deployment on Dokploy.
 
-## 📁 Files Created
+## Files
 
-### Workflow Files
-- **`workflows/deploy.yml`** - Main GitHub Actions workflow that builds and pushes Docker images to Docker Hub
+- **`workflows/deploy.yml`** — On every **pull request** (→ `main` / `develop`) and **push** to `main`: run **Flyway** + **`./gradlew test`** against a **PostgreSQL 15 service container** (no external DB secrets). On **push** to `main` only, also **build and push** the image to `ghcr.io`
 
-### Documentation
-- **`DOKPLOY_SETUP.md`** - Quick setup guide with checklists
-- **`../DEPLOYMENT.md`** - Comprehensive deployment documentation
+### CI database
 
-### Configuration
-- **`../.dockerignore`** - Optimizes Docker builds by excluding unnecessary files
+El job `verify` levanta **Postgres 15 Alpine** en el runner (`recicar_test` / `marketplace_test`). No hace falta configurar secretos `TEST_DATABASE_*` en GitHub.
 
-## 🎯 What This Workflow Does
+## What the workflow does
 
-1. **Triggers** on every push to the `main` branch
-2. **Builds** the Spring Boot application using the existing Dockerfile
-3. **Pushes** the Docker image to Docker Hub with tags:
-   - `latest` - Always points to the newest version
-   - `main-<commit-sha>` - Version specific to each commit
-4. **Enables** Dokploy to pull and deploy the pre-built image
+1. **Triggers** on push to `main` / PRs to `main` or `develop`
+2. **verify:** Postgres en servicio → `flywayMigrateTest` → `test`
+3. **build (solo push a `main`):** **Build** the image using the repo `Dockerfile` → **Push** to GHCR with tags `latest` and `main-<commit-sha>`
+4. **Image name:** `ghcr.io/<owner>/<repo>` (GitHub path, lowercased for the registry)
 
-## ✨ Benefits
+## Requirements
 
-- **No Server Overload**: Builds happen on GitHub's infrastructure, not your Dokploy server
-- **Faster Deployments**: Pre-built images download much faster than building from source
-- **Automatic**: Just push code and it deploys automatically
-- **Versioned**: Every deployment is tagged with the commit SHA
-- **Zero Downtime**: When configured with health checks in Dokploy
+- Repo **Settings → Actions → General → Workflow permissions:** **Read and write permissions** (so `GITHUB_TOKEN` can push packages), or a PAT with `write:packages` wired into the workflow if you customize it
+- **No Docker Hub** account or secrets for the default workflow
 
-## 🚀 Getting Started
+## Dokploy
 
-1. **Read**: [DOKPLOY_SETUP.md](./DOKPLOY_SETUP.md) for quick setup
-2. **Follow**: The checklist to configure Docker Hub and GitHub secrets
-3. **Push**: Your code to trigger the first build
-4. **Configure**: Dokploy to use your Docker image
+### Producción
 
-## 📖 Documentation
+- **Source type:** Docker  
+- **Image:** `ghcr.io/<your-lower-case-owner>/<your-lower-case-repo>:latest`  
+- For **private** packages, configure registry login on Dokploy (`ghcr.io` + GitHub username + PAT with `read:packages`)
 
-- **Quick Start**: [DOKPLOY_SETUP.md](./DOKPLOY_SETUP.md)
-- **Full Guide**: [../DEPLOYMENT.md](../DEPLOYMENT.md)
-- **Workflow**: [workflows/deploy.yml](./workflows/deploy.yml)
+### Entorno test (PostgreSQL en Dokploy)
 
-## 🔄 Deployment Flow
+Despliega un **servicio PostgreSQL** en el mismo proyecto/red que la app (plantilla de base de datos de Dokploy o stack Docker). Variables de la aplicación (perfil **`test`**):
+
+- `SPRING_PROFILES_ACTIVE=test`
+- `DATABASE_URL`, `DATABASE_USERNAME`, `DATABASE_PASSWORD` apuntando al hostname **interno** del Postgres del stack test.
+
+Detalle en **[../DEPLOYMENT.md](../DEPLOYMENT.md)** (sección entorno test).
+
+## Documentation
+
+- **Quick checklist:** [DOKPLOY_SETUP.md](./DOKPLOY_SETUP.md)
+- **Full guide:** [../DEPLOYMENT.md](../DEPLOYMENT.md)
+
+## Deployment flow
 
 ```mermaid
 graph LR
     A[Push to main] --> B[GitHub Actions]
-    B --> C[Build Docker Image]
-    C --> D[Push to Docker Hub]
-    D --> E[Dokploy Webhook]
-    E --> F[Pull & Deploy]
+    B --> C[verify: PostgreSQL + tests]
+    C --> D[Push to GHCR]
+    D --> E[Deploy hook or manual]
+    E --> F[Dokploy pull & deploy]
     F --> G[Health Check]
-    G -->|Pass| H[Live ✅]
-    G -->|Fail| I[Rollback 🔄]
 ```
 
-## 🛠️ Customization
+## Customization
 
-### Change Trigger Branch
+### Trigger branches
+
 Edit `workflows/deploy.yml`:
+
 ```yaml
 on:
   push:
-    branches: ["main", "production"]  # Add more branches
+    branches: ["main", "production"]
 ```
 
-### Add Build Steps
-Add additional steps before the Docker build:
-```yaml
-- name: Run Tests
-  run: ./gradlew test
+### Dokploy webhook after push
 
-- name: Run Security Scan
-  run: ./gradlew dependencyCheckAnalyze
-```
+Add a step that POSTs to your Dokploy deploy URL (secret). See `DEPLOYMENT.md`.
 
-### Multi-Architecture Builds
-For ARM64 support, modify `workflows/deploy.yml`:
+### Multi-arch
+
+In `deploy.yml`, extend platforms on the build-push step, for example:
+
 ```yaml
 platforms: linux/amd64,linux/arm64
 ```
 
-## 📊 Monitoring
+## Monitoring
 
-- **Build Status**: GitHub → Actions tab
-- **Image Registry**: Docker Hub → Your repository
-- **Deployment**: Dokploy dashboard
+- **Builds:** GitHub → Actions  
+- **Images:** GitHub → Packages (`ghcr.io`)  
+- **Runtime:** Dokploy dashboard and logs
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
-If builds fail:
-1. Check the **Actions** tab for error logs
-2. Verify GitHub secrets are set correctly
-3. Ensure Dockerfile is valid
-4. Check Docker Hub credentials
+- **403 / denied push to ghcr.io:** fix workflow permissions or use a PAT with `write:packages` in `docker/login-action`
+- **Dokploy pull fails:** check image name (lowercase), tag `latest`, and private-registry credentials
+- **Dockerfile errors:** inspect the failed job log in Actions
 
-If deployment fails:
-1. Verify image was pushed to Docker Hub
-2. Check Dokploy environment variables
-3. Review application logs in Dokploy
-4. Verify database connectivity
+## Security
 
-## 🔐 Security
-
-- Never commit Docker Hub credentials
-- Use GitHub Secrets for sensitive data
-- Rotate access tokens regularly
-- Keep dependencies updated
+- Do not commit registry or application secrets; use GitHub Secrets and Dokploy environment variables
+- Rotate PATs used for private `docker pull` from GHCR
 
 ---
 
-**Questions?** Check the [full deployment guide](../DEPLOYMENT.md)
-
+**Questions?** See [../DEPLOYMENT.md](../DEPLOYMENT.md)

@@ -93,26 +93,43 @@
         }
         
         /* Category Items */
+        .parts-catalog {
+            margin: 0;
+        }
+
         .parts-catalog__items {
             margin: 0;
             position: relative;
         }
-        
+
+        .parts-catalog__row {
+            display: flex;
+            align-items: stretch;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .parts-catalog__items:last-child .parts-catalog__row {
+            border-bottom: none;
+        }
+
         .parts-catalog__title {
             display: flex;
             align-items: center;
-            padding: 15px 20px;
+            flex: 1;
+            min-width: 0;
+            padding: 15px 16px 15px 20px;
             text-decoration: none;
             color: #333;
             transition: all 0.3s ease;
-            border-bottom: 1px solid #f0f0f0;
         }
-        
-        .parts-catalog__title:hover {
+
+        .parts-catalog__title:hover,
+        .parts-catalog__title:focus {
             background-color: #f8f9fa;
             color: #007bff;
+            outline: none;
         }
-        
+
         .parts-catalog__title i {
             margin-right: 12px;
             width: 20px;
@@ -120,13 +137,20 @@
             color: #666;
             font-size: 16px;
         }
-        
+
+        .parts-catalog__items.is-active > .parts-catalog__row > .parts-catalog__title,
+        .cat__sub_items.is-active > .cat__sub_links {
+            background-color: #fff3e0;
+            color: #ff9800;
+        }
+
         .cat__links__name {
             flex: 1;
             font-weight: 500;
             font-size: 14px;
+            overflow-wrap: anywhere;
         }
-        
+
         .cat__links__count {
             margin-left: auto;
             background-color: #e9ecef;
@@ -136,33 +160,55 @@
             font-size: 12px;
             margin-right: 8px;
             font-weight: 500;
+            white-space: nowrap;
         }
-        
-        .category-arrow {
-            margin-left: 8px;
-            transition: transform 0.3s ease;
+
+        .category-toggle {
+            flex: 0 0 44px;
+            border: 0;
+            border-left: 1px solid #f0f0f0;
+            background: #fff;
             color: #666;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .category-toggle:hover,
+        .category-toggle:focus {
+            background-color: #f8f9fa;
+            color: #007bff;
+            outline: none;
+        }
+
+        .category-arrow {
+            transition: transform 0.3s ease;
             font-size: 12px;
         }
-        
-        .parts-catalog__title:hover .category-arrow {
-            transform: rotate(180deg);
+
+        .parts-catalog__items.is-expanded > .parts-catalog__row .category-arrow {
+            transform: rotate(45deg);
         }
-        
+
         /* Subcategories */
         .parts-catalog__block {
+            display: none;
             background: #f8f9fa;
             padding-left: 0;
+            margin: 0;
         }
-        
+
+        .parts-catalog__items.is-expanded > .parts-catalog__block {
+            display: block;
+        }
+
         .cat__sub_items {
             border-bottom: 1px solid #e9ecef;
         }
-        
+
         .cat__sub_items:last-child {
             border-bottom: none;
         }
-        
+
         .cat__sub_links {
             display: flex;
             align-items: center;
@@ -171,17 +217,20 @@
             color: #666;
             transition: all 0.3s ease;
         }
-        
-        .cat__sub_links:hover {
+
+        .cat__sub_links:hover,
+        .cat__sub_links:focus {
             color: #007bff;
             background-color: #fff;
+            outline: none;
         }
-        
+
         .cat__sub_links__name {
             flex: 1;
             font-size: 13px;
+            overflow-wrap: anywhere;
         }
-        
+
         .cat__sub_links__count {
             background-color: #e9ecef;
             color: #666;
@@ -189,6 +238,7 @@
             border-radius: 10px;
             font-size: 11px;
             margin-left: 8px;
+            white-space: nowrap;
         }
         
         /* Checkbox Styling */
@@ -380,28 +430,45 @@
                         <div class="widget_inner">
                             <!-- Main Categories -->
                             <div class="widget_list widget_categories">
-                                <h2>Categorías</h2>
+                                <h2>Main Categories</h2>
                                 <ul class="parts-catalog cat clearfix">
                                     <!-- Dynamic Categories from Backend -->
                                     <th:block th:each="category : ${categories}">
                                         <th:block th:if="${category.parent == null}">
-                                            <li class="parts-catalog__items cat__items cat-items-js" th:attr="data-category=${category.slug}">
-                                                <a th:href="@{/search(category=${category.slug})}" 
-                                                   class="parts-catalog__title cat__links cat-links-js"
-                                                   th:id="'cat-link-' + ${category.id}">
-                                                    <i class="fa fa-cog"></i>
-                                                    <span class="cat__links__name" th:text="${category.name}">Category Name</span>
-                                                    <span class="cat__links__count" th:text="${category.products.size()}">0</span>
-                                                    <i class="fa fa-plus category-arrow" th:if="${!category.children.isEmpty()}"></i>
-                                                </a>
+                                            <li class="parts-catalog__items cat__items cat-items-js"
+                                                th:classappend="${categorySlug == category.slug or (selectedCategoryIds != null and #lists.contains(selectedCategoryIds, category.id)) or (categoryHierarchy != null and #lists.contains(categoryHierarchy, category))} ? ' is-active' : ''"
+                                                th:attr="data-category=${category.slug}">
+                                                <div class="parts-catalog__row">
+                                                    <a th:href="@{/search(category=${category.slug})}" 
+                                                       class="parts-catalog__title cat__links"
+                                                       th:id="'cat-link-' + ${category.id}">
+                                                        <i class="fa fa-cog" aria-hidden="true"></i>
+                                                        <span class="cat__links__name" th:text="${category.name}">Category Name</span>
+                                                        <span class="cat__links__count"
+                                                              th:text="${category.products.size()}"
+                                                              th:attr="aria-label=${category.products.size()} + ' products'">0</span>
+                                                    </a>
+                                                    <button th:if="${!category.children.isEmpty()}"
+                                                            type="button"
+                                                            class="category-toggle cat-links-js"
+                                                            th:attr="aria-expanded=${(selectedCategoryIds != null and #lists.contains(selectedCategoryIds, category.id)) or (categoryHierarchy != null and #lists.contains(categoryHierarchy, category))}, aria-controls='subcategories-' + ${category.id}, aria-label='Toggle subcategories for ' + ${category.name}">
+                                                        <i class="fa fa-plus category-arrow" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
                                                 <!-- Subcategories -->
-                                                <ul class="parts-catalog__block cat__sub cat-sub-js" th:if="${!category.children.isEmpty()}">
-                                                    <li class="cat__sub_items cat-sub-items-js" th:each="subcategory : ${category.children}">
+                                                <ul class="parts-catalog__block cat__sub cat-sub-js"
+                                                    th:if="${!category.children.isEmpty()}"
+                                                    th:id="'subcategories-' + ${category.id}">
+                                                    <li class="cat__sub_items cat-sub-items-js"
+                                                        th:each="subcategory : ${category.children}"
+                                                        th:classappend="${categorySlug == subcategory.slug or (selectedCategoryIds != null and #lists.contains(selectedCategoryIds, subcategory.id)) or (categoryHierarchy != null and #lists.contains(categoryHierarchy, subcategory))} ? ' is-active' : ''">
                                                         <a th:href="@{/search(category=${subcategory.slug})}" 
                                                            class="cat__sub_links cat-sub-links-js"
                                                            th:id="'cat-link-' + ${subcategory.id}">
                                                             <span class="cat__sub_links__name" th:text="${subcategory.name}">Subcategory Name</span>
-                                                            <span class="cat__sub_links__count" th:text="${subcategory.products.size()}">0</span>
+                                                            <span class="cat__sub_links__count"
+                                                                  th:text="${subcategory.products.size()}"
+                                                                  th:attr="aria-label=${subcategory.products.size()} + ' products'">0</span>
                                                         </a>
                                                     </li>
                                                 </ul>
@@ -1177,90 +1244,37 @@
      <!-- Filter Sidebar JavaScript -->
      <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Category search functionality
-            const categorySearchInput = document.getElementById('category-filter');
             const categoryItems = document.querySelectorAll('.parts-catalog__items');
-            
-            if (categorySearchInput) {
-                categorySearchInput.addEventListener('input', function() {
-                    const searchTerm = this.value.toLowerCase();
-                    
-                    categoryItems.forEach(item => {
-                        const categoryName = item.querySelector('.cat__links__name').textContent.toLowerCase();
-                        const categoryLink = item.querySelector('.parts-catalog__title');
-                        const subcategoriesList = item.querySelector('.subcategories-list');
-                        
-                        // Check if category name matches
-                        let categoryMatches = categoryName.includes(searchTerm);
-                        
-                        // Check if any subcategory matches
-                        let subcategoryMatches = false;
-                        if (subcategoriesList) {
-                            const subcategoryLinks = subcategoriesList.querySelectorAll('.subcategory-link');
-                            subcategoryLinks.forEach(subLink => {
-                                const subName = subLink.querySelector('.subcategory-name').textContent.toLowerCase();
-                                if (subName.includes(searchTerm)) {
-                                    subcategoryMatches = true;
-                                }
-                            });
-                        }
-                        
-                        // Show/hide based on matches
-                        if (categoryMatches || subcategoryMatches) {
-                            item.style.display = 'block';
-                            categoryLink.style.backgroundColor = searchTerm ? '#fff3e0' : '';
-                            
-                            // Expand if search term exists and there are subcategories
-                            if (searchTerm && subcategoriesList && subcategoryMatches) {
-                                item.classList.add('expanded');
-                                subcategoriesList.style.display = 'block';
-                            }
-                        } else {
-                            item.style.display = searchTerm ? 'none' : 'block';
-                        }
-                    });
+            const expandCategoryItem = (item, expanded) => {
+                const toggle = item.querySelector('.category-toggle');
+                item.classList.toggle('is-expanded', expanded);
+                if (toggle) {
+                    toggle.setAttribute('aria-expanded', String(expanded));
+                }
+            };
+
+            const closeSiblingCategories = (currentItem) => {
+                categoryItems.forEach(item => {
+                    if (item !== currentItem) {
+                        expandCategoryItem(item, false);
+                    }
                 });
-            }
-            
-            // Category expansion functionality
-            const categoryLinks = document.querySelectorAll('.cat-links-js');
-            
-            categoryLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
+            };
+
+            document.querySelectorAll('.category-toggle').forEach(toggle => {
+                toggle.addEventListener('click', function() {
                     const parentItem = this.closest('.parts-catalog__items');
-                    const subcategoriesList = parentItem.querySelector('.subcategories-list');
-                    
-                    // If there are no subcategories, redirect to category search
-                    if (!subcategoriesList) {
-                        window.location.href = this.getAttribute('href');
-                        return;
-                    }
-                    
-                    // Toggle expanded state
-                    const isExpanded = parentItem.classList.contains('expanded');
-                    
-                    // Close all other categories
-                    document.querySelectorAll('.parts-catalog__items').forEach(item => {
-                        if (item !== parentItem) {
-                            item.classList.remove('expanded');
-                            const subList = item.querySelector('.subcategories-list');
-                            if (subList) {
-                                subList.style.display = 'none';
-                            }
-                        }
-                    });
-                    
-                    // Toggle current category
-                    if (isExpanded) {
-                        parentItem.classList.remove('expanded');
-                        subcategoriesList.style.display = 'none';
-                    } else {
-                        parentItem.classList.add('expanded');
-                        subcategoriesList.style.display = 'block';
-                    }
+                    const isExpanded = parentItem.classList.contains('is-expanded');
+
+                    closeSiblingCategories(parentItem);
+                    expandCategoryItem(parentItem, !isExpanded);
                 });
+            });
+
+            categoryItems.forEach(item => {
+                if (item.classList.contains('is-active')) {
+                    expandCategoryItem(item, true);
+                }
             });
             
             // Filter checkbox functionality
@@ -1296,16 +1310,7 @@
                     });
                     
                     // Clear search input
-                    if (categorySearchInput) {
-                        categorySearchInput.value = '';
-                    }
-                    
-                    // Show all category items
-                    categoryItems.forEach(item => {
-                        item.style.display = 'block';
-                        const categoryLink = item.querySelector('.parts-catalog__title');
-                        categoryLink.style.backgroundColor = '';
-                    });
+                    categoryItems.forEach(item => expandCategoryItem(item, false));
                     
                     // Reset all select elements
                     const selectElements = document.querySelectorAll('select');
@@ -1344,37 +1349,6 @@
                 }
             }
 
-            // Category filtering functionality
-            const categoryCheckboxes = document.querySelectorAll('.filterCategories');
-            categoryCheckboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    const selectedCategories = Array.from(document.querySelectorAll('.filterCategories:checked'))
-                        .map(cb => cb.value);
-                    
-                    if (selectedCategories.length > 0) {
-                        // Redirect to categories search endpoint
-                        const url = `/search/categories?category=${selectedCategories.join(',')}`;
-                        window.location.href = url;
-                    } else {
-                        // If no categories selected, go back to main shop list
-                        window.location.href = '/shop-list';
-                    }
-                });
-            });
-
-            // Initialize category states based on URL parameters
-            const urlParams = new URLSearchParams(window.location.search);
-            const selectedCategories = urlParams.get('category');
-            
-            if (selectedCategories) {
-                const categoryIds = selectedCategories.split(',');
-                categoryIds.forEach(id => {
-                    const checkbox = document.getElementById('cpc-' + id);
-                    if (checkbox) {
-                        checkbox.checked = true;
-                    }
-                });
-            }
         });
      </script>
 

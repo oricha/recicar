@@ -2,39 +2,34 @@
 
 ## 🚀 Deploy to Dokploy (Recommended)
 
-This app is configured to deploy to Dokploy using Docker images built and pushed via GitHub Actions to Docker Hub.
+This app is configured to deploy to Dokploy using Docker images built and pushed via GitHub Actions to **GitHub Container Registry** (`ghcr.io`).
 
 ### Prerequisites
 
-1. **Docker Hub Account** - Sign up at [hub.docker.com](https://hub.docker.com)
-2. **GitHub Repository** - Your code should be in GitHub
+1. **GitHub Repository** - Your code should be on GitHub
+2. **Actions permissions** - Repo **Settings → Actions → General**: allow **Read and write permissions** (or equivalent so `GITHUB_TOKEN` can push packages)
 3. **Dokploy Instance** - Have Dokploy installed and running
 
 ### Quick Setup
 
-#### 1. Configure Docker Hub
-- Create a repository named `recicar` in Docker Hub
-- Generate an access token: **Account Settings → Security → Access Tokens**
+#### 1. GitHub (no Docker Hub)
+- Ensure workflow permissions allow publishing **Packages** (see Prerequisites).
+- The workflow uses `GITHUB_TOKEN`; you do **not** need `DOCKERHUB_*` secrets for the default setup.
 
-#### 2. Configure GitHub Secrets
-Go to **GitHub Repo → Settings → Secrets → Actions** and add:
-- `DOCKERHUB_USERNAME` - Your Docker Hub username
-- `DOCKERHUB_TOKEN` - Your Docker Hub access token
-
-#### 3. Push to GitHub
+#### 2. Push to GitHub
 ```bash
 git push origin main
 ```
 
 The GitHub Actions workflow will automatically:
 - Build the Docker image
-- Push it to Docker Hub with tags: `latest` and `main-<commit-sha>`
+- Push it to **GHCR** as `ghcr.io/<owner-lowercase>/<repo-lowercase>:latest` and `main-<commit-sha>`
 
-#### 4. Configure Dokploy
+#### 3. Configure Dokploy
 
 **Application Settings:**
 - **Source Type**: Docker
-- **Docker Image**: `YOUR_DOCKERHUB_USERNAME/recicar:latest`
+- **Docker Image**: `ghcr.io/your-github-org-or-user/recicar:latest` (use your real GitHub `owner/repo` path in **lowercase**)
 
 **Environment Variables:**
 ```env
@@ -71,21 +66,18 @@ SERVER_PORT=8080
 }
 ```
 
-#### 5. Deploy
+#### 4. Deploy
 - Click **Deploy** in Dokploy
 - Access your application via the configured domain
 
 ### Auto-Deploy Setup
 
-**Using Docker Hub Webhook:**
-1. In Dokploy: **Application → Deployments → Copy Webhook URL**
-2. In Docker Hub: **Repository → Webhooks → Create Webhook**
-3. Paste the Webhook URL and save
+GHCR does not provide Docker Hub-style webhooks. Typical options:
 
-Now every push to `main` will automatically:
-1. Build and push Docker image via GitHub Actions
-2. Trigger Dokploy deployment via webhook
-3. Deploy with zero downtime and automatic rollback on failure
+1. **Dokploy deploy webhook / API** — call it from an extra step at the end of `.github/workflows/deploy.yml` (store the URL or API key as GitHub secrets), or  
+2. **Manual / scheduled** redeploy in Dokploy after a successful Actions run.
+
+See `DEPLOYMENT.md` for an example `curl` step using `DOKPLOY_DEPLOY_HOOK_URL`.
 
 ### 📚 Full Documentation
 
@@ -114,10 +106,10 @@ docker-compose up -d postgres
 # Run with dev profile (local PostgreSQL)
 ./gradlew runLocal
 
-# Run with test profile (Neon DB from .env)
+# Run with test profile (PostgreSQL test desde .env TEST_*; en Dokploy usa DATABASE_* hacia el Postgres del stack)
 ./gradlew runTest
 
-# Run with prod profile (Neon DB from .env)
+# Run with prod profile (PostgreSQL prod desde .env PROD_*)
 ./gradlew runProd
 ```
 
@@ -215,6 +207,18 @@ kill -9 <PID>
 - Check credentials in `.env` or environment variables
 - Ensure database exists
 - Check firewall/network settings
+
+### `permission denied for schema public` (Flyway / PostgreSQL 15+)
+
+El usuario de la app debe poder crear tablas en el esquema `public`. Como `postgres`:
+
+```sql
+\c marketplace_dev
+GRANT CREATE, USAGE ON SCHEMA public TO marketplace_user;
+ALTER SCHEMA public OWNER TO marketplace_user;
+```
+
+Script de referencia: `docs/postgres-local-dev-setup.sql`
 
 ### Build Issues
 ```bash

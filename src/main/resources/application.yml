@@ -32,7 +32,9 @@ spring:
       on-profile: dev
   
   datasource:
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/marketplace_dev}
+    # currentSchema=recicar: en PostgreSQL 15+ el rol suele no tener CREATE en "public";
+    # un esquema propio se crea con Flyway (create-schemas) si el usuario es dueño de la BD.
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/marketplace_dev?currentSchema=recicar}
     username: ${DATABASE_USERNAME:marketplace_user}
     password: ${DATABASE_PASSWORD:marketplace_pass}
     driver-class-name: org.postgresql.Driver
@@ -45,6 +47,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+        default_schema: recicar
         
   flyway:
     enabled: true
@@ -52,6 +55,10 @@ spring:
     baseline-on-migrate: true
     repair-on-migrate: true
     clean-disabled: false
+    create-schemas: true
+    default-schema: recicar
+    schemas:
+      - recicar
     
   thymeleaf:
     cache: false
@@ -117,7 +124,7 @@ spring:
       on-profile: remote
 
   datasource:
-    url: jdbc:postgresql://${DATABASE_HOST:localhost}:${DATABASE_PORT:5432}/${DATABASE_NAME:marketplace_dev}
+    url: jdbc:postgresql://${DATABASE_HOST:localhost}:${DATABASE_PORT:5432}/${DATABASE_NAME:marketplace_dev}?currentSchema=recicar
     username: ${DATABASE_USERNAME:marketplace_user}
     password: ${DATABASE_PASSWORD:marketplace_pass}
     driver-class-name: org.postgresql.Driver
@@ -132,12 +139,17 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_schema: recicar
 
   flyway:
     enabled: true
     locations: classpath:db/migration
     baseline-on-migrate: true
     repair-on-migrate: true
+    create-schemas: true
+    default-schema: recicar
+    schemas:
+      - recicar
 
   thymeleaf:
     cache: false
@@ -189,7 +201,7 @@ logging:
   level:
     com.recicar.marketplace: INFO
 
-# Neon DB configuration - SSL is handled automatically by Neon
+# Test: PostgreSQL en la misma red que la app (p. ej. servicio Dokploy / Docker). Sin SSL interno suele bastar jdbc:postgresql://host:5432/db
 
 ---
 spring:
@@ -235,7 +247,7 @@ spring:
   security:
     require-ssl: false  # Northflank handles SSL termination
 
-# Neon DB configuration - SSL is handled automatically by Neon
+# Prod: PostgreSQL gestionado; si el proveedor exige TLS, añade sslmode=require (u otros parámetros) en DATABASE_URL
 
 server:
   port: ${SERVER_PORT:8080}

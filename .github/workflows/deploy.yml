@@ -1,44 +1,111 @@
-name: Build and Push Docker Image to Docker Hub
+name: CI and Deploy to GHCR
 
 on:
   push:
     branches: ["main"]
+  pull_request:
+    branches: ["main", "develop"]
+
+env:
+  REGISTRY: ghcr.io
+  # Postgres efímero para CI (mismo patrón que test en Dokploy: PostgreSQL en la misma red Docker)
+  CI_POSTGRES_USER: recicar_test
+  CI_POSTGRES_PASSWORD: recicar_test
+  CI_POSTGRES_DB: marketplace_test
 
 jobs:
-  build-and-push-dockerfile-image:
+  verify:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: ${{ env.CI_POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.CI_POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ env.CI_POSTGRES_DB }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ${{ env.CI_POSTGRES_USER }} -d ${{ env.CI_POSTGRES_DB }}"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      TEST_DATABASE_URL: jdbc:postgresql://localhost:5432/${{ env.CI_POSTGRES_DB }}
+      TEST_DATABASE_USERNAME: ${{ env.CI_POSTGRES_USER }}
+      TEST_DATABASE_PASSWORD: ${{ env.CI_POSTGRES_PASSWORD }}
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
-          java-version: '21'
-          distribution: 'temurin'
-          cache: 'gradle'
+          java-version: "21"
+          distribution: "temurin"
+          cache: "gradle"
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
+      - name: Flyway migrate (test PostgreSQL)
+        run: ./gradlew flywayMigrateTest --no-daemon
+
+      - name: Run tests (PostgreSQL)
+        env:
+          SPRING_DATASOURCE_URL: ${{ env.TEST_DATABASE_URL }}
+          SPRING_DATASOURCE_USERNAME: ${{ env.TEST_DATABASE_USERNAME }}
+          SPRING_DATASOURCE_PASSWORD: ${{ env.TEST_DATABASE_PASSWORD }}
+          SPRING_FLYWAY_ENABLED: "true"
+          SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+        run: ./gradlew test --no-daemon
+
+  build-and-push-dockerfile-image:
+    needs: verify
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          java-version: "21"
+          distribution: "temurin"
+          cache: "gradle"
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Image name (GHCR requires lowercase)
+        id: image
+        run: echo "full_name=${REGISTRY}/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract metadata for Docker
         id: meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
-          images: ${{ secrets.DOCKERHUB_USERNAME }}/recicar
+          images: ${{ steps.image.outputs.full_name }}
           tags: |
             type=raw,value=latest
             type=sha,prefix={{branch}}-
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
@@ -46,4 +113,3 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64
-
