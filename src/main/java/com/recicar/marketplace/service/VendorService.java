@@ -19,6 +19,8 @@ public interface VendorService {
 
     Optional<Vendor> findById(Long vendorId);
 
+    Optional<Vendor> findByUserId(Long userId);
+
     List<Vendor> findAllApproved();
 
     void updateProfile(Long vendorId, ProfileUpdateRequest request);

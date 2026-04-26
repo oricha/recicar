@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html class="no-js" lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/new-base :: html}">
+<head>
+    <th:block th:fragment="head-extra">
+        <title th:text="${pageTitle} + ' - ReciCar'">Centro de ayuda</title>
+    </th:block>
+</head>
+<body>
+<div th:fragment="content">
+    <section class="py-5 support_help">
+        <div class="container">
+            <h1 class="text-center mb-2" th:text="${pageTitle}">Centro de ayuda</h1>
+            <p class="text-center text-muted mb-5">
+                Guías, preguntas frecuentes, blog y formulario de contacto.
+            </p>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card h-100 border shadow-sm">
+                        <div class="card-body d-flex flex-column">
+                            <h2 class="h5 card-title">Preguntas frecuentes</h2>
+                            <p class="card-text text-muted small">Respuestas por tema: pedidos, envíos, devoluciones y cuenta.</p>
+                            <a class="mt-auto btn btn-outline-primary" th:href="@{/faq}">Ver FAQs</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border shadow-sm">
+                        <div class="card-body d-flex flex-column">
+                            <h2 class="h5 card-title">Blog</h2>
+                            <p class="card-text text-muted small">Consejos para comprar recambio con confianza.</p>
+                            <a class="mt-auto btn btn-outline-primary" th:href="@{/blog}">Ir al blog</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border shadow-sm">
+                        <div class="card-body d-flex flex-column">
+                            <h2 class="h5 card-title">Contacto</h2>
+                            <p class="card-text text-muted small">Escribe al equipo. También puedes usar el correo de soporte.</p>
+                            <a class="mt-auto btn btn-primary" th:href="@{/contact}">Formulario de contacto</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="alert alert-light border mt-5 text-center mb-0">
+                <span class="me-1">Correo de soporte:</span>
+                <a th:href="|mailto:${supportEmail}|" th:text="${supportEmail}">email</a>
+            </div>
+        </div>
+    </section>
+</div>
+</body>
+</html>

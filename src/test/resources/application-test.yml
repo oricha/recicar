@@ -1,3 +1,4 @@
+# Flyway off + H2: slices like @DataJpaTest can use ddl-auto. Full SQL migrations (e.g. GIN) need PostgreSQL — see integration tests.
 spring:
   datasource:
     url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL

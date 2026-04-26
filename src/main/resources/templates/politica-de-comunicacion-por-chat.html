@@ -1,0 +1,35 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" class="no-js" lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Reglas de uso del chat con vendedores en ReciCar.">
+    <title th:text="${pageTitle} + ' | ReciCar'">Política de chat | ReciCar</title>
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/assets/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+</head>
+<body>
+<th:block th:replace="fragments/_header :: header"></th:block>
+<th:block th:replace="fragments/_offcanvasmenu :: offcanvasmenu"></th:block>
+<th:block th:replace="~{fragments/_legal_hero_breadcrumb :: legalBreadcrumb (currentLabel=${pageTitle})}"></th:block>
+<section class="main_content_area py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h1 th:text="${pageTitle}">Política de comunicación por chat</h1>
+                <h2>Objeto</h2>
+                <p>El <strong>chat en ReciCar</strong> sirve para coordinar dudas sobre la pieza, el envío o el pedido con el vendedor. No sustituye el registro de pedido ni constituye, por sí solo, aceptación contractual de condiciones adicionales.</p>
+                <h2>Conducta</h2>
+                <p>Prohibimos lenguaje ofensivo, acoso, spam, enlaces a fraudes, datos de terceros sin consentimiento o intento de concretar el pago fuera de la plataforma con fines que evaden las políticas o la ley. Podemos restringir el acceso, moderar o eliminar contenidos e informar a las autoridades si procede.</p>
+                <h2>Contenido y trazabilidad</h2>
+                <p>Los mensajes pueden conservarse mientras dure la relación comercial y plazos legales, para <strong>resolución de incidencias</strong> o requerimientos de las autoridades. Tratamiento detallado en la <a th:href="@{/politica-de-privacidad}">política de privacidad</a>.</p>
+                <h2>Problemas</h2>
+                <p>Ante abuso o riesgo, contacta con <a th:href="@{/contact}">atención al cliente</a> indicando el hilo o el vendedor y lo ocurrido.</p>
+            </div>
+        </div>
+    </div>
+</section>
+<th:block th:replace="fragments/_footer :: footer"></th:block>
+</body>
+</html>

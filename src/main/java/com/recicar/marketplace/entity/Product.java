@@ -83,6 +83,9 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<VehicleCompatibility> compatibilities = new ArrayList<>();
 
+    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private VehicleInfo vehicleInfo;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
@@ -248,6 +251,14 @@ public class Product {
 
     public void setCompatibilities(List<VehicleCompatibility> compatibilities) {
         this.compatibilities = compatibilities;
+    }
+
+    public VehicleInfo getVehicleInfo() {
+        return vehicleInfo;
+    }
+
+    public void setVehicleInfo(VehicleInfo vehicleInfo) {
+        this.vehicleInfo = vehicleInfo;
     }
 
     // Helper methods

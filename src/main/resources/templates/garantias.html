@@ -1,0 +1,36 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" class="no-js" lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Garantías y conformidad de piezas en el marketplace ReciCar.">
+    <title th:text="${pageTitle} + ' | ReciCar'">Garantías | ReciCar</title>
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/assets/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+</head>
+<body>
+<th:block th:replace="fragments/_header :: header"></th:block>
+<th:block th:replace="fragments/_offcanvasmenu :: offcanvasmenu"></th:block>
+<th:block th:replace="~{fragments/_legal_hero_breadcrumb :: legalBreadcrumb (currentLabel=${pageTitle})}"></th:block>
+<section class="main_content_area py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h1 th:text="${pageTitle}">Garantías</h1>
+                <p class="lead">Transparencia sobre lo que cubre el marketplace y lo que aplica a cada vendedor.</p>
+                <h2>Garantía legal (consumidor)</h2>
+                <p>Como consumidor en la UE, en piezas con defectos de <strong>conformidad</strong> (distinto del desgaste natural o daños posteriores a la entrega) puedes exigir reparación, sustitución, rebaja o resolución según plazos y condiciones del marco legal de consumo aplicable al vendedor y al canal de venta. La responsabilidad frente a ti corresponde al <strong>vendedor</strong> del producto; ReciCar puede facilitar la mediación o los datos de contacto.</p>
+                <h2>Devolución por desistimiento</h2>
+                <p>El derecho a <strong>desistir en 14 días</strong> a distancia se describe en la <a th:href="@{/politica-de-devolucion}">política de devolución</a>, con las salvedades legales (p. ej. pieza personalizada o montada indebidamente, cuando prospere en cada caso).</p>
+                <h2>Estado y descripción (usado / reciclado)</h2>
+                <p>En piezas de <strong>desguace o usadas</strong>, el estado (kilometraje, marcas, referencias) es el indicado en la ficha. Asegúrate de la compatibilidad (vehículo, motor, año) antes de instalar. Las fotos o textos de la ficha vinculan al vendedor; reclama con fundamento en su descripción y en el pedido realizado a través de ReciCar.</p>
+                <h2>Procedimiento de reclamación</h2>
+                <p>Abre una incidencia o contacta con <a th:href="@{/contact}">soporte</a> con número de pedido, fotos del defecto y, si aplica, informe de taller, para agilizar la mediación con el vendedor.</p>
+            </div>
+        </div>
+    </div>
+</section>
+<th:block th:replace="fragments/_footer :: footer"></th:block>
+</body>
+</html>

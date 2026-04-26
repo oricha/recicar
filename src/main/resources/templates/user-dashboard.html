@@ -1,0 +1,74 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" class="no-js" lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ReciCar - Mi panel</title>
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/assets/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+</head>
+<body>
+<th:block th:replace="fragments/_header :: header"></th:block>
+<th:block th:replace="fragments/_offcanvasmenu :: offcanvasmenu"></th:block>
+
+<div class="breadcrumbs_area">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="breadcrumb_content">
+                    <ul>
+                        <li><a th:href="@{/}">Inicio</a></li>
+                        <li>Mi panel</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="main_content_area py-5">
+    <div class="container">
+        <h2 class="mb-4" th:text="'Hola, ' + ${user.firstName} + ' ' + ${user.lastName}">Hola</h2>
+        <p class="text-muted mb-4" th:text="${user.email}">email</p>
+        <div class="row mb-4">
+            <div class="col-md-4 mb-2">
+                <a class="btn btn-primary" th:href="@{/user-dashboard/chat}">Mensajería con vendedores</a>
+            </div>
+            <div class="col-md-4 mb-2">
+                <a class="btn btn-outline-primary" th:href="@{/wishlist}">Mi lista de deseos</a>
+            </div>
+            <div class="col-md-4 mb-2">
+                <a class="btn btn-outline-secondary" th:href="@{/my-account}">Cuenta clásica</a>
+            </div>
+        </div>
+        <p class="small text-muted">Búsquedas guardadas: <code>GET/POST /api/v1/user/saved-searches</code> (ya existente).</p>
+
+        <h3 class="mb-3">Pedidos recientes</h3>
+        <div class="table-responsive" th:if="${orders != null and !orders.isEmpty()}">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Nº</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Total</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="o : ${orders}">
+                    <td th:text="${o.orderNumber}">—</td>
+                    <td th:text="${#temporals.format(o.createdAt, 'dd/MM/yyyy HH:mm')}">—</td>
+                    <td th:text="${o.status}">—</td>
+                    <td th:text="${o.totalAmount} + ' €'">—</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <p th:if="${orders == null or orders.isEmpty()}" class="text-muted">Aún no tienes pedidos.</p>
+    </div>
+</section>
+
+<th:block th:replace="fragments/_footer :: footer"></th:block>
+</body>
+</html>

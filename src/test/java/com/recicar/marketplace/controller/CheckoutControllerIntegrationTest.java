@@ -1,21 +1,22 @@
 package com.recicar.marketplace.controller;
 
+import com.recicar.marketplace.service.CartService;
+import com.recicar.marketplace.service.CartPricingService;
+import com.recicar.marketplace.service.OrderService;
+import com.recicar.marketplace.repository.ProductRepository;
+import com.recicar.marketplace.repository.UserRepository;
 import com.recicar.marketplace.dto.CartDto;
-import com.recicar.marketplace.dto.CheckoutForm;
-import com.recicar.marketplace.dto.OrderItemRequest;
 import com.recicar.marketplace.entity.Order;
 import com.recicar.marketplace.entity.Product;
 import com.recicar.marketplace.entity.User;
-import com.recicar.marketplace.repository.ProductRepository;
-import com.recicar.marketplace.repository.UserRepository;
-import com.recicar.marketplace.service.CartService;
-import com.recicar.marketplace.service.OrderService;
+import com.recicar.marketplace.dto.OrderItemRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -30,6 +31,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
@@ -53,6 +55,9 @@ public class CheckoutControllerIntegrationTest {
 
     @MockBean
     private OrderService orderService;
+
+    @MockBean
+    private CartPricingService cartPricingService;
 
     private User mockUser;
     private Product mockProduct;
@@ -86,72 +91,48 @@ public class CheckoutControllerIntegrationTest {
         when(cartService.calculateShippingCost(anyLong(), anyString(), anyString(), anyString())).thenReturn(new BigDecimal("5.00"));
         doNothing().when(cartService).validateCart(anyLong());
         doNothing().when(cartService).clearCart(anyLong());
-        when(orderService.convertCartItemsToOrderItems(any())).thenReturn(List.of());
+        var line = new OrderItemRequest();
+        line.setProductId(1L);
+        line.setQuantity(1);
+        when(orderService.convertCartItemsToOrderItems(any())).thenReturn(List.of(line));
         when(orderService.createOrder(any())).thenReturn(mockOrder);
     }
 
     @Test
     @WithMockUser(username = "test@example.com", roles = {"CUSTOMER"})
-    void testCheckoutPage() throws Exception {
+    void checkoutRootRedirectsToShipping() throws Exception {
         mockMvc.perform(get("/checkout"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("checkout"));
-    }
-
-    @Test
-    @WithMockUser(username = "test@example.com", roles = {"CUSTOMER"})
-    void testPlaceOrder() throws Exception {
-        CheckoutForm checkoutForm = new CheckoutForm();
-        checkoutForm.setFirstName("John");
-        checkoutForm.setLastName("Doe");
-        checkoutForm.setAddress("123 Main St");
-        checkoutForm.setCity("Anytown");
-        checkoutForm.setState("CA");
-        checkoutForm.setZipCode("12345");
-        checkoutForm.setCountry("USA");
-        checkoutForm.setPaymentMethod("creditCard");
-
-        mockMvc.perform(post("/checkout")
-                        .param("firstName", checkoutForm.getFirstName())
-                        .param("lastName", checkoutForm.getLastName())
-                        .param("address", checkoutForm.getAddress())
-                        .param("city", checkoutForm.getCity())
-                        .param("state", checkoutForm.getState())
-                        .param("zipCode", checkoutForm.getZipCode())
-                        .param("country", checkoutForm.getCountry())
-                        .param("paymentMethod", checkoutForm.getPaymentMethod()))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrlPattern("/orders/confirmation?orderNumber=*"));
+                .andExpect(redirectedUrl("/checkout/shipping"));
     }
 
     @Test
     @WithMockUser(username = "test@example.com", roles = {"CUSTOMER"})
-    void testCustomerPurchaseFlow() throws Exception {
-        // 1. Proceed to checkout page
-        mockMvc.perform(get("/checkout"))
+    void testShippingPage() throws Exception {
+        mockMvc.perform(get("/checkout/shipping"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("checkout"));
+                .andExpect(view().name("checkout-shipping"));
+    }
 
-        // 2. Place order
-        CheckoutForm checkoutForm = new CheckoutForm();
-        checkoutForm.setFirstName("John");
-        checkoutForm.setLastName("Doe");
-        checkoutForm.setAddress("123 Main St");
-        checkoutForm.setCity("Anytown");
-        checkoutForm.setState("CA");
-        checkoutForm.setZipCode("12345");
-        checkoutForm.setCountry("USA");
-        checkoutForm.setPaymentMethod("creditCard");
+    @Test
+    @WithMockUser(username = "test@example.com", roles = {"CUSTOMER"})
+    void testPlaceOrderFlow() throws Exception {
+        MockHttpSession session = new MockHttpSession();
+        mockMvc.perform(post("/checkout/shipping")
+                        .param("firstName", "John")
+                        .param("lastName", "Doe")
+                        .param("address", "123 Main St")
+                        .param("city", "Madrid")
+                        .param("state", "M")
+                        .param("zipCode", "28001")
+                        .param("country", "ES")
+                        .session(session))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/checkout/payment"));
 
-        mockMvc.perform(post("/checkout")
-                        .param("firstName", checkoutForm.getFirstName())
-                        .param("lastName", checkoutForm.getLastName())
-                        .param("address", checkoutForm.getAddress())
-                        .param("city", checkoutForm.getCity())
-                        .param("state", checkoutForm.getState())
-                        .param("zipCode", checkoutForm.getZipCode())
-                        .param("country", checkoutForm.getCountry())
-                        .param("paymentMethod", checkoutForm.getPaymentMethod()))
+        mockMvc.perform(post("/checkout/confirm")
+                        .param("paymentMethod", "VISA")
+                        .session(session))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrlPattern("/orders/confirmation?orderNumber=*"));
     }

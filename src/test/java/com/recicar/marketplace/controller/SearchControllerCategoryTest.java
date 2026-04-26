@@ -4,6 +4,7 @@ import com.recicar.marketplace.entity.Category;
 import com.recicar.marketplace.entity.Product;
 import com.recicar.marketplace.service.CategoryService;
 import com.recicar.marketplace.service.ProductService;
+import com.recicar.marketplace.service.SearchService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -37,6 +38,9 @@ class SearchControllerCategoryTest {
 
     @MockBean
     private CategoryService categoryService;
+
+    @MockBean
+    private SearchService searchService;
 
     @Test
     public void testSearchByCategory_Success() throws Exception {

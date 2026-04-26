@@ -2,8 +2,6 @@ package com.recicar.marketplace.controller;
 
 import com.recicar.marketplace.dto.UserRegistrationDto;
 import com.recicar.marketplace.dto.LoginForm;
-import com.recicar.marketplace.entity.User;
-import com.recicar.marketplace.service.CustomUserDetailsService;
 import com.recicar.marketplace.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -12,7 +10,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -26,27 +23,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class AuthController {
-    //TODO: Remove this before production
-    /**
-     * 
-     * TEMPORARY — remove or set to {@code false} before production.
-     * When {@code true}, POST /login ignores the submitted email/password and always
-     * establishes a session as the admin user ({@code admin@recicar.com}).
-     */
-    private static final boolean TEMP_FORCE_ADMIN_LOGIN = true;
-
-    private static final String TEMP_FORCE_LOGIN_AS_EMAIL = "admin@recicar.com";
-
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
-    private final CustomUserDetailsService userDetailsService;
 
     public AuthController(UserService userService,
-                          AuthenticationManager authenticationManager,
-                          CustomUserDetailsService userDetailsService) {
+                          AuthenticationManager authenticationManager) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
-        this.userDetailsService = userDetailsService;
     }
 
     @GetMapping("/login")
@@ -70,22 +53,9 @@ public class AuthController {
                                RedirectAttributes redirectAttributes,
                                HttpServletRequest request) {
         try {
-            // UsernamePasswordAuthenticationToken authRequest =
-            //         new UsernamePasswordAuthenticationToken(loginForm.getEmail(), loginForm.getPassword());
-
-            // Authentication authentication = authenticationManager.authenticate(authRequest);
-            Authentication authentication;
-            if (TEMP_FORCE_ADMIN_LOGIN) {
-                UserDetails admin = userDetailsService.loadUserByUsername(TEMP_FORCE_LOGIN_AS_EMAIL);
-                authentication = new UsernamePasswordAuthenticationToken(
-                        admin,
-                        null,
-                        admin.getAuthorities());
-            } else {
-                UsernamePasswordAuthenticationToken authRequest =
-                        new UsernamePasswordAuthenticationToken(loginForm.getEmail(), loginForm.getPassword());
-                authentication = authenticationManager.authenticate(authRequest);
-            }
+            UsernamePasswordAuthenticationToken authRequest =
+                    new UsernamePasswordAuthenticationToken(loginForm.getEmail(), loginForm.getPassword());
+            Authentication authentication = authenticationManager.authenticate(authRequest);
 
             // Create security context and session
             SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
@@ -136,7 +106,7 @@ public class AuthController {
         }
 
         try {
-            User user = userService.registerUser(registrationDto);
+            userService.registerUser(registrationDto);
             redirectAttributes.addFlashAttribute("message",
                 "Registration successful! You can now sign in.");
             return "redirect:/login";

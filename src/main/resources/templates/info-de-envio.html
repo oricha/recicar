@@ -1,0 +1,36 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" class="no-js" lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Cómo enviamos tu pedido en ReciCar: plazos, transportistas, UE y DPD.">
+    <title th:text="${pageTitle} + ' | ReciCar'">Información de envío | ReciCar</title>
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/assets/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+</head>
+<body>
+<th:block th:replace="fragments/_header :: header"></th:block>
+<th:block th:replace="fragments/_offcanvasmenu :: offcanvasmenu"></th:block>
+<th:block th:replace="~{fragments/_legal_hero_breadcrumb :: legalBreadcrumb (currentLabel=${pageTitle})}"></th:block>
+<section class="main_content_area py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h1 th:text="${pageTitle}">Información de envío</h1>
+                <p class="lead">Transparencia en plazos, coste y compañía de transporte.</p>
+                <h2>Transporte y seguimiento</h2>
+                <p>Los envíos a clientes en la Unión Europea se realizan, cuando corresponda, mediante operadores de paquetería (por ejemplo, <strong>DPD</strong> y otros) que permiten trazabilidad. Recibirás la información de seguimiento cuando el vendedor o el transportista la publique.</p>
+                <h2>Coste de envío en el pedido</h2>
+                <p>El <strong>importe de envío</strong> se calcula en el checkout en función de tu dirección, el peso/volumen del envío y las tarifas vigentes en ese momento. El desglose aparece antes de que confirmes el pago: subtotal (IVA excl. si aplica), tarifa de servicio, IVA, envío y total.</p>
+                <h2>Plazos</h2>
+                <p>Los <strong>plazos de entrega</strong> indicados en la ficha del producto o en el resumen de pedido son estimaciones; pueden variar por disponibilidad del desguace, festividades locales o incidencias del transporte.</p>
+                <h2>Incidencias</h2>
+                <p>Si un envío se retrasa o se pierde, abre un contacto a través de <a th:href="@{/contact}">atención al cliente</a> indicando tu número de pedido. Coordinaremos con el vendedor y el operador logístico.</p>
+            </div>
+        </div>
+    </div>
+</section>
+<th:block th:replace="fragments/_footer :: footer"></th:block>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" class="no-js" lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Cómo ReciCar trata tus datos personales: finalidades, base legal, derechos y contacto.">
+    <title th:text="${pageTitle} + ' | ReciCar'">Política de privacidad | ReciCar</title>
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/assets/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+</head>
+<body>
+<th:block th:replace="fragments/_header :: header"></th:block>
+<th:block th:replace="fragments/_offcanvasmenu :: offcanvasmenu"></th:block>
+<th:block th:replace="~{fragments/_legal_hero_breadcrumb :: legalBreadcrumb (currentLabel=${pageTitle})}"></th:block>
+<section class="main_content_area py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h1 th:text="${pageTitle}">Política de privacidad</h1>
+                <p class="text-muted">Texto informativo adaptado a marketplace. En producción, revisa con asesoramiento jurídico (RGPD y LOPDGDD en España, si aplica).</p>
+                <h2>Responsable</h2>
+                <p>El responsable del tratamiento de los datos personales en relación con el servicio de la plataforma es la entidad que figure en el Aviso legal / datos registrales de ReciCar (datos a completar en el pie de sitio o página “empresa”).</p>
+                <h2>Datos que tratamos y finalidad</h2>
+                <p>Tratamos, entre otros, los datos de <strong>registro</strong> (identificación, contacto, contraseña cifrada), de <strong>pedidos y facturación</strong>, de <strong>navegación y cookies técnicas</strong> (cuando apliquen) y, si las usas, de <strong>mensajería con vendedores</strong> para poner en contacto a comprador y vendedor. La base puede ser <strong>ejecución de contrato</strong>, <strong>interés legítimo</strong> (seguridad, mejora del servicio) o <strong>consentimiento</strong> (p. ej. marketing), según el caso y lo que se implemente en la plataforma.</p>
+                <h2>Conservación</h2>
+                <p>Conservamos los datos el tiempo necesario para la finalidad (p. ej. cuatro años u otro plazo exigible para comercio y fiscalidad, según normativa) y, posteriormente, bloqueo o supresión.</p>
+                <h2>Derechos</h2>
+                <p>Puedes ejercer <strong>acceso, rectificación, supresión, oposición, limitación, portabilidad y retirar el consentimiento</strong> (cuando proceda) escribiendo al correo o canal de privacidad indicado por ReciCar, adjuntando copia de documento de identidad si es necesario. También puedes presentar reclamación ante la autoridad de control (en España, la AEPD).</p>
+                <h2>Encargados y transferencias</h2>
+                <p>Podemos contar con proveedores (hosting, email, pago) que tratan datos por nuestra cuenta, con cláusulas contractuales adecuadas. Las transferencias fuera del EEE, si existieran, se realizarán con garantías legales (decisiones de adecuación, cláusulas tipo, etc.).</p>
+            </div>
+        </div>
+    </div>
+</section>
+<th:block th:replace="fragments/_footer :: footer"></th:block>
+</body>
+</html>

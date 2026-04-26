@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html class="no-js" lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/new-base :: html}">
+<head>
+    <th:block th:fragment="head-extra">
+        <title th:text="${pageTitle} + ' - ReciCar'">Artículo</title>
+        <meta name="description" th:content="${post.summary}" th:if="${post.summary != null}">
+    </th:block>
+</head>
+<body>
+<div th:fragment="content">
+    <article class="py-5 support_blog_post">
+        <div class="container" style="max-width: 760px;">
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a th:href="@{/}">Inicio</a></li>
+                    <li class="breadcrumb-item"><a th:href="@{/blog}">Blog</a></li>
+                    <li class="breadcrumb-item active" aria-current="page" th:text="${#strings.abbreviate(post.title, 48)}">Artículo</li>
+                </ol>
+            </nav>
+            <header class="mb-4">
+                <time class="text-muted" th:text="${#temporals.format(post.publishedAt, 'd MMMM yyyy')}">Fecha</time>
+                <h1 class="h2 mt-2" th:text="${post.title}">Título</h1>
+                <p class="lead text-muted" th:if="${post.summary != null}" th:text="${post.summary}">Resumen</p>
+            </header>
+            <div class="article_body" th:utext="${post.body}">
+                Cuerpo HTML
+            </div>
+            <p class="mt-5 mb-0">
+                <a th:href="@{/blog}">← Volver al blog</a>
+            </p>
+        </div>
+    </article>
+</div>
+</body>
+</html>

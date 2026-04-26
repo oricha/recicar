@@ -1,0 +1,34 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" class="no-js" lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Métodos de pago aceptados y seguridad en ReciCar.">
+    <title th:text="${pageTitle} + ' | ReciCar'">Información de pago | ReciCar</title>
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/assets/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+</head>
+<body>
+<th:block th:replace="fragments/_header :: header"></th:block>
+<th:block th:replace="fragments/_offcanvasmenu :: offcanvasmenu"></th:block>
+<th:block th:replace="~{fragments/_legal_hero_breadcrumb :: legalBreadcrumb (currentLabel=${pageTitle})}"></th:block>
+<section class="main_content_area py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h1 th:text="${pageTitle}">Información de pago</h1>
+                <p class="lead">Cómo pagas y cómo protegemos tus datos de pago.</p>
+                <h2>Métodos disponibles en checkout</h2>
+                <p>En la confirmación de pedido puedes elegir, según la configuración activa, entre: <strong>PayPal</strong>, tarjeta (Visa, Mastercard, Maestro), <strong>Paysera</strong> o <strong>transferencia bancaria</strong>. La disponibilidad exacta se muestra en el paso de pago.</p>
+                <h2>Seguridad</h2>
+                <p>Los datos bancarios o de tarjeta <strong>no se almacenan en nuestros servidores</strong> cuando el cobro lo gestiona una pasarela (PSP) certificada. Si pagas por transferencia, el importe y la referencia indicados en el pedido deben coincidir con lo abonado.</p>
+                <h2>Cobro y confirmación</h2>
+                <p>En métodos inmediatamente confirmados, el pedido pasa a procesamiento. En <strong>transferencia</strong>, el pedido puede quedar en estado pendiente hasta comprobar el abono, según nuestro procedimiento de conciliación.</p>
+            </div>
+        </div>
+    </div>
+</section>
+<th:block th:replace="fragments/_footer :: footer"></th:block>
+</body>
+</html>

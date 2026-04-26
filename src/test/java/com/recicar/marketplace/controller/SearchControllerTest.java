@@ -4,16 +4,20 @@ import com.recicar.marketplace.entity.Category;
 import com.recicar.marketplace.entity.Product;
 import com.recicar.marketplace.service.CategoryService;
 import com.recicar.marketplace.service.ProductService;
+import com.recicar.marketplace.service.SearchService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
 
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -30,6 +34,9 @@ class SearchControllerTest {
 
     @MockBean
     private CategoryService categoryService;
+
+    @MockBean
+    private SearchService searchService;
 
     @Test
     public void testSearchByPartNumber() throws Exception {
@@ -72,6 +79,20 @@ class SearchControllerTest {
                 .andExpect(view().name("shop-list"))
                 .andExpect(model().attributeExists("products"))
                 .andExpect(model().attribute("searchQuery", "54321"));
+    }
+
+    @Test
+    public void searchByBrandModel_delegatesToSearchService() throws Exception {
+        when(searchService.searchAdvanced(anyString(), anyString(), anyString(), isNull(), isNull(), isNull(), isNull(), isNull(), any(Pageable.class)))
+                .thenReturn(new org.springframework.data.domain.PageImpl<>(Collections.emptyList(), PageRequest.of(0, 12), 0));
+        when(categoryService.findRootCategories()).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get("/search").param("brand", "Audi").param("model", "A4"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("shop-list"))
+                .andExpect(model().attribute("searchType", "advancedVehicle"));
+
+        verify(searchService).searchAdvanced(eq(""), eq("Audi"), eq("A4"), isNull(), isNull(), isNull(), isNull(), isNull(), any(Pageable.class));
     }
 
     @Test

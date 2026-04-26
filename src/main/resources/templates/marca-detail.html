@@ -1,0 +1,50 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" class="no-js" lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${pageTitle}">Marca — ReciCar</title>
+    <link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.ico">
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/font.awesome.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<th:block th:replace="fragments/_header :: header"></th:block>
+<th:block th:replace="fragments/_offcanvasmenu :: offcanvasmenu"></th:block>
+
+<div class="breadcrumbs_area">
+    <div class="container">
+        <div class="breadcrumb_content">
+            <ul>
+                <li><a href="/">Inicio</a></li>
+                <li><a th:href="@{/marcas}">Marcas</a></li>
+                <li th:text="${brand.name}">Marca</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="container py-4">
+    <h1 th:text="${brand.name}">Marca</h1>
+    <p class="text-muted" th:if="${brand.country != null}" th:text="${brand.country}"></p>
+    <h2 class="h4 mt-4">Modelos</h2>
+    <ul class="list-group" th:if="${!models.isEmpty()}">
+        <li class="list-group-item d-flex justify-content-between align-items-center" th:each="m : ${models}">
+            <span th:text="${m.modelName}">Modelo</span>
+            <a class="btn btn-sm btn-primary"
+               th:href="@{/search(brand=${brand.name},model=${m.modelName})}">Ver piezas</a>
+        </li>
+    </ul>
+    <p th:if="${models.isEmpty()}" class="text-muted">Aún no hay modelos catalogados para esta marca.
+        <a th:href="@{/search(brand=${brand.name})}">Buscar piezas por marca</a></p>
+</div>
+
+<th:block th:replace="fragments/_calltoaction :: calltoaction"></th:block>
+<th:block th:replace="fragments/_footer :: footer"></th:block>
+<script src="assets/js/vendor/jquery-3.4.1.min.js"></script>
+<script src="assets/js/popper.js"></script>
+<script src="assets/js/bootstrap.min.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

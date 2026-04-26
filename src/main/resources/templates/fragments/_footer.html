@@ -19,13 +19,18 @@
                             <h3>Información</h3>
                             <div class="footer_menu">
                                 <ul>
-                                    <li><a href="/about">Sobre Nosotros</a></li>
-                                    <li><a href="#">Información de Entrega</a></li>
-                                    <li><a href="/privacy-policy">Política de Privacidad</a></li>
-                                    <li><a href="/coming-soon">Próximamente</a></li>
-                                    <li><a href="#">Términos y Condiciones</a></li>
-                                    <li><a href="#">Devoluciones</a></li>
-                                    <li><a href="#">Tarjetas de Regalo</a></li>
+                                    <li><a th:href="@{/help}">Centro de ayuda</a></li>
+                                    <li><a th:href="@{/faq}">Preguntas frecuentes</a></li>
+                                    <li><a th:href="@{/blog}">Blog</a></li>
+                                    <li><a th:href="@{/contact}">Contacto</a></li>
+                                    <li><a th:href="|mailto:${supportEmail}|" th:text="'Soporte: ' + ${supportEmail}">Soporte</a></li>
+                                    <li><a th:href="@{/about}">Sobre nosotros</a></li>
+                                    <li><a th:href="@{/info-de-envio}">Información de entrega</a></li>
+                                    <li><a th:href="@{/politica-de-privacidad}">Política de privacidad</a></li>
+                                    <li><a th:href="@{/garantias}">Garantías</a></li>
+                                    <li><a th:href="@{/terminos-de-uso}">Términos de uso</a></li>
+                                    <li><a th:href="@{/politica-de-devolucion}">Devoluciones</a></li>
+                                    <li><a th:href="@{/info-de-pago}">Información de pago</a></li>
                                 </ul>
                             </div>
                         </div>

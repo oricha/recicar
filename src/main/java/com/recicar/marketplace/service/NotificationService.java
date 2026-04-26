@@ -13,5 +13,10 @@ public interface NotificationService {
 
     void sendPasswordResetEmail(User user, String resetLink);
 
+    /**
+     * Forwards a public contact form submission to the configured support inbox (logged until SMTP is integrated).
+     */
+    void sendSupportContactInquiry(String fromName, String fromEmail, String subject, String body, String toAddress);
+
     // Other notification methods
 }

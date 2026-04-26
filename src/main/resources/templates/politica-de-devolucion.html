@@ -1,0 +1,35 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" class="no-js" lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Derecho de desistimiento 14 días y condiciones de devolución en ReciCar.">
+    <title th:text="${pageTitle} + ' | ReciCar'">Política de devoluciones | ReciCar</title>
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/assets/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+</head>
+<body>
+<th:block th:replace="fragments/_header :: header"></th:block>
+<th:block th:replace="fragments/_offcanvasmenu :: offcanvasmenu"></th:block>
+<th:block th:replace="~{fragments/_legal_hero_breadcrumb :: legalBreadcrumb (currentLabel=${pageTitle})}"></th:block>
+<section class="main_content_area py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h1 th:text="${pageTitle}">Política de devoluciones</h1>
+                <h2>Plazo: 14 días naturales</h2>
+                <p>Como consumidor en la Unión Europea, dispones de un plazo de <strong>14 días naturales</strong> para desistir de la compra a distancia a partir de la entrega de la pieza, sin necesidad de justificar el motivo, de conformidad con la normativa aplicable de consumo, salvo excepciones legales (p. ej. piezas hechas a medida, bienes desprecintados o montados con pérdida de integridad, cuando proceda según ley).</p>
+                <h2>Cómo ejercer el desistimiento</h2>
+                <p>Comunícanos tu decisión de forma inequívoca (por email o el canal que indique atención al cliente) e indica <strong>número de pedido</strong> y, si aplica, motivo. Te daremos la dirección de devolución del vendedor o el procedimiento concreto.</p>
+                <h2>Estado de la pieza y embalaje</h2>
+                <p>La pieza debe devolverse <strong>en buen estado</strong> y, cuando sea razonable, con el embalaje original. Cualquier pérdida de valor derivada de un uso distinto al necesario para comprobar el estado puede deducirse del reembolso según ley y condiciones de venta con el vendedor.</p>
+                <h2>Reembolsos</h2>
+                <p>Tras recibir y comprobar la devolución, se procede al reembolso con el <strong> mismo medio de pago</strong> usado, salvo acuerdo distinto, en el plazo que marque la normativa vigente. Los gastos de devolución pueden ser a tu cargo, salvo que el vendedor ofrezca otra condición o la ley disponga lo contrario.</p>
+            </div>
+        </div>
+    </div>
+</section>
+<th:block th:replace="fragments/_footer :: footer"></th:block>
+</body>
+</html>

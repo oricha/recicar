@@ -3,6 +3,7 @@ package com.recicar.marketplace.controller;
 import com.recicar.marketplace.dto.CartDto;
 import com.recicar.marketplace.dto.CartItemDto;
 import com.recicar.marketplace.repository.ProductRepository;
+import com.recicar.marketplace.service.CartPricingService;
 import com.recicar.marketplace.service.CartService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,11 +26,38 @@ public class CartApiController {
     private final CartService cartService;
     private final com.recicar.marketplace.repository.UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final CartPricingService cartPricingService;
 
-    public CartApiController(CartService cartService, com.recicar.marketplace.repository.UserRepository userRepository, ProductRepository productRepository) {
+    public CartApiController(
+            CartService cartService,
+            com.recicar.marketplace.repository.UserRepository userRepository,
+            ProductRepository productRepository,
+            CartPricingService cartPricingService) {
         this.cartService = cartService;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
+        this.cartPricingService = cartPricingService;
+    }
+
+    @GetMapping
+    public ResponseEntity<CartDto> getFullCart(
+            @AuthenticationPrincipal UserDetails userDetails,
+            HttpSession session) {
+        if (userDetails != null) {
+            return userRepository.findByEmailIgnoreCase(userDetails.getUsername())
+                    .map(u -> ResponseEntity.ok(cartService.getCart(u.getId())))
+                    .orElseGet(() -> ResponseEntity.status(401).build());
+        }
+        List<CartItemDto> sessionCart = getSessionCart(session);
+        CartDto dto = new CartDto();
+        dto.setItems(sessionCart);
+        BigDecimal sub = sessionCart.stream()
+                .filter(i -> i.getPrice() != null)
+                .map(i -> i.getPrice().multiply(BigDecimal.valueOf(i.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        dto.setSubtotal(sub);
+        cartPricingService.applyPricing(dto, null, null, null, null);
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/count")
@@ -72,9 +101,14 @@ public class CartApiController {
             addItemToSessionCart(sessionCart, productId, quantity);
             session.setAttribute(SESSION_CART_KEY, sessionCart);
 
-            // Return a CartDto representation of the session cart
             CartDto cartDto = new CartDto();
             cartDto.setItems(sessionCart);
+            BigDecimal sub = sessionCart.stream()
+                    .filter(i -> i.getPrice() != null)
+                    .map(i -> i.getPrice().multiply(BigDecimal.valueOf(i.getQuantity())))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            cartDto.setSubtotal(sub);
+            cartPricingService.applyPricing(cartDto, null, null, null, null);
             return ResponseEntity.ok(cartDto);
         }
     }

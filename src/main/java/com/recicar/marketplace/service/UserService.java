@@ -1,5 +1,6 @@
 package com.recicar.marketplace.service;
 
+import com.recicar.marketplace.dto.ProfileUpdateRequest;
 import com.recicar.marketplace.dto.UserRegistrationDto;
 import com.recicar.marketplace.entity.User;
 import com.recicar.marketplace.entity.PasswordResetToken;
@@ -48,7 +49,8 @@ public class UserService {
         user.setPhone(registrationDto.getPhone());
         user.setRole(UserRole.CUSTOMER);
         user.setActive(true);
-        user.setEmailVerified(false); // Will be verified via email
+        // Email verification flow can be added later; keep account usable after registration.
+        user.setEmailVerified(true);
 
         return userRepository.save(user);
     }
@@ -81,6 +83,31 @@ public class UserService {
      * Update user profile
      */
     public User updateUser(User user) {
+        return userRepository.save(user);
+    }
+
+    /**
+     * Updates account fields from a profile form (name, contact email, phone).
+     */
+    public User updateAccountFromProfileRequest(Long userId, ProfileUpdateRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        if (request.getFirstName() != null && !request.getFirstName().isBlank()) {
+            user.setFirstName(request.getFirstName().trim());
+        }
+        if (request.getLastName() != null && !request.getLastName().isBlank()) {
+            user.setLastName(request.getLastName().trim());
+        }
+        if (request.getPhone() != null) {
+            user.setPhone(request.getPhone().isBlank() ? null : request.getPhone().trim());
+        }
+        if (request.getEmail() != null && !request.getEmail().isBlank()) {
+            String newEmail = request.getEmail().toLowerCase().trim();
+            if (!newEmail.equalsIgnoreCase(user.getEmail()) && userRepository.existsByEmailIgnoreCase(newEmail)) {
+                throw new IllegalArgumentException("Email already in use");
+            }
+            user.setEmail(newEmail);
+        }
         return userRepository.save(user);
     }
 

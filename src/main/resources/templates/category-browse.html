@@ -1,0 +1,66 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" class="no-js" lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${pageTitle}">Categoría — ReciCar</title>
+    <link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.ico">
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/font.awesome.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<th:block th:replace="fragments/_header :: header"></th:block>
+<th:block th:replace="fragments/_offcanvasmenu :: offcanvasmenu"></th:block>
+
+<div class="breadcrumbs_area">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="breadcrumb_content">
+                    <ul>
+                        <li><a href="/">Inicio</a></li>
+                        <li><a th:href="@{/categories}">Categorías</a></li>
+                        <li th:each="c, stat : ${categoryHierarchy}">
+                            <a th:if="${!stat.last}" th:href="@{/categories/view/{s}(s=${c.slug})}" th:text="${c.name}">Nivel</a>
+                            <span th:if="${stat.last}" th:text="${c.name}">Actual</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 th:text="${category.name}">Categoría</h1>
+            <p th:if="${category.description != null and !category.description.isEmpty()}" th:text="${category.description}"></p>
+            <p>
+                <a class="btn btn-primary" th:href="@{/search(category=${category.slug})}">Ver piezas en esta categoría</a>
+            </p>
+        </div>
+    </div>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3 mt-2" th:if="${!subcategories.isEmpty()}">
+        <div class="col" th:each="sub : ${subcategories}">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="h5 card-title" th:text="${sub.name}">Sub</h2>
+                    <p class="card-text small text-muted" th:text="${sub.description}"></p>
+                    <a th:href="@{/categories/view/{s}(s=${sub.slug})}" class="stretched-link">Seguir</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <p class="mt-3 text-muted" th:if="${subcategories.isEmpty()}">No hay subcategorías. Use el botón para ver productos asignados a esta categoría.</p>
+</div>
+
+<th:block th:replace="fragments/_calltoaction :: calltoaction"></th:block>
+<th:block th:replace="fragments/_footer :: footer"></th:block>
+<script src="assets/js/vendor/jquery-3.4.1.min.js"></script>
+<script src="assets/js/popper.js"></script>
+<script src="assets/js/bootstrap.min.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

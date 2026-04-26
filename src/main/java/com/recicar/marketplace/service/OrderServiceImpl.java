@@ -1,11 +1,13 @@
 package com.recicar.marketplace.service;
 
+import com.recicar.marketplace.dto.CartDto;
 import com.recicar.marketplace.dto.OrderItemRequest;
 import com.recicar.marketplace.dto.OrderRequest;
 import com.recicar.marketplace.entity.*;
 import com.recicar.marketplace.repository.OrderRepository;
 import com.recicar.marketplace.repository.ProductRepository;
 import com.recicar.marketplace.repository.UserRepository;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,13 +25,24 @@ public class OrderServiceImpl implements OrderService {
     private final UserRepository userRepository;
     private final PaymentService paymentService;
     private final NotificationService notificationService;
+    private final CartService cartService;
+    private final CartPricingService cartPricingService;
 
-    public OrderServiceImpl(OrderRepository orderRepository, ProductRepository productRepository, UserRepository userRepository, PaymentService paymentService, NotificationService notificationService) {
+    public OrderServiceImpl(
+            OrderRepository orderRepository,
+            ProductRepository productRepository,
+            UserRepository userRepository,
+            PaymentService paymentService,
+            NotificationService notificationService,
+            CartService cartService,
+            CartPricingService cartPricingService) {
         this.orderRepository = orderRepository;
         this.productRepository = productRepository;
         this.userRepository = userRepository;
         this.paymentService = paymentService;
         this.notificationService = notificationService;
+        this.cartService = cartService;
+        this.cartPricingService = cartPricingService;
     }
 
     @Override
@@ -38,7 +51,9 @@ public class OrderServiceImpl implements OrderService {
         Order order = new Order();
         order.setOrderNumber(generateOrderNumber());
         order.setStatus(Order.OrderStatus.PENDING);
-        order.setCreatedAt(LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+        order.setCreatedAt(now);
+        order.setUpdatedAt(now);
 
         User customer = userRepository.findById(orderRequest.getCustomerId())
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
@@ -49,15 +64,21 @@ public class OrderServiceImpl implements OrderService {
                 .collect(Collectors.toList());
         order.setItems(orderItems);
 
-        BigDecimal subtotal = orderItems.stream()
+        BigDecimal lineSubtotal = orderItems.stream()
                 .map(item -> item.getUnitPrice().multiply(new BigDecimal(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        order.setSubtotal(subtotal);
 
-        // TODO: Implement tax and shipping calculation
-        order.setTaxAmount(BigDecimal.ZERO);
-        order.setShippingAmount(BigDecimal.ZERO);
-        order.setTotalAmount(subtotal);
+        CartDto pricedCart = cartService.getCart(orderRequest.getCustomerId());
+        if (pricedCart.getSubtotal().compareTo(lineSubtotal) != 0) {
+            throw new RuntimeException("Cart has changed; please review your order.");
+        }
+        CartPricingService.OrderAmounts amounts = cartPricingService.computeOrderAmounts(
+                orderRequest.getCustomerId(), pricedCart, orderRequest.getShippingInfo());
+        order.setSubtotal(amounts.subtotal());
+        order.setServiceFee(amounts.serviceFee());
+        order.setTaxAmount(amounts.vatAmount());
+        order.setShippingAmount(amounts.shippingAmount());
+        order.setTotalAmount(amounts.totalAmount());
 
         ShippingInfo shippingInfo = new ShippingInfo();
         shippingInfo.setAddressLine1(orderRequest.getShippingInfo().getAddress());
@@ -69,6 +90,7 @@ public class OrderServiceImpl implements OrderService {
         order.setShippingInfo(shippingInfo);
 
         Payment payment = new Payment();
+        payment.setOrder(order);
         payment.setPaymentMethod(orderRequest.getPayment().getPaymentMethod());
         payment.setAmount(order.getTotalAmount());
         payment.setStatus(Payment.PaymentStatus.PENDING);
@@ -119,5 +141,11 @@ public class OrderServiceImpl implements OrderService {
                     return orderItemRequest;
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Order> findOrdersByCustomerId(Long customerId, Pageable pageable) {
+        return orderRepository.findByCustomer_IdOrderByCreatedAtDesc(customerId, pageable);
     }
 }

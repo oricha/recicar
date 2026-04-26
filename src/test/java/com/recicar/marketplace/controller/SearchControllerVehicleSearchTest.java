@@ -3,6 +3,7 @@ package com.recicar.marketplace.controller;
 import com.recicar.marketplace.entity.Product;
 import com.recicar.marketplace.service.CategoryService;
 import com.recicar.marketplace.service.ProductService;
+import com.recicar.marketplace.service.SearchService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -32,6 +33,9 @@ class SearchControllerVehicleSearchTest {
     
     @MockBean
     private CategoryService categoryService;
+
+    @MockBean
+    private SearchService searchService;
 
     @Test
     void searchByMakeModelEngineAndPartName_returnsShopList() throws Exception {

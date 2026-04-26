@@ -1,0 +1,67 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" class="no-js" lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ReciCar - Mensajes</title>
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/assets/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+</head>
+<body>
+<th:block th:replace="fragments/_header :: header"></th:block>
+<th:block th:replace="fragments/_offcanvasmenu :: offcanvasmenu"></th:block>
+
+<div class="breadcrumbs_area">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="breadcrumb_content">
+                    <ul>
+                        <li><a th:href="@{/}">Inicio</a></li>
+                        <li><a th:href="@{/user-dashboard}">Mi panel</a></li>
+                        <li>Mensajes</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="main_content_area py-5">
+    <div class="container">
+        <h2 class="mb-3">Mensajería</h2>
+        <p class="text-muted mb-4">Conversaciones con vendedores. Puedes ampliar esta vista con un cliente de chat que consuma
+            <code>/api/v1/user/conversations</code>.</p>
+        <ul id="conv-list" class="list-group mb-4"></ul>
+        <p id="conv-empty" class="text-muted d-none">No hay conversaciones aún. Inicia una desde la ficha de un producto (API <code>POST /api/v1/user/conversations</code> con <code>vendorId</code>).</p>
+    </div>
+</section>
+
+<th:block th:replace="fragments/_footer :: footer"></th:block>
+<script th:inline="javascript">
+    (function() {
+        fetch("/api/v1/user/conversations", { credentials: "same-origin" })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var el = document.getElementById("conv-list");
+                var empty = document.getElementById("conv-empty");
+                if (!Array.isArray(data) || data.length === 0) {
+                    empty.classList.remove("d-none");
+                    return;
+                }
+                data.forEach(function(c) {
+                    var li = document.createElement("li");
+                    li.className = "list-group-item";
+                    li.textContent = (c.vendorBusinessName || "Vendedor") + " — " + (c.productName || "Sin producto");
+                    el.appendChild(li);
+                });
+            })
+            .catch(function() {
+                document.getElementById("conv-empty").classList.remove("d-none");
+                document.getElementById("conv-empty").textContent = "No se pudieron cargar las conversaciones (¿sesión expirada?).";
+            });
+    })();
+</script>
+</body>
+</html>

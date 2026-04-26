@@ -101,6 +101,12 @@ public class VendorServiceImpl implements VendorService {
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<Vendor> findByUserId(Long userId) {
+        return vendorRepository.findByUserId(userId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<Vendor> findAllApproved() {
         return vendorRepository.findByStatus(VendorStatus.APPROVED);
     }

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html class="no-js" lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/new-base :: html}">
+<head>
+    <th:block th:fragment="head-extra">
+        <title th:text="${pageTitle} + ' - ReciCar'">Blog</title>
+    </th:block>
+</head>
+<body>
+<div th:fragment="content">
+    <section class="py-5 support_blog">
+        <div class="container">
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a th:href="@{/}">Inicio</a></li>
+                    <li class="breadcrumb-item"><a th:href="@{/help}">Ayuda</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Blog</li>
+                </ol>
+            </nav>
+            <h1 class="h2 mb-4" th:text="${pageTitle}">Blog</h1>
+
+            <div th:if="${posts == null or !posts.hasContent()}" class="alert alert-info">Aún no hay artículos publicados.</div>
+
+            <div class="row g-4" th:if="${posts != null and posts.hasContent()}">
+                <div class="col-md-4" th:each="p : ${posts.content}">
+                    <article class="card h-100 border shadow-sm">
+                        <div class="card-body d-flex flex-column">
+                            <time class="text-muted small" th:text="${#temporals.format(p.publishedAt, 'd MMM yyyy')}">Fecha</time>
+                            <h2 class="h5 card-title mt-2" th:text="${p.title}">Título</h2>
+                            <p class="card-text text-muted small flex-grow-1" th:text="${p.summary}">Resumen</p>
+                            <a class="stretched-link" th:href="@{/blog/{slug}(slug=${p.slug})}">Leer más</a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+
+            <nav th:if="${posts != null and posts.getTotalPages() > 1}" class="mt-4" aria-label="Paginación blog">
+                <ul class="pagination">
+                    <li class="page-item" th:classappend="${posts.first} ? ' disabled'">
+                        <a class="page-link" th:href="@{/blog(page=${posts.number - 1})}">Anterior</a>
+                    </li>
+                    <li class="page-item disabled"><span class="page-link" th:text="${posts.number + 1} + ' / ' + ${posts.totalPages}">1</span></li>
+                    <li class="page-item" th:classappend="${posts.last} ? ' disabled'">
+                        <a class="page-link" th:href="@{/blog(page=${posts.number + 1})}">Siguiente</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </section>
+</div>
+</body>
+</html>

@@ -4,6 +4,7 @@ import com.recicar.marketplace.entity.Category;
 import com.recicar.marketplace.entity.Product;
 import com.recicar.marketplace.service.CategoryService;
 import com.recicar.marketplace.service.ProductService;
+import com.recicar.marketplace.service.SearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +27,7 @@ public class SearchController {
 
     private final ProductService productService;
     private final CategoryService categoryService;
+    private final SearchService searchService;
 
     /**
      * Main search endpoint - handles general search, part number, and OEM number searches
@@ -36,11 +38,39 @@ public class SearchController {
             @RequestParam(value = "query", required = false) String query,
             @RequestParam(value = "q", required = false) String q,
             @RequestParam(value = "category", required = false) String categorySlug,
+            @RequestParam(value = "brand", required = false) String brand,
+            @RequestParam(value = "model", required = false) String vehicleModel,
             @RequestParam(defaultValue = "0") int page,
             Model model
     ) {
         if (categorySlug != null && !categorySlug.trim().isEmpty()) {
             return searchByCategorySlug(categorySlug, page, model);
+        }
+
+        String brandTerm = brand != null ? brand.trim() : "";
+        String modelTerm = vehicleModel != null ? vehicleModel.trim() : "";
+        if (!brandTerm.isEmpty() || !modelTerm.isEmpty()) {
+            String searchTerm = query != null && !query.isBlank() ? query : (q != null ? q : "");
+            Page<Product> productPage = searchService.searchAdvanced(
+                    searchTerm == null ? "" : searchTerm,
+                    brandTerm,
+                    modelTerm,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    PageRequest.of(page, 12)
+            );
+            model.addAttribute("products", productPage.getContent());
+            model.addAttribute("page", productPage);
+            model.addAttribute("searchQuery", searchTerm);
+            model.addAttribute("searchType", "advancedVehicle");
+            model.addAttribute("vehicleMake", brandTerm.isEmpty() ? null : brandTerm);
+            model.addAttribute("vehicleModel", modelTerm.isEmpty() ? null : modelTerm);
+            model.addAttribute("totalElements", productPage.getTotalElements());
+            model.addAttribute("categories", categoryService.findRootCategories());
+            return "shop-list";
         }
 
         // Use 'query' parameter if available, otherwise fall back to 'q'

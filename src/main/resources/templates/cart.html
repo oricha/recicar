@@ -321,21 +321,29 @@
                                 <h3>Totales del carrito</h3>
                                 <div class="coupon_inner">
                                     <div class="cart_subtotal">
-                                        <p>Subtotal</p>
-                                        <p class="cart_amount" th:text="${cart != null && cart.subtotal != null ? #numbers.formatCurrency(cart.subtotal) : '€0.00'}">€0.00</p>
+                                        <p>Subtotal (IVA excl.)</p>
+                                        <p class="cart_amount" th:text="${cart != null && cart.subtotal != null ? #numbers.formatDecimal(cart.subtotal,1,2) : '0.00'} + ' €'">0,00 €</p>
                                     </div>
-                                    <div class="cart_subtotal ">
+                                    <div class="cart_subtotal" th:if="${cart != null && cart.serviceFee != null}">
+                                        <p>Tarifa de servicio</p>
+                                        <p class="cart_amount" th:text="${#numbers.formatDecimal(cart.serviceFee,1,2)} + ' €'">0,00 €</p>
+                                    </div>
+                                    <div class="cart_subtotal" th:if="${cart != null && cart.vatAmount != null}">
+                                        <p>IVA (tasa <span th:if="${cart.vatRate != null}" th:text="${#numbers.formatDecimal(cart.vatRate.multiply(100),1,0)} + '%'">21%</span>)</p>
+                                        <p class="cart_amount" th:text="${#numbers.formatDecimal(cart.vatAmount,1,2)} + ' €'">0,00 €</p>
+                                    </div>
+                                    <div class="cart_subtotal">
                                         <p>Envío</p>
-                                        <p class="cart_amount"><span>Tarifa fija:</span> €25.00</p>
+                                        <p class="cart_amount" th:text="${cart != null && cart.shippingAmount != null ? #numbers.formatDecimal(cart.shippingAmount,1,2) : '0.00'} + ' €'">0,00 €</p>
                                     </div>
-                                    <a href="#">Calcular envío</a>
+                                    <p class="small text-muted" th:if="${cart != null && cart.shippingAmount != null && cart.shippingAmount == 0}">El envío se recalcula con tu dirección en el checkout (DPD en UE cuando aplique).</p>
 
                                     <div class="cart_subtotal">
-                                        <p>Total</p>
-                                        <p class="cart_amount" th:text="${cart != null && cart.subtotal != null ? #numbers.formatCurrency(cart.subtotal.add(T(java.math.BigDecimal).valueOf(25L))) : '€25.00'}">€25.00</p>
+                                        <p>Total (IVA incl.)</p>
+                                        <p class="cart_amount" th:text="${cart != null && cart.totalAmount != null ? #numbers.formatDecimal(cart.totalAmount,1,2) : '0.00'} + ' €'">0,00 €</p>
                                     </div>
                                     <div class="checkout_btn">
-                                        <a href="/checkout">Proceder al Pago</a>
+                                        <a th:href="@{/checkout}">Proceder al pago</a>
                                     </div>
                                 </div>
                             </div>

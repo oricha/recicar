@@ -2,6 +2,7 @@ package com.recicar.marketplace.controller;
 
 import com.recicar.marketplace.dto.CartDto;
 import com.recicar.marketplace.dto.CartItemDto;
+import com.recicar.marketplace.service.CartPricingService;
 import com.recicar.marketplace.service.CartService;
 import com.recicar.marketplace.repository.UserRepository;
 import com.recicar.marketplace.repository.ProductRepository;
@@ -26,11 +27,17 @@ public class CartController {
     private final CartService cartService;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final CartPricingService cartPricingService;
 
-    public CartController(CartService cartService, UserRepository userRepository, ProductRepository productRepository) {
+    public CartController(
+            CartService cartService,
+            UserRepository userRepository,
+            ProductRepository productRepository,
+            CartPricingService cartPricingService) {
         this.cartService = cartService;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
+        this.cartPricingService = cartPricingService;
     }
 
     @GetMapping
@@ -59,6 +66,7 @@ public class CartController {
                         .filter(item -> item.getPrice() != null) // Filter out null prices
                         .map(item -> item.getPrice().multiply(java.math.BigDecimal.valueOf(item.getQuantity())))
                         .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add));
+                cartPricingService.applyPricing(cart, null, null, null, null);
             }
             model.addAttribute("cart", cart);
             return "cart";
@@ -70,6 +78,7 @@ public class CartController {
             CartDto emptyCart = new CartDto();
             emptyCart.setItems(new java.util.ArrayList<>());
             emptyCart.setSubtotal(java.math.BigDecimal.ZERO);
+            cartPricingService.applyPricing(emptyCart, null, null, null, null);
             model.addAttribute("cart", emptyCart);
             return "cart";
         }
@@ -161,7 +170,12 @@ public class CartController {
             // Check if item already exists in cart
             for (CartItemDto item : cart) {
                 if (item.getProductId() != null && item.getProductId().equals(productId)) {
-                    item.setQuantity(item.getQuantity() + quantity);
+                    int next = item.getQuantity() + quantity;
+                    var productOpt = productRepository.findById(productId);
+                    if (productOpt.isPresent()) {
+                        int max = Math.min(10, productOpt.get().getStockQuantity());
+                        item.setQuantity(Math.min(next, max));
+                    }
                     return;
                 }
             }
@@ -170,10 +184,15 @@ public class CartController {
             var productOpt = productRepository.findById(productId);
             if (productOpt.isPresent()) {
                 var product = productOpt.get();
+                int q = Math.min(quantity, 10);
+                q = Math.min(q, product.getStockQuantity());
+                if (q < 1) {
+                    return;
+                }
                 CartItemDto newItem = new CartItemDto();
                 newItem.setId(productId); // Use productId as id for session cart
                 newItem.setProductId(productId);
-                newItem.setQuantity(quantity);
+                newItem.setQuantity(q);
                 newItem.setProductName(product.getName());
                 newItem.setPrice(product.getPrice());
 

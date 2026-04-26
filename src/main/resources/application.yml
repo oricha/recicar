@@ -70,6 +70,18 @@ server:
     session:
       persistent: false
 
+# Checkout: ex-VAT line totals; VAT and service fee applied in CartPricingService
+app:
+  checkout:
+    vat-rate: 0.21
+    service-fee-rate: 0.02
+  support:
+    # Shown in footer / help; contact form notifications are directed here when email integration is added
+    email: help@ovoko.es
+  shipping:
+    dpd:
+      brand: "DPD (envío EU)"
+
 logging:
   file:
     name: logs/recicar-dev.log
@@ -167,26 +179,24 @@ spring:
   config:
     activate:
       on-profile: test
-      
+  # In-memory H2 for unit tests (MockMvc, @SpringBootTest). Do not use empty DATABASE_URL here — it would win over defaults.
   datasource:
-    url: ${DATABASE_URL}
-    username: ${DATABASE_USERNAME}
-    password: ${DATABASE_PASSWORD}
-    driver-class-name: org.postgresql.Driver
-    
+    url: jdbc:h2:mem:recicar_test;DB_CLOSE_DELAY=-1;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create-drop
     show-sql: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        dialect: org.hibernate.dialect.H2Dialect
 
   flyway:
-    enabled: true
+    enabled: false
     locations: classpath:db/migration
-    baseline-on-migrate: true
-    repair-on-migrate: true
 
   thymeleaf:
     cache: false
@@ -200,8 +210,6 @@ logging:
     name: logs/recicar-test.log
   level:
     com.recicar.marketplace: INFO
-
-# Test: PostgreSQL en la misma red que la app (p. ej. servicio Dokploy / Docker). Sin SSL interno suele bastar jdbc:postgresql://host:5432/db
 
 ---
 spring:
