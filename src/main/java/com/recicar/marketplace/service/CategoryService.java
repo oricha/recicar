@@ -59,6 +59,14 @@ public class CategoryService {
     }
 
     /**
+     * Get child categories of a parent id.
+     */
+    @Transactional(readOnly = true)
+    public List<Category> findByParentId(Long parentId) {
+        return categoryRepository.findByParentIdAndActiveTrueOrderBySortOrderAsc(parentId);
+    }
+
+    /**
      * Search categories by name
      */
     @Transactional(readOnly = true)
@@ -203,6 +211,14 @@ public class CategoryService {
         }
         
         return hierarchy;
+    }
+
+    /**
+     * Returns category ids in hierarchy from current node to root.
+     */
+    @Transactional(readOnly = true)
+    public List<Long> findHierarchyBySlug(String slug) {
+        return categoryRepository.findHierarchy(slug);
     }
 
     /**
