@@ -130,48 +130,6 @@ docker-compose up -d postgres
 ./gradlew flywayMigrateProd
 ```
 
----
-
-## 🧪 Testing
-
-### Run Tests
-```bash
-./gradlew test
-```
-
-### Run Cucumber Tests
-```bash
-./gradlew cucumber
-```
-
----
-
-## 🔧 Build
-
-### Build JAR
-```bash
-./gradlew bootJar
-```
-
-The JAR will be in `build/libs/recicar-0.0.1-SNAPSHOT.jar`
-
-### Build Docker Image Locally
-```bash
-docker build -t recicar:local .
-```
-
-### Run Docker Image Locally
-```bash
-docker run -p 8080:8080 \
-  -e DATABASE_URL=jdbc:postgresql://host.docker.internal:5432/marketplace_dev \
-  -e DATABASE_USERNAME=marketplace_user \
-  -e DATABASE_PASSWORD=marketplace_pass \
-  -e SPRING_PROFILES_ACTIVE=dev \
-  recicar:local
-```
-
----
-
 ## 📊 Monitoring
 
 ### Health Check
@@ -190,45 +148,3 @@ curl http://localhost:8080/actuator/info
 ```
 
 ---
-
-## 🐛 Troubleshooting
-
-### Port Already in Use
-```bash
-# Find process using port 8080
-lsof -i :8080
-
-# Kill the process
-kill -9 <PID>
-```
-
-### Database Connection Issues
-- Verify PostgreSQL is running
-- Check credentials in `.env` or environment variables
-- Ensure database exists
-- Check firewall/network settings
-
-### `permission denied for schema public` (Flyway / PostgreSQL 15+)
-
-El usuario de la app debe poder crear tablas en el esquema `public`. Como `postgres`:
-
-```sql
-\c marketplace_dev
-GRANT CREATE, USAGE ON SCHEMA public TO marketplace_user;
-ALTER SCHEMA public OWNER TO marketplace_user;
-```
-
-Script de referencia: `docs/postgres-local-dev-setup.sql`
-
-### Build Issues
-```bash
-# Clean build
-./gradlew clean build
-
-# Clear Gradle cache
-rm -rf ~/.gradle/caches/
-```
-
----
-
-**Need Help?** Check the full deployment documentation in `DEPLOYMENT.md`
