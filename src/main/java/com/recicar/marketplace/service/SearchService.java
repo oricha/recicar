@@ -3,8 +3,13 @@ package com.recicar.marketplace.service;
 import com.recicar.marketplace.entity.Product;
 import com.recicar.marketplace.entity.Category;
 import com.recicar.marketplace.entity.ProductCondition;
+import com.recicar.marketplace.entity.SavedSearch;
+import com.recicar.marketplace.entity.User;
 import com.recicar.marketplace.entity.Vendor;
 import com.recicar.marketplace.repository.ProductRepository;
+import com.recicar.marketplace.repository.SavedSearchRepository;
+import com.recicar.marketplace.repository.SearchRepository;
+import com.recicar.marketplace.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -18,9 +23,20 @@ import java.util.List;
 public class SearchService {
 
     private final ProductRepository productRepository;
+    private final SearchRepository searchRepository;
+    private final SavedSearchRepository savedSearchRepository;
+    private final UserRepository userRepository;
 
-    public SearchService(ProductRepository productRepository) {
+    public SearchService(
+            ProductRepository productRepository,
+            SearchRepository searchRepository,
+            SavedSearchRepository savedSearchRepository,
+            UserRepository userRepository
+    ) {
         this.productRepository = productRepository;
+        this.searchRepository = searchRepository;
+        this.savedSearchRepository = savedSearchRepository;
+        this.userRepository = userRepository;
     }
 
     private static final int MIN_SEARCH_LENGTH = 2;
@@ -43,7 +59,7 @@ public class SearchService {
             throw new IllegalArgumentException("Invalid search term");
         }
         String toSearch = trimmed.length() > MAX_SEARCH_LENGTH ? trimmed.substring(0, MAX_SEARCH_LENGTH) : trimmed;
-        return productRepository.searchByNameOrPartNumber(toSearch, pageable);
+        return searchRepository.searchSimple(toSearch, pageable);
     }
 
     /**
@@ -122,8 +138,41 @@ public class SearchService {
         if (partialTerm == null || partialTerm.trim().length() < 2) {
             return List.of();
         }
-        // Simplified implementation - returns empty list; can be extended with actual suggestions
-        return List.of();
+        return searchRepository.fetchSuggestions(partialTerm.trim());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Product> searchAdvanced(
+            String query,
+            String brand,
+            String model,
+            String modification,
+            String condition,
+            Boolean inStock,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            Pageable pageable
+    ) {
+        if (minPrice != null && maxPrice != null && minPrice.compareTo(maxPrice) > 0) {
+            throw new IllegalArgumentException("Min price cannot be greater than max price");
+        }
+        return searchRepository.searchAdvanced(query, brand, model, modification, condition, inStock, minPrice, maxPrice, pageable);
+    }
+
+    public SavedSearch saveSearch(Long userId, String query, String filtersJson) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        SavedSearch savedSearch = new SavedSearch();
+        savedSearch.setUser(user);
+        savedSearch.setSearchQuery(query == null ? "" : query.trim());
+        savedSearch.setFiltersJson(filtersJson);
+        return savedSearchRepository.save(savedSearch);
+    }
+
+    @Transactional(readOnly = true)
+    public List<SavedSearch> getSavedSearches(Long userId) {
+        return savedSearchRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
 
     /**
