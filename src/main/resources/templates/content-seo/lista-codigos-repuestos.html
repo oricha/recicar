@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html class="no-js" lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/new-base :: html}">
+<head>
+    <th:block th:fragment="head-extra"></th:block>
+</head>
+<body>
+<div th:fragment="content">
+    <section class="py-5">
+        <div class="container" style="max-width: 900px;">
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a th:href="@{/}">Inicio</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Códigos de repuestos</li>
+                </ol>
+            </nav>
+            <h1 class="h2" th:text="${pageTitle}">Referencias</h1>
+            <p class="text-muted">Referencia orientativa. Cruza siempre con el fabricante del vehículo, el número de bastidor o la referencia exacta de la pieza a sustituir.</p>
+
+            <div class="table-responsive mt-4">
+                <table class="table table-striped table-sm">
+                    <thead>
+                    <tr>
+                        <th>Código / marca</th>
+                        <th>Fabricante</th>
+                        <th>Ámbito</th>
+                        <th>Nota</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="row : ${partCodes}">
+                        <td th:text="${row.code}">OEM</td>
+                        <td th:text="${row.manufacturer}">—</td>
+                        <td th:text="${row.partType}">—</td>
+                        <td th:text="${row.description}">—</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p class="mt-4 small text-muted">
+                <a th:href="@{/help}">Centro de ayuda</a> ·
+                <a th:href="@{/equivalencia-neumaticos}">Equivalencia de neumáticos</a>
+            </p>
+        </div>
+    </section>
+</div>
+</body>
+</html>

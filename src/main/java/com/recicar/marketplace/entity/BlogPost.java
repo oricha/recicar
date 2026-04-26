@@ -21,6 +21,9 @@ public class BlogPost {
     @Column(columnDefinition = "TEXT")
     private String summary;
 
+    @Column(name = "meta_description", length = 500)
+    private String metaDescription;
+
     @Column(nullable = false, columnDefinition = "TEXT")
     private String body;
 
@@ -85,6 +88,14 @@ public class BlogPost {
 
     public void setSummary(String summary) {
         this.summary = summary;
+    }
+
+    public String getMetaDescription() {
+        return metaDescription;
+    }
+
+    public void setMetaDescription(String metaDescription) {
+        this.metaDescription = metaDescription;
     }
 
     public String getBody() {

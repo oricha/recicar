@@ -5,6 +5,7 @@ import com.recicar.marketplace.dto.ContactRequest;
 import com.recicar.marketplace.entity.BlogPost;
 import com.recicar.marketplace.service.ContactMessageService;
 import com.recicar.marketplace.service.SupportContentService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @Controller
 public class HelpSupportController {
@@ -76,20 +78,57 @@ public class HelpSupportController {
     @GetMapping("/blog")
     public String blogList(
             Model model,
-            @RequestParam(defaultValue = "0") int page) {
+            @RequestParam(defaultValue = "0") int page,
+            HttpServletRequest request) {
         Page<BlogPostSummaryDto> posts = supportContentService.listPublishedBlogSummaries(page, 9);
         model.addAttribute("posts", posts);
-        model.addAttribute("pageTitle", "Blog");
+        model.addAttribute("pageTitle", "Blog — ReciCar");
+        model.addAttribute("metaDescription", "Consejos y guías sobre recambio de coche, referencias y mantenimiento.");
+        model.addAttribute("canonicalUrl", ServletUriComponentsBuilder.fromRequest(request).toUriString());
         return "support/blog-list";
     }
 
     @GetMapping("/blog/{slug}")
-    public String blogPost(@PathVariable String slug, Model model) {
+    public String blogPost(@PathVariable String slug, Model model, HttpServletRequest request) {
         BlogPost post = supportContentService.findPublishedPostBySlug(slug)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Artículo no encontrado"));
+        String canonical = ServletUriComponentsBuilder.fromRequest(request).toUriString();
+        String meta = post.getMetaDescription();
+        if (meta == null || meta.isBlank()) {
+            meta = post.getSummary();
+        }
         model.addAttribute("post", post);
         model.addAttribute("pageTitle", post.getTitle());
+        model.addAttribute("metaDescription", meta);
+        model.addAttribute("canonicalUrl", canonical);
+        model.addAttribute("blogPostingJsonLd", toBlogPostingJsonLd(post, canonical));
         return "support/blog-post";
+    }
+
+    private static String toBlogPostingJsonLd(BlogPost p, String url) {
+        String head = jsonEscape(p.getTitle());
+        String desc = p.getMetaDescription() != null && !p.getMetaDescription().isBlank()
+                ? p.getMetaDescription() : p.getSummary();
+        if (desc == null) {
+            desc = "";
+        } else {
+            desc = jsonEscape(desc);
+        }
+        return "{\"@context\":\"https://schema.org\",\"@type\":\"BlogPosting\","
+                + "\"headline\":\"" + head + "\","
+                + "\"datePublished\":\"" + p.getPublishedAt().toString() + "\","
+                + "\"description\":\"" + desc + "\","
+                + "\"url\":\"" + jsonEscape(url) + "\"}";
+    }
+
+    private static String jsonEscape(String s) {
+        if (s == null) {
+            return "";
+        }
+        return s.replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", " ")
+                .replace("\r", "");
     }
 
     @GetMapping({"/blog-details", "/blog-fullwidth", "/blog-sidebar"})

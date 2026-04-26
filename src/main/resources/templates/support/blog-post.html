@@ -2,8 +2,9 @@
 <html class="no-js" lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/new-base :: html}">
 <head>
     <th:block th:fragment="head-extra">
-        <title th:text="${pageTitle} + ' - ReciCar'">Artículo</title>
-        <meta name="description" th:content="${post.summary}" th:if="${post.summary != null}">
+        <th:block th:if="${blogPostingJsonLd != null}">
+            <script type="application/ld+json" th:utext="${blogPostingJsonLd}"></script>
+        </th:block>
     </th:block>
 </head>
 <body>
