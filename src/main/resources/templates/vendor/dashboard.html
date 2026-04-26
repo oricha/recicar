@@ -43,7 +43,7 @@
                                     </div>
                                     <div class="card_content">
                                         <h3 class="card_title">Line sales (this month)</h3>
-                                        <p class="card_value" th:text="${#numbers.formatDecimal(monthSales, 1, 2)} + ' €'">0.00 €</p>
+                                        <p class="card_value" th:text="${@priceView.plainEur(monthSales)}">0.00 €</p>
                                     </div>
                                 </div>
                             </div>
@@ -107,7 +107,7 @@
                                             <td th:text="${ro.orderNumber}">#</td>
                                             <td th:text="${#temporals.format(ro.createdAt, 'dd MMM yyyy HH:mm')}">—</td>
                                             <td th:text="${ro.status}">PENDING</td>
-                                            <td class="text-end" th:text="${#numbers.formatDecimal(ro.lineTotalForVendor, 1, 2)} + ' €'">0</td>
+                                            <td class="text-end" th:text="${@priceView.plainEur(ro.lineTotalForVendor)}">0</td>
                                         </tr>
                                         </tbody>
                                     </table>

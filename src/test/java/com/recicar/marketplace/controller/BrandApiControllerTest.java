@@ -1,12 +1,14 @@
 package com.recicar.marketplace.controller;
 
 import com.recicar.marketplace.entity.Brand;
+import com.recicar.marketplace.config.MvcSliceTestConfig;
 import com.recicar.marketplace.service.BrandService;
 import com.recicar.marketplace.service.CategoryService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -19,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = BrandApiController.class)
 @org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc(addFilters = false)
+@Import(MvcSliceTestConfig.class)
 class BrandApiControllerTest {
 
     @Autowired

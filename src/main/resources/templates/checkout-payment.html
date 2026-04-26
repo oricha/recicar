@@ -33,11 +33,11 @@
             <div class="col-lg-6">
                 <h4>Totales</h4>
                 <table class="table" th:if="${cart != null}">
-                    <tr><td>Subtotal (IVA excl.)</td><td th:text="${#numbers.formatDecimal(cart.subtotal,1,2)} + ' €'"></td></tr>
-                    <tr th:if="${cart.serviceFee != null}"><td>Tarifa de servicio</td><td th:text="${#numbers.formatDecimal(cart.serviceFee,1,2)} + ' €'"></td></tr>
-                    <tr th:if="${cart.shippingAmount != null}"><td>Envío</td><td th:text="${#numbers.formatDecimal(cart.shippingAmount,1,2)} + ' €'"></td></tr>
-                    <tr th:if="${cart.vatAmount != null}"><td>IVA</td><td th:text="${#numbers.formatDecimal(cart.vatAmount,1,2)} + ' €'"></td></tr>
-                    <tr><th>Total (IVA incl.)</th><th th:text="${#numbers.formatDecimal(cart.totalAmount,1,2)} + ' €'"></th></tr>
+                    <tr><td>Subtotal (IVA excl.)</td><td th:text="${@priceView.plainEur(cart.subtotal)}"></td></tr>
+                    <tr th:if="${cart.serviceFee != null}"><td>Tarifa de servicio</td><td th:text="${@priceView.plainEur(cart.serviceFee)}"></td></tr>
+                    <tr th:if="${cart.shippingAmount != null}"><td>Envío</td><td th:text="${@priceView.plainEur(cart.shippingAmount)}"></td></tr>
+                    <tr th:if="${cart.vatAmount != null}"><td>IVA</td><td th:text="${@priceView.plainEur(cart.vatAmount)}"></td></tr>
+                    <tr><th>Total (IVA incl.)</th><th th:text="${@priceView.plainEur(cart.totalAmount)}"></th></tr>
                 </table>
             </div>
             <div class="col-lg-6">

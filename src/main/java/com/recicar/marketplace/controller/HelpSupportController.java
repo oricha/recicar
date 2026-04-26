@@ -32,7 +32,7 @@ public class HelpSupportController {
     public HelpSupportController(
             SupportContentService supportContentService,
             ContactMessageService contactMessageService,
-            @Value("${app.support.email:help@ovoko.es}") String supportInbox) {
+            @Value("${app.support.email:help@recicar.es}") String supportInbox) {
         this.supportContentService = supportContentService;
         this.contactMessageService = contactMessageService;
         this.supportInbox = supportInbox;
@@ -57,6 +57,8 @@ public class HelpSupportController {
             model.addAttribute("contactRequest", new ContactRequest());
         }
         model.addAttribute("pageTitle", "Contacto");
+        model.addAttribute("metaDescription",
+                "Formulario de contacto, correo de soporte e información de la empresa.");
         return "support/contact";
     }
 

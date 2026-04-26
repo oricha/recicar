@@ -39,7 +39,7 @@
                     <tr th:each="p : ${products.content}">
                         <td th:text="${p.name}">—</td>
                         <td th:text="${p.partNumber != null ? p.partNumber : '—'}">—</td>
-                        <td th:text="${#numbers.formatDecimal(p.price, 1, 2)} + ' €'">0</td>
+                        <td th:text="${@priceView.plainEur(p.price)}">0</td>
                         <td th:text="${p.stockQuantity}">0</td>
                         <td th:text="${p.active} ? 'Yes' : 'No'">—</td>
                         <td class="text-end">

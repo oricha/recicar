@@ -140,7 +140,7 @@
                         
                         <!-- Price -->
                         <div class="mb-3">
-                            <span class="h2 text-success" th:text="${product.formattedPrice}">€0.00</span>
+                            <span class="h2 text-success" th:text="${@priceView.formatEur(clientPreferences, product.price)}">€0.00</span>
                             <small class="text-muted ms-2" th:if="${product.stockQuantity > 0}">
                                 <span th:text="${product.stockQuantity}">0</span> available
                             </small>
@@ -281,7 +281,7 @@
                             
                             <div class="mt-auto">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <span class="fw-bold text-success" th:text="${relatedProduct.formattedPrice}">€0.00</span>
+                                    <span class="fw-bold text-success" th:text="${@priceView.formatEur(clientPreferences, relatedProduct.price)}">€0.00</span>
                                     <small class="text-muted" th:text="${relatedProduct.condition.name()}">Condition</small>
                                 </div>
                                 
@@ -388,7 +388,7 @@
                         
                         <!-- Price -->
                         <div class="mb-3">
-                            <span class="h2 text-success" th:text="${product.formattedPrice}">€0.00</span>
+                            <span class="h2 text-success" th:text="${@priceView.formatEur(clientPreferences, product.price)}">€0.00</span>
                             <small class="text-muted ms-2" th:if="${product.stockQuantity > 0}">
                                 <span th:text="${product.stockQuantity}">0</span> available
                             </small>
@@ -529,7 +529,7 @@
                             
                             <div class="mt-auto">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <span class="fw-bold text-success" th:text="${relatedProduct.formattedPrice}">€0.00</span>
+                                    <span class="fw-bold text-success" th:text="${@priceView.formatEur(clientPreferences, relatedProduct.price)}">€0.00</span>
                                     <small class="text-muted" th:text="${relatedProduct.condition.name()}">Condition</small>
                                 </div>
                                 
@@ -636,7 +636,7 @@
                         
                         <!-- Price -->
                         <div class="mb-3">
-                            <span class="h2 text-success" th:text="${product.formattedPrice}">€0.00</span>
+                            <span class="h2 text-success" th:text="${@priceView.formatEur(clientPreferences, product.price)}">€0.00</span>
                             <small class="text-muted ms-2" th:if="${product.stockQuantity > 0}">
                                 <span th:text="${product.stockQuantity}">0</span> available
                             </small>
@@ -762,7 +762,7 @@
                             
                             <div class="mt-auto">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <span class="fw-bold text-success" th:text="${relatedProduct.formattedPrice}">€0.00</span>
+                                    <span class="fw-bold text-success" th:text="${@priceView.formatEur(clientPreferences, relatedProduct.price)}">€0.00</span>
                                     <small class="text-muted" th:text="${relatedProduct.condition.name()}">Condition</small>
                                 </div>
                                 

@@ -77,7 +77,53 @@ app:
     service-fee-rate: 0.02
   support:
     # Shown in footer / help; contact form notifications are directed here when email integration is added
-    email: help@ovoko.es
+    email: help@recicar.es
+  company:
+    display-name: "ReciCar"
+    legal-name: "recicar.es"
+    copyright-years: "2014-2026"
+    tagline: "Recambio de desguace con trazabilidad, envío en la UE y soporte en tu idioma."
+    address: "España — datos fiscales y de contacto en la facturación o aviso legal."
+    phone: ""
+    social:
+      facebook: "https://www.facebook.com/ovoko"
+      youtube: "https://www.youtube.com/@ovokocom"
+      instagram: "https://www.instagram.com/ovokocom"
+  # Store prices include IVA de referencia (España); se recalcula al cambiar región/IVA en UI
+  market:
+    default-region: ES
+    reference-vat: 0.21
+    regions:
+      - code: ES
+        name: España
+        vat: 0.21
+      - code: FR
+        name: France
+        vat: 0.20
+      - code: DE
+        name: Deutschland
+        vat: 0.19
+      - code: IT
+        name: Italia
+        vat: 0.22
+      - code: PT
+        name: Portugal
+        vat: 0.23
+      - code: NL
+        name: Países Bajos
+        vat: 0.21
+      - code: PL
+        name: Polonia
+        vat: 0.23
+      - code: AT
+        name: Austria
+        vat: 0.20
+      - code: BE
+        name: Bélgica
+        vat: 0.21
+      - code: CZ
+        name: "Rep. Checa"
+        vat: 0.21
   shipping:
     dpd:
       brand: "DPD (envío EU)"

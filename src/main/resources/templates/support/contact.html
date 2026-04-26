@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <html class="no-js" lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/new-base :: html}">
 <head>
-    <th:block th:fragment="head-extra">
-        <title th:text="${pageTitle} + ' - ReciCar'">Contacto</title>
-    </th:block>
+    <th:block th:fragment="head-extra"></th:block>
 </head>
 <body>
 <div th:fragment="content">
@@ -17,6 +15,15 @@
                 </ol>
             </nav>
             <h1 class="h2 mb-3" th:text="${pageTitle}">Contacto</h1>
+            <div class="card border shadow-sm mb-4" th:if="${company != null}">
+                <div class="card-body small">
+                    <h2 class="h6 text-uppercase text-muted" th:text="${company.legalName}">Empresa</h2>
+                    <p class="mb-1" th:text="${company.address}">Dirección</p>
+                    <p class="mb-0" th:if="${company.phone != null and !#strings.isEmpty(#strings.trim(company.phone))}">
+                        Tel.: <a th:href="'tel:' + ${company.phone}" th:text="${company.phone}">—</a>
+                    </p>
+                </div>
+            </div>
             <p class="text-muted">
                 También puedes escribirnos a
                 <a th:href="|mailto:${supportEmail}|" th:text="${supportEmail}">email</a>.

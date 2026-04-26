@@ -59,10 +59,6 @@ public class PagesController {
         return "index-2";
     }
     
-    @GetMapping("/about")
-    public String about(Model model) {
-        return "about";
-    }
 
      @GetMapping("/wishlist" )
      public String wishlist(

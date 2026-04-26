@@ -182,10 +182,10 @@
                                         <span class="oem_number" th:if="${product.oemNumber}" th:text="'OEM: ' + ${product.oemNumber}">OEM: XYZ789</span>
                                     </div>
                                     <div class="product_price">
-                                        <span class="current_price" th:text="'$' + ${#numbers.formatDecimal(product.price, 1, 2)}">$99.99</span>
-                                        <span th:if="${product.originalPrice != null and product.originalPrice > product.price}" 
-                                              class="original_price" 
-                                              th:text="'$' + ${#numbers.formatDecimal(product.originalPrice, 1, 2)}">$129.99</span>
+                                        <span class="current_price" th:text="${@priceView.formatEur(clientPreferences, product.price)}">€99.99</span>
+                                        <span th:if="${product.oldPrice != null and product.price != null and product.oldPrice > product.price}"
+                                              class="original_price"
+                                              th:text="${@priceView.formatEur(clientPreferences, product.oldPrice)}">€129.99</span>
                                     </div>
                                     <div class="product_footer">
                                         <div class="vendor_info">

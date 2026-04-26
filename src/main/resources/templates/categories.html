@@ -461,8 +461,8 @@
                                 </h3>
                                 <p class="product-category" th:text="${product.category.name}">Category</p>
                                 <div class="product-price">
-                                    <span class="current-price" th:text="${product.formattedPrice}">$160.00</span>
-                                    <span class="old-price" th:if="${product.oldPrice != null}" th:text="${#numbers.formatCurrency(product.oldPrice)}">$320.00</span>
+                                    <span class="current-price" th:text="${@priceView.formatEur(clientPreferences, product.price)}">$160.00</span>
+                                    <span class="old-price" th:if="${product.oldPrice != null}" th:text="${@priceView.formatEur(clientPreferences, product.oldPrice)}">€320.00</span>
                                 </div>
                             </div>
                         </div>

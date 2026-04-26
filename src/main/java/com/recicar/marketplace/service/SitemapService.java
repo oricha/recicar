@@ -19,6 +19,7 @@ public class SitemapService {
             "/help",
             "/faq",
             "/contact",
+            "/acerca-de-nosotros",
             "/blog",
             "/categories",
             "/lista-de-codigos-de-repuestos",

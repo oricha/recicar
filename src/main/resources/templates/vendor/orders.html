@@ -41,7 +41,7 @@
                         <td th:text="${#temporals.format(o.createdAt, 'dd MMM yyyy HH:mm')}">—</td>
                         <td th:text="${o.status}">PENDING</td>
                         <td th:text="${o.lineItemCount}">0</td>
-                        <td class="text-end" th:text="${#numbers.formatDecimal(o.lineTotalForVendor, 1, 2)} + ' €'">0</td>
+                        <td class="text-end" th:text="${@priceView.plainEur(o.lineTotalForVendor)}">0</td>
                     </tr>
                     </tbody>
                 </table>

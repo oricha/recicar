@@ -7,10 +7,22 @@
                             <div class="footer_logo">
                                 <a href="#"><img src="/img/logo/logo.png" alt=""></a>
                             </div>
-                            <div class="footer_contact">
-                                <p>Somos un equipo de diseñadores y desarrolladores que crean Magento, Prestashop, Opencart de alta calidad...</p>
-                                <p><span>Dirección</span> 4710-4890 Breckinridge St, UK Burlington, VT 05401</p>
-                                <p><span>¿Necesitas ayuda?</span>Llama: <a href="tel:1-800-345-6789">1-800-345-6789</a></p>
+                            <div class="footer_contact" th:if="${company != null}">
+                                <p th:text="${company.tagline}">Tagline de la empresa.</p>
+                                <p><span>Dirección</span> <span th:text="${company.address}">—</span></p>
+                                <p th:if="${company.phone != null and !#strings.isEmpty(#strings.trim(company.phone))}">
+                                    <span>Tel.:</span> <a th:href="'tel:' + ${company.phone}" th:text="${company.phone}">—</a>
+                                </p>
+                                <p><span>¿Necesitas ayuda?</span> <a th:href="@{/help}">Centro de ayuda</a> ·
+                                <a th:href="|mailto:${supportEmail}|" th:text="${supportEmail}">soporte</a></p>
+                                <p class="footer_social mt-2" th:if="${company.social != null}">
+                                    <a th:if="${company.social.facebook != null and !#strings.isEmpty(#strings.trim(company.social.facebook))}"
+                                       class="me-2" rel="me noopener" target="_blank" th:href="${company.social.facebook}">Facebook</a>
+                                    <a th:if="${company.social.youtube != null and !#strings.isEmpty(#strings.trim(company.social.youtube))}"
+                                       class="me-2" rel="me noopener" target="_blank" th:href="${company.social.youtube}">YouTube</a>
+                                    <a th:if="${company.social.instagram != null and !#strings.isEmpty(#strings.trim(company.social.instagram))}"
+                                       class="me-2" rel="me noopener" target="_blank" th:href="${company.social.instagram}">Instagram</a>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -24,7 +36,7 @@
                                     <li><a th:href="@{/blog}">Blog</a></li>
                                     <li><a th:href="@{/contact}">Contacto</a></li>
                                     <li><a th:href="|mailto:${supportEmail}|" th:text="'Soporte: ' + ${supportEmail}">Soporte</a></li>
-                                    <li><a th:href="@{/about}">Sobre nosotros</a></li>
+                                    <li><a th:href="@{/acerca-de-nosotros}">Sobre nosotros</a></li>
                                     <li><a th:href="@{/info-de-envio}">Información de entrega</a></li>
                                     <li><a th:href="@{/politica-de-privacidad}">Política de privacidad</a></li>
                                     <li><a th:href="@{/garantias}">Garantías</a></li>
@@ -58,9 +70,9 @@
                             <h3>Suscríbete al Boletín</h3>
                             <p>Nunca compartiremos tu dirección de correo electrónico con terceros.</p>
                             <div class="subscribe_form">
-                                <form id="mc-form" class="mc-form footer-newsletter">
-                                    <input id="mc-email" type="email" autocomplete="off" placeholder="Introduce tu dirección de correo electrónico aquí..." />
-                                    <button id="mc-submit">Suscribirse</button>
+                                <form id="mc-form" class="mc-form footer-newsletter" th:action="@{/newsletter/subscribe}" method="post">
+                                    <input name="email" id="mc-email" type="email" autocomplete="email" required placeholder="Correo electrónico" />
+                                    <button type="submit" id="mc-submit">Suscribirse</button>
                                 </form>
                                 <!-- mailchimp-alerts Start -->
                                 <div class="mailchimp-alerts text-centre">
@@ -77,7 +89,11 @@
                 <div class="row">
                     <div class="col-lg-6 col-md-6">
                         <div class="copyright_area">
-                            <p>Copyright &copy; 2021 <a href="#">Recicar</a> All Right Reserved.</p>
+                            <p th:if="${company != null}">
+                                <span th:text="${company.copyrightLine}">2014-2026 © recicar.es</span>
+                                · <span th:text="${company.displayName}">ReciCar</span>
+                            </p>
+                            <p th:unless="${company != null}">Copyright &copy; 2021 ReciCar</p>
                         </div>
                     </div>
                     <div class="col-lg-6 col-md-6">

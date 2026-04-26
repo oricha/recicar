@@ -26,7 +26,7 @@ public class SupportApiController {
 
     public SupportApiController(
             SupportContentService supportContentService,
-            @Value("${app.support.email:help@ovoko.es}") String supportEmail) {
+            @Value("${app.support.email:help@recicar.es}") String supportEmail) {
         this.supportContentService = supportContentService;
         this.supportEmail = supportEmail;
     }
