@@ -121,8 +121,8 @@
 
                             </div>
                             <div class="price_box">
-                                <span class="current_price" th:text="${product.formattedPrice}">$70.00</span>
-                                <span class="old_price" th:if="${product.oldPrice != null}" th:text="${#numbers.formatCurrency(product.oldPrice)}">$80.00</span>
+                                <span class="current_price" th:text="${@priceView.formatEur(clientPreferences, product.price)}">$70.00</span>
+                                <span class="old_price" th:if="${product.oldPrice != null}" th:text="${@priceView.formatEur(clientPreferences, product.oldPrice)}">€80.00</span>
 
                             </div>
                             <div class="product_desc">
@@ -331,7 +331,7 @@
                                 </div>
                                 <div class="product_footer d-flex align-items-center">
                                     <div class="price_box">
-                                        <span class="regular_price" th:text="${relatedProduct.formattedPrice}">$180.00</span>
+                                        <span class="regular_price" th:text="${@priceView.formatEur(clientPreferences, relatedProduct.price)}">$180.00</span>
                                     </div>
                                     <div class="add_to_cart">
                                         <a href="/cart" title="add to cart"><span class="lnr lnr-cart"></span></a>

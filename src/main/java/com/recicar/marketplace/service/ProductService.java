@@ -1,6 +1,8 @@
 package com.recicar.marketplace.service;
 
 import com.recicar.marketplace.dto.ProductRequest;
+import com.recicar.marketplace.dto.ProductCardDto;
+import com.recicar.marketplace.dto.SellerInfoDto;
 import com.recicar.marketplace.entity.Product;
 import com.recicar.marketplace.entity.ProductCondition;
 import com.recicar.marketplace.entity.Category;
@@ -172,6 +174,13 @@ public interface ProductService {
     long countActiveByVendor(Vendor vendor);
 
     /**
+     * All products (active and inactive) for seller inventory.
+     */
+    Page<Product> findAllProductsByVendorForManagement(Vendor vendor, Pageable pageable);
+
+    long countProductsByVendor(Vendor vendor);
+
+    /**
      * Find products by part number (exact match, case insensitive)
      */
     List<Product> findByPartNumber(String partNumber);
@@ -200,4 +209,19 @@ public interface ProductService {
      * Find 8 random products related to the given product for product details page
      */
     List<Product> findRelatedProducts(Long productId);
+
+    /**
+     * Listing cards for API with seller and fee information.
+     */
+    Page<ProductCardDto> getProductCards(int page, int size);
+
+    /**
+     * Count all active products for listing counters.
+     */
+    long countActiveProducts();
+
+    /**
+     * Seller information associated with a product.
+     */
+    Optional<SellerInfoDto> getSellerInfoByProductId(Long productId);
 }

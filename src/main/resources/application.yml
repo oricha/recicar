@@ -70,6 +70,64 @@ server:
     session:
       persistent: false
 
+# Checkout: ex-VAT line totals; VAT and service fee applied in CartPricingService
+app:
+  checkout:
+    vat-rate: 0.21
+    service-fee-rate: 0.02
+  support:
+    # Shown in footer / help; contact form notifications are directed here when email integration is added
+    email: help@recicar.es
+  company:
+    display-name: "ReciCar"
+    legal-name: "recicar.es"
+    copyright-years: "2014-2026"
+    tagline: "Recambio de desguace con trazabilidad, envío en la UE y soporte en tu idioma."
+    address: "España — datos fiscales y de contacto en la facturación o aviso legal."
+    phone: ""
+    social:
+      facebook: "https://www.facebook.com/ovoko"
+      youtube: "https://www.youtube.com/@ovokocom"
+      instagram: "https://www.instagram.com/ovokocom"
+  # Store prices include IVA de referencia (España); se recalcula al cambiar región/IVA en UI
+  market:
+    default-region: ES
+    reference-vat: 0.21
+    regions:
+      - code: ES
+        name: España
+        vat: 0.21
+      - code: FR
+        name: France
+        vat: 0.20
+      - code: DE
+        name: Deutschland
+        vat: 0.19
+      - code: IT
+        name: Italia
+        vat: 0.22
+      - code: PT
+        name: Portugal
+        vat: 0.23
+      - code: NL
+        name: Países Bajos
+        vat: 0.21
+      - code: PL
+        name: Polonia
+        vat: 0.23
+      - code: AT
+        name: Austria
+        vat: 0.20
+      - code: BE
+        name: Bélgica
+        vat: 0.21
+      - code: CZ
+        name: "Rep. Checa"
+        vat: 0.21
+  shipping:
+    dpd:
+      brand: "DPD (envío EU)"
+
 logging:
   file:
     name: logs/recicar-dev.log
@@ -167,26 +225,24 @@ spring:
   config:
     activate:
       on-profile: test
-      
+  # In-memory H2 for unit tests (MockMvc, @SpringBootTest). Do not use empty DATABASE_URL here — it would win over defaults.
   datasource:
-    url: ${DATABASE_URL}
-    username: ${DATABASE_USERNAME}
-    password: ${DATABASE_PASSWORD}
-    driver-class-name: org.postgresql.Driver
-    
+    url: jdbc:h2:mem:recicar_test;DB_CLOSE_DELAY=-1;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create-drop
     show-sql: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        dialect: org.hibernate.dialect.H2Dialect
 
   flyway:
-    enabled: true
+    enabled: false
     locations: classpath:db/migration
-    baseline-on-migrate: true
-    repair-on-migrate: true
 
   thymeleaf:
     cache: false

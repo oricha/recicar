@@ -1,6 +1,8 @@
 package com.recicar.marketplace.service;
 
 import com.recicar.marketplace.dto.ProductRequest;
+import com.recicar.marketplace.dto.ProductCardDto;
+import com.recicar.marketplace.dto.SellerInfoDto;
 import com.recicar.marketplace.entity.Product;
 import com.recicar.marketplace.entity.ProductCondition;
 import com.recicar.marketplace.entity.Category;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -144,6 +147,34 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Page<ProductCardDto> getProductCards(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        return productRepository.findActiveForListing(pageable).map(this::toProductCardDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long countActiveProducts() {
+        return productRepository.countByActiveTrue();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<SellerInfoDto> getSellerInfoByProductId(Long productId) {
+        return productRepository.findByIdWithSellerInfo(productId).map(product -> {
+            SellerInfoDto dto = new SellerInfoDto();
+            dto.setSellerId(product.getVendor().getId());
+            dto.setSellerName(product.getVendor().getBusinessName());
+            dto.setSellerEmail(product.getVendor().getUser() != null ? product.getVendor().getUser().getEmail() : null);
+            BigDecimal rating = computeSellerRating(product.getVendor());
+            dto.setSellerRating(rating);
+            dto.setTopSeller(rating.compareTo(new BigDecimal("4.50")) >= 0);
+            return dto;
+        });
+    }
+
+    @Override
     public Optional<Product> findActiveById(Long id) {
         return productRepository.findById(id)
                 .filter(Product::isActive);
@@ -182,6 +213,16 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Page<Product> findByVendor(Vendor vendor, Pageable pageable) {
         return productRepository.findByVendorAndActiveTrue(vendor, pageable);
+    }
+
+    @Override
+    public Page<Product> findAllProductsByVendorForManagement(Vendor vendor, Pageable pageable) {
+        return productRepository.findByVendorOrderByNameAsc(vendor, pageable);
+    }
+
+    @Override
+    public long countProductsByVendor(Vendor vendor) {
+        return productRepository.countByVendor(vendor);
     }
 
     @Override
@@ -451,5 +492,43 @@ public class ProductServiceImpl implements ProductService {
         }
 
         return relatedProducts;
+    }
+
+    private ProductCardDto toProductCardDto(Product product) {
+        ProductCardDto dto = new ProductCardDto();
+        dto.setId(product.getId());
+        dto.setName(product.getName());
+        dto.setPartNumber(product.getPartNumber());
+        dto.setPrice(product.getPrice());
+        dto.setCondition(product.getCondition() != null ? product.getCondition().name() : null);
+        dto.setInStock(product.isInStock());
+        dto.setImageUrl(product.getPrimaryImage() != null ? product.getPrimaryImage().getImageUrl() : null);
+        dto.setSellerName(product.getVendor().getBusinessName());
+        BigDecimal rating = computeSellerRating(product.getVendor());
+        dto.setSellerRating(rating);
+        dto.setTopSeller(rating.compareTo(new BigDecimal("4.50")) >= 0);
+        dto.setServiceFeePercent(new BigDecimal("1.50"));
+        dto.setServiceFeeMin(new BigDecimal("1.99"));
+        dto.setServiceFeeMax(new BigDecimal("3.99"));
+        return dto;
+    }
+
+    private BigDecimal computeSellerRating(Vendor vendor) {
+        if (vendor.getMetrics() == null || vendor.getMetrics().isEmpty()) {
+            return new BigDecimal("4.00");
+        }
+        BigDecimal averageConversion = vendor.getMetrics().stream()
+                .map(metric -> metric.getConversionRate() == null ? BigDecimal.ZERO : metric.getConversionRate())
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .divide(BigDecimal.valueOf(vendor.getMetrics().size()), 4, RoundingMode.HALF_UP);
+
+        BigDecimal scaled = averageConversion.multiply(BigDecimal.valueOf(5));
+        if (scaled.compareTo(BigDecimal.ONE) < 0) {
+            return BigDecimal.ONE;
+        }
+        if (scaled.compareTo(BigDecimal.valueOf(5)) > 0) {
+            return BigDecimal.valueOf(5);
+        }
+        return scaled.setScale(2, RoundingMode.HALF_UP);
     }
 }

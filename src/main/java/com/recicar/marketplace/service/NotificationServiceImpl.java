@@ -26,4 +26,13 @@ public class NotificationServiceImpl implements NotificationService {
         log.info("Simulating sending password reset email to: {}, link: {}", user.getEmail(), resetLink);
         // In a real application, integrate with an email service provider here
     }
+
+    @Override
+    public void sendSupportContactInquiry(
+            String fromName, String fromEmail, String subject, String body, String toAddress) {
+        log.info(
+                "Support contact — to: {} | from: {} <{}> | subject: {} | message (truncated): {}...",
+                toAddress, fromName, fromEmail, subject,
+                body != null && body.length() > 200 ? body.substring(0, 200) : body);
+    }
 }

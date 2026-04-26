@@ -23,11 +23,17 @@ public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private final CartPricingService cartPricingService;
 
-    public CartServiceImpl(CartRepository cartRepository, ProductRepository productRepository, UserRepository userRepository) {
+    public CartServiceImpl(
+            CartRepository cartRepository,
+            ProductRepository productRepository,
+            UserRepository userRepository,
+            CartPricingService cartPricingService) {
         this.cartRepository = cartRepository;
         this.productRepository = productRepository;
         this.userRepository = userRepository;
+        this.cartPricingService = cartPricingService;
     }
 
     @Override
@@ -37,7 +43,7 @@ public class CartServiceImpl implements CartService {
         try {
             Cart cart = getCartForUser(userId);
             log.debug("Cart retrieved successfully, items count: {}", cart.getItems().size());
-            CartDto dto = toDto(cart);
+            CartDto dto = finalizeForUser(cart, userId);
             log.debug("CartDto created successfully");
             return dto;
         } catch (Exception e) {
@@ -53,21 +59,22 @@ public class CartServiceImpl implements CartService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        if (product.getStockQuantity() < quantity) {
-            throw new RuntimeException("Not enough stock for product: " + product.getName());
-        }
-
-        if (quantity > 10) {
-            throw new RuntimeException("You can add a maximum of 10 items of the same product to the cart.");
-        }
-
         CartItem cartItem = cart.getItems().stream()
                 .filter(item -> item.getProduct().getId().equals(productId))
                 .findFirst()
                 .orElse(null);
 
+        int newQuantity = (cartItem != null) ? cartItem.getQuantity() + quantity : quantity;
+
+        if (newQuantity > product.getStockQuantity()) {
+            throw new RuntimeException("Not enough stock for product: " + product.getName());
+        }
+        if (newQuantity > 10) {
+            throw new RuntimeException("You can add a maximum of 10 items of the same product to the cart.");
+        }
+
         if (cartItem != null) {
-            cartItem.setQuantity(cartItem.getQuantity() + quantity);
+            cartItem.setQuantity(newQuantity);
         } else {
             cartItem = new CartItem();
             cartItem.setCart(cart);
@@ -78,7 +85,7 @@ public class CartServiceImpl implements CartService {
         }
 
         cartRepository.save(cart);
-        return toDto(cart);
+        return finalizeForUser(cart, userId);
     }
 
     @Override
@@ -100,7 +107,7 @@ public class CartServiceImpl implements CartService {
 
         cartItem.setQuantity(quantity);
         cartRepository.save(cart);
-        return toDto(cart);
+        return finalizeForUser(cart, userId);
     }
 
     @Override
@@ -117,6 +124,12 @@ public class CartServiceImpl implements CartService {
         Cart cart = getCartForUser(userId);
         cart.getItems().clear();
         cartRepository.save(cart);
+    }
+
+    private CartDto finalizeForUser(Cart cart, Long userId) {
+        CartDto dto = toDto(cart);
+        cartPricingService.applyPricing(dto, userId, null, null, null);
+        return dto;
     }
 
     @Override

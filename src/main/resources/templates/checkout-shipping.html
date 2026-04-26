@@ -1,0 +1,69 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es" class="no-js">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Checkout — envío | ReciCar</title>
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+</head>
+<body>
+<th:block th:replace="fragments/_header :: header"></th:block>
+<th:block th:replace="fragments/_offcanvasmenu :: offcanvasmenu"></th:block>
+<div class="breadcrumbs_area">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="breadcrumb_content">
+                    <ul>
+                        <li><a th:href="@{/}">Inicio</a></li>
+                        <li>Checkout (1/2)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<section class="main_content_area py-5">
+    <div class="container">
+        <h2>Datos de envío</h2>
+        <p class="text-muted">Paso 1 de 2 — después indicarás el pago.</p>
+        <form th:action="@{/checkout/shipping}" method="post" class="row g-3" style="max-width: 640px;">
+            <div class="col-md-6">
+                <label class="form-label">Nombre</label>
+                <input class="form-control" name="firstName" th:value="${checkoutForm.firstName}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Apellidos</label>
+                <input class="form-control" name="lastName" th:value="${checkoutForm.lastName}">
+            </div>
+            <div class="col-12">
+                <label class="form-label">Dirección *</label>
+                <input class="form-control" name="address" required th:value="${checkoutForm.address}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Ciudad *</label>
+                <input class="form-control" name="city" required th:value="${checkoutForm.city}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Provincia / estado</label>
+                <input class="form-control" name="state" th:value="${checkoutForm.state}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">C.P. *</label>
+                <input class="form-control" name="zipCode" required th:value="${checkoutForm.zipCode}">
+            </div>
+            <div class="col-12">
+                <label class="form-label">País * (p. ej. ES o Spain)</label>
+                <input class="form-control" name="country" required th:value="${checkoutForm.country}" placeholder="ES">
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Continuar al pago</button>
+                <a class="btn btn-link" th:href="@{/cart}">Volver al carrito</a>
+            </div>
+        </form>
+    </div>
+</section>
+<th:block th:replace="fragments/_footer :: footer"></th:block>
+</body>
+</html>

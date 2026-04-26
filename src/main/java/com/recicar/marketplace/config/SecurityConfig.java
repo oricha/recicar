@@ -2,6 +2,7 @@ package com.recicar.marketplace.config;
 
 import com.recicar.marketplace.service.CartService;
 import com.recicar.marketplace.service.CustomUserDetailsService;
+import com.recicar.marketplace.service.WishlistService;
 import com.recicar.marketplace.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -51,12 +52,14 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationSuccessHandler customAuthenticationSuccessHandler() {
-        return new CustomAuthenticationSuccessHandler(cartService, userRepository);
+    public AuthenticationSuccessHandler customAuthenticationSuccessHandler(WishlistService wishlistService) {
+        return new CustomAuthenticationSuccessHandler(cartService, userRepository, wishlistService);
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(
+            HttpSecurity http,
+            AuthenticationSuccessHandler customAuthenticationSuccessHandler) throws Exception {
         http
             .headers(headers -> headers
                 .contentSecurityPolicy(csp -> csp.policyDirectives(
@@ -84,7 +87,7 @@ public class SecurityConfig {
                         "/img/**", 
                         "/css/**", 
                         "/js/**", 
-                        "/api/**", 
+                        "/api/v1/auth/**",
                         "/login", 
                         "/register", 
                         "/forgot-password", 
@@ -93,6 +96,13 @@ public class SecurityConfig {
                         "/shop**", 
                         "/product-details**"
                 ).permitAll()
+                .requestMatchers(
+                        "/user-dashboard/**",
+                        "/api/v1/user/**"
+                ).authenticated()
+                .requestMatchers("/wishlist/**", "/cart/**", "/api/cart/**", "/checkout/**", "/my-account/**").authenticated()
+                .requestMatchers("/vendor/**", "/api/vendor/**", "/api/v1/vendor/**").hasAnyRole("VENDOR", "ADMIN")
+                .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().permitAll()
             )
             .formLogin(form -> form
@@ -101,7 +111,7 @@ public class SecurityConfig {
                 .loginProcessingUrl("/spring-security-login")
                 .usernameParameter("email")
                 .passwordParameter("password")
-                .successHandler(customAuthenticationSuccessHandler())
+                .successHandler(customAuthenticationSuccessHandler)
                 .failureUrl("/login?error")
                 .permitAll()
             )

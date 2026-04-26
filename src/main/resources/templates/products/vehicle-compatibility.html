@@ -22,7 +22,7 @@
     <div th:each="product : ${products}">
         <h2 th:text="${product.name}"></h2>
         <p th:text="${product.description}"></p>
-        <p th:text="${product.price}"></p>
+        <p th:text="${@priceView.formatEur(clientPreferences, product.price)}">€0.00</p>
     </div>
 </div>
 

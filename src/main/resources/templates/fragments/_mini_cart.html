@@ -23,7 +23,7 @@
                 <div class="cart_info">
                     <a th:href="@{/product-details(id=${item.productId})}" th:text="${item.productName}">Product</a>
                     <span class="quantity" th:text="'Qty: ' + ${item.quantity}">Qty: 1</span>
-                    <span class="price_cart" th:text="'$' + ${#numbers.formatDecimal(item.price, 1, 2)}">$0.00</span>
+                    <span class="price_cart" th:text="${@priceView.formatEur(clientPreferences, item.price)}">€0.00</span>
                 </div>
                 <div class="cart_remove">
                     <a th:href="@{'/cart/remove/' + ${item.id}}"><i class="ion-android-close"></i></a>
@@ -38,7 +38,7 @@
         <div class="mini_cart_table">
             <div class="cart_total">
                 <span>Sub total:</span>
-                <span class="price" th:text="'$' + ${#numbers.formatDecimal(cart != null ? cart.subtotal : 0, 1, 2)}">$0.00</span>
+                <span class="price" th:text="${@priceView.plainEur(cart != null ? cart.subtotal : null)}">€0.00</span>
             </div>
         </div>
 

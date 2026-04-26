@@ -128,10 +128,18 @@ ext.loadDotEnv = {
 
 // Si existe TEST_* en .env / entorno, los tests usan ese PostgreSQL (p. ej. misma URL que el servicio de test en Dokploy o CI).
 tasks.named('test', Test) {
+    useJUnitPlatform {
+        // @Tag("integration") uses Testcontainers; run with: ./gradlew test -PincludeIntegration
+        if (!project.hasProperty('includeIntegration')) {
+            excludeTags 'integration'
+        }
+    }
     def envs = loadDotEnv()
     def testUrl = envs['TEST_DATABASE_URL'] ?: System.getenv('TEST_DATABASE_URL')
     if (testUrl) {
+        // Integration tests against PostgreSQL: URL + driver must match (else H2 from yaml is paired with a jdbc:postgresql URL).
         environment 'SPRING_DATASOURCE_URL', testUrl
+        environment 'SPRING_DATASOURCE_DRIVER_CLASS_NAME', 'org.postgresql.Driver'
         environment 'SPRING_DATASOURCE_USERNAME', envs['TEST_DATABASE_USERNAME'] ?: System.getenv('TEST_DATABASE_USERNAME') ?: ''
         environment 'SPRING_DATASOURCE_PASSWORD', envs['TEST_DATABASE_PASSWORD'] ?: System.getenv('TEST_DATABASE_PASSWORD') ?: ''
         environment 'SPRING_FLYWAY_ENABLED', 'true'

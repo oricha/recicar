@@ -1,0 +1,63 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es" class="no-js">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Checkout — pago | ReciCar</title>
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+</head>
+<body>
+<th:block th:replace="fragments/_header :: header"></th:block>
+<th:block th:replace="fragments/_offcanvasmenu :: offcanvasmenu"></th:block>
+<div class="breadcrumbs_area">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="breadcrumb_content">
+                    <ul>
+                        <li><a th:href="@{/}">Inicio</a></li>
+                        <li>Checkout (2/2)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<section class="main_content_area py-5">
+    <div class="container">
+        <h2>Resumen y pago</h2>
+        <p th:if="${shippingDraft != null}" class="text-muted" th:text="${shippingDraft.address} + ', ' + ${shippingDraft.zipCode} + ' ' + ${shippingDraft.city} + ' — ' + ${shippingDraft.country}">Dirección</p>
+        <p th:if="${cart != null && cart.shippingCarrierLabel != null}" th:text="${cart.shippingCarrierLabel}" class="small text-info"></p>
+        <div class="row">
+            <div class="col-lg-6">
+                <h4>Totales</h4>
+                <table class="table" th:if="${cart != null}">
+                    <tr><td>Subtotal (IVA excl.)</td><td th:text="${@priceView.plainEur(cart.subtotal)}"></td></tr>
+                    <tr th:if="${cart.serviceFee != null}"><td>Tarifa de servicio</td><td th:text="${@priceView.plainEur(cart.serviceFee)}"></td></tr>
+                    <tr th:if="${cart.shippingAmount != null}"><td>Envío</td><td th:text="${@priceView.plainEur(cart.shippingAmount)}"></td></tr>
+                    <tr th:if="${cart.vatAmount != null}"><td>IVA</td><td th:text="${@priceView.plainEur(cart.vatAmount)}"></td></tr>
+                    <tr><th>Total (IVA incl.)</th><th th:text="${@priceView.plainEur(cart.totalAmount)}"></th></tr>
+                </table>
+            </div>
+            <div class="col-lg-6">
+                <h4>Método de pago</h4>
+                <form th:action="@{/checkout/confirm}" method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Selecciona</label>
+                        <select name="paymentMethod" class="form-select" required>
+                            <option th:each="pm : ${paymentMethods}" th:value="${pm.name()}" th:text="${pm.name()}" th:selected="${pm.name() == paymentMethod}"></option>
+                        </select>
+                    </div>
+                    <p class="text-muted small">Integración con pasarelas (PayPal, Stripe, etc.) no incluida: aquí se registra el método y se simula el cobro (transferencia = pendiente).</p>
+                    <div th:if="${checkoutError != null}" class="alert alert-danger" th:text="${checkoutError}"></div>
+                    <button type="submit" class="btn btn-primary w-100">Confirmar pedido</button>
+                </form>
+                <a class="btn btn-link mt-2" th:href="@{/checkout/shipping}">Volver al envío</a>
+            </div>
+        </div>
+    </div>
+</section>
+<th:block th:replace="fragments/_footer :: footer"></th:block>
+</body>
+</html>

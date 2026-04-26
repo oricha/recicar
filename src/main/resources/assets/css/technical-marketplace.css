@@ -1,0 +1,145 @@
+/**
+ * Technical storefront UX: mobile-first, hamburger nav, search suggestions, market bar.
+ * Loaded after style.css in layout/new-base.
+ */
+
+/* --- Viewport & touch targets (mobile-first) --- */
+.main-content,
+.container {
+  max-width: 100%;
+}
+
+.hamburger_btn {
+  display: none;
+  background: #ffd54c;
+  border: none;
+  border-radius: 4px;
+  width: 44px;
+  height: 44px;
+  line-height: 1;
+  font-size: 1.4rem;
+  color: #333;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.hamburger_btn:focus {
+  outline: 2px solid #333;
+  outline-offset: 2px;
+}
+
+@media (max-width: 991.98px) {
+  .hamburger_btn {
+    display: inline-flex;
+  }
+
+  .header_bottom .main_nav_with_toggle {
+    position: relative;
+  }
+
+  .header_bottom .main_menu.header_position {
+    width: 100%;
+  }
+
+  .header_bottom .main_menu nav > ul {
+    display: none;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.5rem 0 1rem;
+    width: 100%;
+  }
+
+  .header_bottom .main_menu nav > ul.mnav-open {
+    display: flex;
+  }
+
+  .header_bottom .main_menu nav > ul > li {
+    width: 100%;
+    border-bottom: 1px solid #eee;
+  }
+
+  .header_bottom .main_menu.mnav-floating {
+    z-index: 30;
+  }
+}
+
+/* --- Market / IVA bar --- */
+.market_ux_bar {
+  border-top: 1px solid #eee;
+  font-size: 0.85rem;
+}
+
+.market_ux_bar .form-select {
+  max-width: 12rem;
+}
+
+@media (max-width: 576px) {
+  .market_ux_bar {
+    font-size: 0.8rem;
+  }
+
+  .market_ux_bar .form-select {
+    max-width: 100%;
+  }
+}
+
+/* --- Header search autocomplete --- */
+.search-container.position-relative {
+  position: relative;
+}
+
+.header-search-suggestions {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  z-index: 100;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-top: 0;
+  max-height: 280px;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.header-search-suggestions[hidden] {
+  display: none !important;
+}
+
+.header-search-suggestions button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: #fff;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+}
+
+.header-search-suggestions button:hover,
+.header-search-suggestions button:focus {
+  background: #fff9e6;
+  outline: none;
+}
+
+/* --- Middel: stack on small --- */
+@media (max-width: 767.98px) {
+  .header_middle .middel_right {
+    flex-direction: column;
+    align-items: stretch !important;
+  }
+
+  .header_middle .search-container {
+    order: 2;
+  }
+
+  .header_middle .middel_right_info {
+    order: 1;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+  }
+}

@@ -1,0 +1,36 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" class="no-js" lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Términos y condiciones de uso de la plataforma ReciCar.">
+    <title th:text="${pageTitle} + ' | ReciCar'">Términos de uso | ReciCar</title>
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/assets/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+</head>
+<body>
+<th:block th:replace="fragments/_header :: header"></th:block>
+<th:block th:replace="fragments/_offcanvasmenu :: offcanvasmenu"></th:block>
+<th:block th:replace="~{fragments/_legal_hero_breadcrumb :: legalBreadcrumb (currentLabel=${pageTitle})}"></th:block>
+<section class="main_content_area py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h1 th:text="${pageTitle}">Términos de uso</h1>
+                <p class="text-muted">Última actualización: documento informativo; revisa la versión vinculada al registro o al pedido en producción.</p>
+                <h2>1. Objeto</h2>
+                <p><strong>ReciCar</strong> es un marketplace en el que terceros vendedores ofertan recambios; el operador de la plataforma facilita la interacción, el catálogo y el proceso de compra según se configure. La relación de compraventa concreta es entre tú y el vendedor, sin perjuicio de las obligaciones que correspondan a ReciCar como intermediario o prestador de servicios adicionales.</p>
+                <h2>2. Cuenta y uso</h2>
+                <p>Te comprometes a facilitar datos veraces, mantener la confidencialidad de tu acceso y no utilizar el servicio con fines ilícitos, fraudulentos o que saturen la infraestructura.</p>
+                <h2>3. Productos y vendedores</h2>
+                <p>La descripción, compatibilidad, referencias (OEM) y el estado (nuevo, usado, reacondicionado) son responsabilidad del vendedor. Revisa la ficha antes de comprar. Las garantías de conformidad o comerciales aplican según vendedor y ley, tal como se refleja en nuestro apartado de <a th:href="@{/garantias}">garantías</a> y legales vinculados.</p>
+                <h2>4. Modificaciones</h2>
+                <p>Podemos actualizar estos términos; la continuidad del uso posterior a la notificación razonable puede implicar su aceptación, según se implemente en la plataforma.</p>
+            </div>
+        </div>
+    </div>
+</section>
+<th:block th:replace="fragments/_footer :: footer"></th:block>
+</body>
+</html>

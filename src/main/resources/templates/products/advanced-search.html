@@ -277,7 +277,7 @@
                                             
                                             <div class="mt-auto">
                                                 <div class="d-flex justify-content-between align-items-center mb-2">
-                                                    <span class="price fw-bold" th:text="${product.formattedPrice}">€0.00</span>
+                                                    <span class="price fw-bold" th:text="${@priceView.formatEur(clientPreferences, product.price)}">€0.00</span>
                                                     <small class="text-muted" th:text="${product.vendor.businessName}">Vendor</small>
                                                 </div>
                                                 

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html class="no-js" lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/new-base :: html}">
+<head>
+    <th:block th:fragment="head-extra">
+        <th:block th:if="${metaDescription != null}">
+            <meta name="description" th:content="${metaDescription}"/>
+        </th:block>
+    </th:block>
+</head>
+<body>
+<div th:fragment="content">
+    <section class="py-5 company_about">
+        <div class="container" style="max-width: 800px;">
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a th:href="@{/}">Inicio</a></li>
+                    <li class="breadcrumb-item active" aria-current="page" th:text="${company.displayName}">Empresa</li>
+                </ol>
+            </nav>
+            <h1 class="h2 mb-3" th:text="${pageTitle}">Acerca de nosotros</h1>
+            <p class="lead" th:text="${company.tagline}">Tagline</p>
+
+            <h2 class="h5 mt-4">Misión</h2>
+            <p>Conectamos a compradores con desguaces y vendedores profesionales, con información clara del repuesto, envío y políticas. Operamos bajo el nombre comercial
+                <strong th:text="${company.displayName}">ReciCar</strong> y la marca
+                <strong th:text="${company.legalName}">recicar.es</strong> en los canales oficiales.</p>
+
+            <h2 class="h5 mt-4">Transparencia</h2>
+            <p>Encontrarás condiciones de envío, pago, devoluciones y garantía en el pie del sitio. El soporte y el formulario de contacto están a tu disposición para incidencias y dudas.</p>
+
+            <h2 class="h5 mt-4">Dónde estamos</h2>
+            <p th:text="${company.address}">Dirección</p>
+            <p th:if="${company.phone != null and !#strings.isEmpty(#strings.trim(company.phone))}">
+                <a th:href="'tel:' + ${company.phone}" th:text="${company.phone}">Tel</a>
+            </p>
+
+            <h2 class="h5 mt-4">Síguenos</h2>
+            <ul class="list-inline" th:if="${company.social != null}">
+                <li class="list-inline-item" th:if="${company.social.facebook != null and !#strings.isEmpty(#strings.trim(company.social.facebook))}">
+                    <a rel="me noopener" target="_blank" th:href="${company.social.facebook}">Facebook</a>
+                </li>
+                <li class="list-inline-item" th:if="${company.social.youtube != null and !#strings.isEmpty(#strings.trim(company.social.youtube))}">
+                    <a rel="me noopener" target="_blank" th:href="${company.social.youtube}">YouTube</a>
+                </li>
+                <li class="list-inline-item" th:if="${company.social.instagram != null and !#strings.isEmpty(#strings.trim(company.social.instagram))}">
+                    <a rel="me noopener" target="_blank" th:href="${company.social.instagram}">Instagram</a>
+                </li>
+            </ul>
+
+            <p class="mt-4 mb-0">
+                <a th:href="@{/contact}">Contacto</a> ·
+                <a th:href="@{/help}">Centro de ayuda</a>
+            </p>
+        </div>
+    </section>
+</div>
+</body>
+</html>

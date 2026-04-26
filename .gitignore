@@ -121,9 +121,11 @@ Thumbs.db
 .gemini/
 .cursor/
 .kiro/
+.agents/
 .agent/
 .vscode/
 .idea/
+.metals/
 .gradle/
 bin/
 build/
@@ -135,4 +137,6 @@ target/
 .settings/
 /recicar/
 /.codex
+.claude/
+openspec/
 node_modules/

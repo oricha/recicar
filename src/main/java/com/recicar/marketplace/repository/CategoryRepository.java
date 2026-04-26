@@ -33,6 +33,11 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
        List<Category> findByParentAndActiveTrueOrderBySortOrderAsc(Category parent);
 
        /**
+        * Find all child categories by parent id.
+        */
+       List<Category> findByParentIdAndActiveTrueOrderBySortOrderAsc(Long parentId);
+
+       /**
         * Find categories by name (case insensitive)
         */
        List<Category> findByNameContainingIgnoreCaseAndActiveTrue(String name);
@@ -58,6 +63,17 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
                      "FROM categories c JOIN category_tree ct ON c.parent_id = ct.id" +
                      ") SELECT * FROM category_tree", nativeQuery = true)
        List<Category> findCategoryHierarchy(@Param("categoryId") Long categoryId);
+
+       /**
+        * Find hierarchy using parent-child relationship from slug.
+        */
+       @Query(value = "WITH RECURSIVE category_path AS (" +
+                     "SELECT c.id, c.parent_id, c.name, c.slug FROM categories c WHERE c.slug = :slug " +
+                     "UNION ALL " +
+                     "SELECT parent.id, parent.parent_id, parent.name, parent.slug " +
+                     "FROM categories parent JOIN category_path cp ON cp.parent_id = parent.id" +
+                     ") SELECT id FROM category_path", nativeQuery = true)
+       List<Long> findHierarchy(@Param("slug") String slug);
 
        /**
         * Count products in category (including subcategories)

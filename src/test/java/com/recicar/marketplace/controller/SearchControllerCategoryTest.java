@@ -1,9 +1,11 @@
 package com.recicar.marketplace.controller;
 
+import com.recicar.marketplace.config.MvcSliceTestConfig;
 import com.recicar.marketplace.entity.Category;
 import com.recicar.marketplace.entity.Product;
 import com.recicar.marketplace.service.CategoryService;
 import com.recicar.marketplace.service.ProductService;
+import com.recicar.marketplace.service.SearchService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -23,10 +25,12 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 
 @WebMvcTest(controllers = SearchController.class)
 @AutoConfigureMockMvc(addFilters = false)
+@Import(MvcSliceTestConfig.class)
 class SearchControllerCategoryTest {
 
     @Autowired
@@ -37,6 +41,9 @@ class SearchControllerCategoryTest {
 
     @MockBean
     private CategoryService categoryService;
+
+    @MockBean
+    private SearchService searchService;
 
     @Test
     public void testSearchByCategory_Success() throws Exception {

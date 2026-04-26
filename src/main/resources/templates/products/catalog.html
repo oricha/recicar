@@ -187,7 +187,7 @@
                                 
                                 <div class="mt-auto">
                                     <div class="d-flex justify-content-between align-items-center">
-                                        <span class="price" th:text="${product.formattedPrice}">€0.00</span>
+                                        <span class="price" th:text="${@priceView.formatEur(clientPreferences, product.price)}">€0.00</span>
                                         <small class="text-muted" th:if="${product.stockQuantity > 0}">
                                             <span th:text="${product.stockQuantity}">0</span> available
                                         </small>

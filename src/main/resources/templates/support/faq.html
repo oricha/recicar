@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html class="no-js" lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/new-base :: html}">
+<head>
+    <th:block th:fragment="head-extra">
+        <title th:text="${pageTitle} + ' - ReciCar'">FAQs</title>
+    </th:block>
+</head>
+<body>
+<div th:fragment="content">
+    <section class="py-5 support_faq">
+        <div class="container" style="max-width: 900px;">
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a th:href="@{/}">Inicio</a></li>
+                    <li class="breadcrumb-item"><a th:href="@{/help}">Ayuda</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">FAQs</li>
+                </ol>
+            </nav>
+            <h1 class="h2 mb-4" th:text="${pageTitle}">Preguntas frecuentes</h1>
+
+            <div th:if="${categories == null or #lists.isEmpty(categories)}" class="alert alert-info">
+                No hay preguntas disponibles en este momento.
+            </div>
+
+            <div th:each="cat, iter : ${categories}" class="mb-5">
+                <h2 class="h4 text-uppercase border-bottom pb-2" th:text="${cat.title}">Categoría</h2>
+                <div class="accordion" th:id="${'acc' + iter.index}">
+                    <div th:each="e, eit : ${cat.entries}" class="accordion-item">
+                        <h3 class="accordion-header" th:id="${'h-' + e.id}">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    th:data-bs-target="|#c-${e.id}|"
+                                    th:aria-controls="|c-${e.id}|"
+                                    aria-expanded="false" th:text="${e.question}">Pregunta</button>
+                        </h3>
+                        <div th:id="|c-${e.id}|" class="accordion-collapse collapse"
+                             th:aria-labelledby="|h-${e.id}|">
+                            <div class="accordion-body" th:text="${e.answer}">Respuesta</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-muted small mb-0">
+                ¿Necesitas más ayuda? <a th:href="@{/contact}">Contacta con nosotros</a> o
+                <a th:href="|mailto:${supportEmail}|">escríbenos a <span th:text="${supportEmail}">email</span></a>.
+            </p>
+        </div>
+    </section>
+</div>
+</body>
+</html>

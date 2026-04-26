@@ -99,7 +99,7 @@
                                                 </a>
                                             </td>
                                             <td class="product_name"><a th:href="@{/product-details(id=${p.id})}" th:text="${p.name}">Product Name</a></td>
-                                            <td class="product-price" th:text="${p.formattedPrice}">€0.00</td>
+                                            <td class="product-price" th:text="${@priceView.formatEur(clientPreferences, p.price)}">€0.00</td>
                                             <td class="product_quantity">
                                                 <span th:text="${p.inStock} ? 'In Stock' : 'Out of Stock'">In Stock</span>
                                             </td>

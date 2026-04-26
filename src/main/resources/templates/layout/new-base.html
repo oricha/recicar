@@ -5,7 +5,13 @@
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title th:text="${pageTitle != null ? pageTitle + ' - Car Parts Marketplace' : 'Car Parts Marketplace'}">Car Parts Marketplace</title>
-    <meta name="description" content="">
+    <th:block th:if="${metaDescription != null and !#strings.isEmpty(#strings.trim(metaDescription))}">
+        <meta name="description" th:content="${metaDescription}"/>
+    </th:block>
+    <th:block th:unless="${metaDescription != null and !#strings.isEmpty(#strings.trim(metaDescription))}">
+        <meta name="description" content="">
+    </th:block>
+    <link rel="canonical" th:if="${canonicalUrl != null}" th:href="${canonicalUrl}"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
     <!-- Favicon -->
@@ -23,6 +29,7 @@
     <link rel="stylesheet" href="/assets/css/slinky.menu.css">
     <link rel="stylesheet" href="/assets/css/plugins.css">
     <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/technical-marketplace.css">
     
     <!-- Additional head content -->
     <th:block th:fragment="head-extra"></th:block>
@@ -149,6 +156,7 @@
     <script src="/assets/js/slinky.menu.js"></script>
     <script src="/assets/js/plugins.js"></script>
     <script src="/assets/js/main.js"></script>
+    <script src="/assets/js/technical-ux.js"></script>
     <script>
     // Global mini-cart counter initialization
     document.addEventListener('DOMContentLoaded', function() {

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/new-base :: html}">
+<head>
+    <th:block th:fragment="head-extra">
+        <title th:text="${pageTitle + ' - Car Parts Marketplace'}">Product - Car Parts Marketplace</title>
+    </th:block>
+</head>
+<body>
+<div th:fragment="content">
+    <section class="vendor_product_form py-5">
+        <div class="container" style="max-width: 720px;">
+            <h1 class="h3 mb-4" th:text="${pageTitle}">Product</h1>
+            <p>
+                <a th:href="@{/vendor/inventory}">← Back to inventory</a>
+            </p>
+
+            <form th:object="${productRequest}" method="post" th:action="@{/vendor/products}">
+                <input type="hidden" th:if="*{id != null}" th:field="*{id}" />
+
+                <div class="mb-3">
+                    <label class="form-label" for="name">Name</label>
+                    <input class="form-control" id="name" th:field="*{name}" required maxlength="255" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="description">Description</label>
+                    <textarea class="form-control" id="description" th:field="*{description}" rows="4"></textarea>
+                </div>
+
+                <div class="row">
+                    <div class="mb-3 col-md-6">
+                        <label class="form-label" for="categoryId">Category</label>
+                        <select class="form-select" id="categoryId" th:field="*{categoryId}" required>
+                            <option value="" disabled th:selected="*{categoryId} == null">Select…</option>
+                            <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.name}">Cat</option>
+                        </select>
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <label class="form-label" for="condition">Condition</label>
+                        <select class="form-select" id="condition" th:field="*{condition}" required>
+                            <option th:each="cond : ${conditions}" th:value="${cond.name()}" th:text="${cond}">—</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="mb-3 col-md-4">
+                        <label class="form-label" for="price">Price (€)</label>
+                        <input class="form-control" id="price" type="number" step="0.01" min="0" th:field="*{price}" required />
+                    </div>
+                    <div class="mb-3 col-md-4">
+                        <label class="form-label" for="stockQuantity">Stock</label>
+                        <input class="form-control" id="stockQuantity" type="number" min="0" th:field="*{stockQuantity}" required />
+                    </div>
+                    <div class="mb-3 col-md-4">
+                        <label class="form-label" for="weightKg">Weight (kg)</label>
+                        <input class="form-control" id="weightKg" type="number" step="0.001" min="0" th:field="*{weightKg}" />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="mb-3 col-md-6">
+                        <label class="form-label" for="partNumber">Part number</label>
+                        <input class="form-control" id="partNumber" th:field="*{partNumber}" maxlength="100" />
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <label class="form-label" for="oemNumber">OEM number</label>
+                        <input class="form-control" id="oemNumber" th:field="*{oemNumber}" maxlength="100" />
+                    </div>
+                </div>
+
+                <div class="mb-4 form-check">
+                    <input class="form-check-input" type="checkbox" id="active" th:field="*{active}" />
+                    <label class="form-check-label" for="active">Active (visible in catalog when in stock rules apply)</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary" th:text="${isEdit} ? 'Save' : 'Create'">Save</button>
+            </form>
+        </div>
+    </section>
+</div>
+</body>
+</html>

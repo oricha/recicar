@@ -30,6 +30,9 @@ public class Order {
     @Column(nullable = false)
     private BigDecimal subtotal;
 
+    @Column(name = "service_fee", nullable = false)
+    private BigDecimal serviceFee = BigDecimal.ZERO;
+
     @Column(nullable = false)
     private BigDecimal taxAmount;
 

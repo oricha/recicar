@@ -4,16 +4,23 @@ import com.recicar.marketplace.entity.User;
 import com.recicar.marketplace.entity.UserRole;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
+/**
+ * Slices the JPA layer: schema is created by Hibernate (ddl-auto) instead of Flyway, because
+ * PostgreSQL-specific migrations (e.g. GIN in V15) are not valid on the embedded H2 test DB.
+ */
+@DataJpaTest(excludeAutoConfiguration = FlywayAutoConfiguration.class)
 @ActiveProfiles("test")
+@TestPropertySource(properties = "spring.jpa.hibernate.ddl-auto=create-drop")
 class UserRepositoryTest {
 
     @Autowired

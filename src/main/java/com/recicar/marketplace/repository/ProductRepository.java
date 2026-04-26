@@ -7,6 +7,7 @@ import com.recicar.marketplace.entity.Vendor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -42,7 +43,22 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Page<Product> findByVendorAndActiveTrue(Vendor vendor, Pageable pageable);
 
+    /**
+     * All products for a vendor (active and inactive), for seller inventory management.
+     */
+    Page<Product> findByVendorOrderByNameAsc(Vendor vendor, Pageable pageable);
+
     Page<Product> findByActiveTrue(Pageable pageable);
+    long countByActiveTrue();
+
+    @EntityGraph(attributePaths = {"vendor", "vendor.user", "images", "vendor.metrics"})
+    @Query(value = "SELECT p FROM Product p WHERE p.active = true",
+            countQuery = "SELECT COUNT(p) FROM Product p WHERE p.active = true")
+    Page<Product> findActiveForListing(Pageable pageable);
+
+    @EntityGraph(attributePaths = {"vendor", "vendor.user", "vendor.metrics"})
+    @Query("SELECT p FROM Product p WHERE p.id = :id")
+    java.util.Optional<Product> findByIdWithSellerInfo(@Param("id") Long id);
 
     Page<Product> findByCategoryAndActiveTrue(Category category, Pageable pageable);
 
@@ -60,6 +76,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findLowStockProductsByVendor(@Param("vendor") Vendor vendor);
 
     long countByVendorAndActiveTrue(Vendor vendor);
+
+    long countByVendor(Vendor vendor);
 
     // Methods for exact match searches (case insensitive)
     List<Product> findByPartNumberIgnoreCase(String partNumber);

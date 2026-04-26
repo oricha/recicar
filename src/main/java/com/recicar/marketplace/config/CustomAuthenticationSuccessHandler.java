@@ -4,6 +4,7 @@ import com.recicar.marketplace.dto.CartItemDto;
 import com.recicar.marketplace.entity.UserRole;
 import com.recicar.marketplace.service.CartService;
 import com.recicar.marketplace.service.CustomUserDetailsService;
+import com.recicar.marketplace.service.WishlistService;
 import com.recicar.marketplace.repository.UserRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,10 +28,13 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
     private final RequestCache requestCache = new HttpSessionRequestCache();
     private final CartService cartService;
     private final UserRepository userRepository;
+    private final WishlistService wishlistService;
 
-    public CustomAuthenticationSuccessHandler(CartService cartService, UserRepository userRepository) {
+    public CustomAuthenticationSuccessHandler(
+            CartService cartService, UserRepository userRepository, WishlistService wishlistService) {
         this.cartService = cartService;
         this.userRepository = userRepository;
+        this.wishlistService = wishlistService;
     }
 
     @Override
@@ -46,6 +50,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         
         // Merge session cart with database cart
         mergeSessionCartToDatabase(request.getSession(), userEmail);
+        mergeSessionWishlistToDatabase(request.getSession(), userEmail);
         
         // Check if there was a saved request (user was trying to access a protected page)
         SavedRequest savedRequest = requestCache.getRequest(request, response);
@@ -105,6 +110,21 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             
         } catch (Exception e) {
             log.error("Error merging session cart to database: {}", e.getMessage(), e);
+        }
+    }
+
+    private void mergeSessionWishlistToDatabase(HttpSession session, String userEmail) {
+        try {
+            Long userId = userRepository.findByEmailIgnoreCase(userEmail)
+                    .map(u -> u.getId())
+                    .orElse(null);
+            if (userId == null) {
+                return;
+            }
+            wishlistService.mergeSessionWishlistIntoDatabase(session, userId);
+            log.debug("Wishlist merged for user: {}", userEmail);
+        } catch (Exception e) {
+            log.error("Error merging session wishlist: {}", e.getMessage(), e);
         }
     }
 }

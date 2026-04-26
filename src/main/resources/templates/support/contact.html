@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html class="no-js" lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/new-base :: html}">
+<head>
+    <th:block th:fragment="head-extra"></th:block>
+</head>
+<body>
+<div th:fragment="content">
+    <section class="py-5 support_contact">
+        <div class="container" style="max-width: 560px;">
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a th:href="@{/}">Inicio</a></li>
+                    <li class="breadcrumb-item"><a th:href="@{/help}">Ayuda</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Contacto</li>
+                </ol>
+            </nav>
+            <h1 class="h2 mb-3" th:text="${pageTitle}">Contacto</h1>
+            <div class="card border shadow-sm mb-4" th:if="${company != null}">
+                <div class="card-body small">
+                    <h2 class="h6 text-uppercase text-muted" th:text="${company.legalName}">Empresa</h2>
+                    <p class="mb-1" th:text="${company.address}">Dirección</p>
+                    <p class="mb-0" th:if="${company.phone != null and !#strings.isEmpty(#strings.trim(company.phone))}">
+                        Tel.: <a th:href="'tel:' + ${company.phone}" th:text="${company.phone}">—</a>
+                    </p>
+                </div>
+            </div>
+            <p class="text-muted">
+                También puedes escribirnos a
+                <a th:href="|mailto:${supportEmail}|" th:text="${supportEmail}">email</a>.
+            </p>
+
+            <form th:action="@{/contact}" th:object="${contactRequest}" method="post" class="mt-4" novalidate>
+                <div class="mb-3">
+                    <label class="form-label" for="name">Nombre</label>
+                    <input class="form-control" id="name" th:field="*{name}" required maxlength="200" autocomplete="name"/>
+                    <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="email">Correo electrónico</label>
+                    <input class="form-control" id="email" type="email" th:field="*{email}" required maxlength="255" autocomplete="email"/>
+                    <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="subject">Asunto</label>
+                    <input class="form-control" id="subject" th:field="*{subject}" required maxlength="500"/>
+                    <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('subject')}" th:errors="*{subject}"></div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="message">Mensaje</label>
+                    <textarea class="form-control" id="message" rows="6" th:field="*{message}" required maxlength="8000"></textarea>
+                    <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('message')}" th:errors="*{message}"></div>
+                </div>
+                <button type="submit" class="btn btn-primary">Enviar</button>
+            </form>
+        </div>
+    </section>
+</div>
+</body>
+</html>

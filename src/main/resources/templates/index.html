@@ -491,7 +491,7 @@
                                 </div>
                                 <div class="product_footer d-flex align-items-center">
                                     <div class="price_box">
-                                        <span class="regular_price" th:text="${product.formattedPrice}">$180.00</span>
+                                        <span class="regular_price" th:text="${@priceView.formatEur(clientPreferences, product.price)}">$180.00</span>
                                     </div>
                                     <div class="add_to_cart">
                                         <a href="/cart" title="añadir al carrito"><span class="lnr lnr-cart"></span></a>
@@ -535,7 +535,7 @@
                                 </div>
                                 <div class="product_footer d-flex align-items-center">
                                     <div class="price_box">
-                                        <span class="regular_price" th:text="${product.formattedPrice}">$180.00</span>
+                                        <span class="regular_price" th:text="${@priceView.formatEur(clientPreferences, product.price)}">$180.00</span>
                                     </div>
                                     <div class="add_to_cart">
                                         <a href="/cart" title="añadir al carrito"><span class="lnr lnr-cart"></span></a>
@@ -579,7 +579,7 @@
                                 </div>
                                 <div class="product_footer d-flex align-items-center">
                                     <div class="price_box">
-                                        <span class="regular_price" th:text="${product.formattedPrice}">$180.00</span>
+                                        <span class="regular_price" th:text="${@priceView.formatEur(clientPreferences, product.price)}">$180.00</span>
                                     </div>
                                     <div class="add_to_cart">
                                         <a href="/cart" title="añadir al carrito"><span class="lnr lnr-cart"></span></a>
@@ -779,7 +779,7 @@
                                     </ul>
                                 </div>
                                 <div class="price_box">
-                                    <span class="current_price" th:text="${product.formattedPrice}">$0.00</span>
+                                    <span class="current_price" th:text="${@priceView.formatEur(clientPreferences, product.price)}">$0.00</span>
                                 </div>
                             </div>
                             <div class="product_thumb">
@@ -815,7 +815,7 @@
                                     </ul>
                                 </div>
                                 <div class="price_box">
-                                    <span class="current_price" th:text="${product.formattedPrice}">$0.00</span>
+                                    <span class="current_price" th:text="${@priceView.formatEur(clientPreferences, product.price)}">$0.00</span>
                                 </div>
                             </div>
                             <div class="product_thumb">

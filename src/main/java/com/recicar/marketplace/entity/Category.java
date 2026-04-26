@@ -42,6 +42,17 @@ public class Category {
     @Column(name = "sort_order", nullable = false)
     private Integer sortOrder = 0;
 
+    @Size(max = 255)
+    @Column(name = "meta_title", length = 255)
+    private String metaTitle;
+
+    @Size(max = 500)
+    @Column(name = "meta_description", length = 500)
+    private String metaDescription;
+
+    @Column(name = "seo_content", columnDefinition = "TEXT")
+    private String seoContent;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -130,6 +141,30 @@ public class Category {
 
     public void setSortOrder(Integer sortOrder) {
         this.sortOrder = sortOrder;
+    }
+
+    public String getMetaTitle() {
+        return metaTitle;
+    }
+
+    public void setMetaTitle(String metaTitle) {
+        this.metaTitle = metaTitle;
+    }
+
+    public String getMetaDescription() {
+        return metaDescription;
+    }
+
+    public void setMetaDescription(String metaDescription) {
+        this.metaDescription = metaDescription;
+    }
+
+    public String getSeoContent() {
+        return seoContent;
+    }
+
+    public void setSeoContent(String seoContent) {
+        this.seoContent = seoContent;
     }
 
     public LocalDateTime getCreatedAt() {
