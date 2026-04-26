@@ -257,6 +257,8 @@ logging:
   level:
     com.recicar.marketplace: INFO
 
+# Test: PostgreSQL en la misma red que la app (p. ej. servicio Dokploy / Docker). Sin SSL interno suele bastar jdbc:postgresql://host:5432/db
+
 ---
 spring:
   config:
