@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="toolbarLine">
+    <div class="page_amount listing-results-count" role="status">
+        <p th:if="${page != null and page.totalPages > 0}">
+            <span th:text="|Mostrando ${page.number * page.size + 1}–${page.number * page.size + page.numberOfElements} de ${page.totalElements} piezas · página ${page.number + 1} / ${page.totalPages}|">
+                Mostrando 1–20 de 100 piezas · página 1 / 5
+            </span>
+        </p>
+        <p th:if="${page != null and page.totalElements == 0}">
+            <span>0 piezas encontradas</span>
+        </p>
+        <p th:if="${page == null}">
+            <span th:text="${productCards == null ? 0 : #lists.size(productCards)} + ' piezas'">0 piezas</span>
+        </p>
+    </div>
+</th:block>
+</html>

@@ -6,12 +6,17 @@ import com.recicar.marketplace.entity.ProductCondition;
 import com.recicar.marketplace.entity.Vendor;
 import com.recicar.marketplace.service.CategoryService;
 import com.recicar.marketplace.service.ProductService;
+import com.recicar.marketplace.service.SearchFilterOptionsService;
+import com.recicar.marketplace.service.SearchService;
+import com.recicar.marketplace.web.ShopListingConstants;
+import com.recicar.marketplace.web.ShopListingModelHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -19,10 +24,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -30,17 +37,19 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class SearchApiControllerUnitTest {
 
     @Mock
     private ProductService productService;
-
     @Mock
     private CategoryService categoryService;
+    @Mock
+    private SearchService searchService;
+    @Mock
+    private SearchFilterOptionsService searchFilterOptionsService;
 
-    @InjectMocks
     private SearchController searchController;
-
     private MockMvc mockMvc;
 
     private Product testProduct;
@@ -49,9 +58,20 @@ class SearchApiControllerUnitTest {
 
     @BeforeEach
     void setUp() {
+        when(productService.mapToProductCardPage(any(Page.class))).thenAnswer(invocation -> {
+            Page<Product> p = invocation.getArgument(0);
+            return new PageImpl<>(Collections.emptyList(), p.getPageable(), p.getTotalElements());
+        });
+        when(productService.mapListToProductCardPage(anyList())).thenAnswer(invocation -> {
+            List<Product> list = invocation.getArgument(0);
+            return new PageImpl<>(Collections.emptyList(), PageRequest.of(0, ShopListingConstants.PAGE_SIZE), list.size());
+        });
+
+        ShopListingModelHelper shopListingModelHelper = new ShopListingModelHelper(productService);
+        searchController = new SearchController(
+                productService, categoryService, searchService, searchFilterOptionsService, shopListingModelHelper);
         mockMvc = MockMvcBuilders.standaloneSetup(searchController).build();
-        
-        // Create test data without database
+
         testCategory = new Category();
         testCategory.setId(1L);
         testCategory.setName("Test Category");
@@ -85,7 +105,7 @@ class SearchApiControllerUnitTest {
 
     @Test
     void searchProducts_WithValidQuery_ShouldReturnResults() throws Exception {
-        Page<Product> productPage = new PageImpl<>(List.of(testProduct), PageRequest.of(0, 12), 1);
+        Page<Product> productPage = new PageImpl<>(List.of(testProduct), PageRequest.of(0, ShopListingConstants.PAGE_SIZE), 1);
         when(productService.findByPartNumber("brake")).thenReturn(List.of());
         when(productService.findByOemNumber("brake")).thenReturn(List.of());
         when(productService.findByPartNumberContaining(anyString(), any(PageRequest.class))).thenReturn(new PageImpl<>(List.of()));
@@ -102,7 +122,6 @@ class SearchApiControllerUnitTest {
 
     @Test
     void searchProducts_WithEmptyQuery_ShouldRedirectToProducts() throws Exception {
-        // Act & Assert
         mockMvc.perform(get("/search").param("query", ""))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/products"));
@@ -110,10 +129,8 @@ class SearchApiControllerUnitTest {
 
     @Test
     void searchProducts_WithShortQuery_ShouldShowError() throws Exception {
-        // Arrange
         when(categoryService.findRootCategories()).thenReturn(List.of(testCategory));
 
-        // Act & Assert
         mockMvc.perform(get("/search").param("query", "a"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("shop-list"))
@@ -136,7 +153,6 @@ class SearchApiControllerUnitTest {
 
     @Test
     void searchByPartNumber_WithInvalidPartNumber_ShouldShowError() throws Exception {
-        // Act & Assert
         mockMvc.perform(get("/search").param("query", "a"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("shop-list"))
@@ -145,7 +161,6 @@ class SearchApiControllerUnitTest {
 
     @Test
     void searchByOemNumber_WithValidOemNumber_ShouldReturnResults() throws Exception {
-        // Arrange
         when(productService.findByPartNumber("OEM001")).thenReturn(List.of());
         when(productService.findByOemNumber("OEM001")).thenReturn(List.of(testProduct));
         when(categoryService.findRootCategories()).thenReturn(List.of(testCategory));
@@ -160,7 +175,6 @@ class SearchApiControllerUnitTest {
 
     @Test
     void searchByOemNumber_WithInvalidOemNumber_ShouldShowError() throws Exception {
-        // Act & Assert
         when(categoryService.findRootCategories()).thenReturn(List.of(testCategory));
         mockMvc.perform(get("/search").param("query", "a"))
                 .andExpect(status().isOk())
@@ -170,7 +184,7 @@ class SearchApiControllerUnitTest {
 
     @Test
     void searchByVehicle_WithValidParameters_ShouldReturnResults() throws Exception {
-        Page<Product> productPage = new PageImpl<>(List.of(testProduct), PageRequest.of(0, 12), 1);
+        Page<Product> productPage = new PageImpl<>(List.of(testProduct), PageRequest.of(0, ShopListingConstants.PAGE_SIZE), 1);
         when(productService.findByMakeModelEngineAndPartName(eq("Toyota"), eq("Camry"), eq("Gasoline"), any(), any(PageRequest.class)))
                 .thenReturn(productPage);
         when(categoryService.findRootCategories()).thenReturn(List.of(testCategory));
@@ -201,7 +215,7 @@ class SearchApiControllerUnitTest {
 
     @Test
     void searchByVehicle_WithInvalidYear_ShouldShowError() throws Exception {
-        Page<Product> productPage = new PageImpl<>(List.of(testProduct), PageRequest.of(0, 12), 1);
+        Page<Product> productPage = new PageImpl<>(List.of(testProduct), PageRequest.of(0, ShopListingConstants.PAGE_SIZE), 1);
         when(productService.findByMakeModelEngineAndPartName(anyString(), anyString(), anyString(), any(), any(PageRequest.class)))
                 .thenReturn(productPage);
         when(categoryService.findRootCategories()).thenReturn(List.of(testCategory));
@@ -227,7 +241,7 @@ class SearchApiControllerUnitTest {
 
     @Test
     void searchProducts_WithNoResults_ShouldShowNoResultsMessage() throws Exception {
-        Page<Product> emptyPage = new PageImpl<>(List.of(), PageRequest.of(0, 12), 0);
+        Page<Product> emptyPage = new PageImpl<>(List.of(), PageRequest.of(0, ShopListingConstants.PAGE_SIZE), 0);
         when(productService.findByPartNumber("nonexistentproduct")).thenReturn(List.of());
         when(productService.findByOemNumber("nonexistentproduct")).thenReturn(List.of());
         when(productService.findByPartNumberContaining(anyString(), any(PageRequest.class))).thenReturn(emptyPage);
@@ -258,6 +272,4 @@ class SearchApiControllerUnitTest {
                 .andExpect(view().name("shop-list"))
                 .andExpect(model().attributeExists("products"));
     }
-
-
 }

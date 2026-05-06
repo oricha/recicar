@@ -10,6 +10,7 @@ import com.recicar.marketplace.entity.Vendor;
 import com.recicar.marketplace.repository.ProductRepository;
 import com.recicar.marketplace.repository.CategoryRepository;
 import com.recicar.marketplace.repository.VendorRepository;
+import com.recicar.marketplace.web.ShopListingConstants;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -161,6 +162,19 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
+    public Page<ProductCardDto> mapToProductCardPage(Page<Product> products) {
+        return products.map(this::toProductCardDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ProductCardDto> mapListToProductCardPage(List<Product> products) {
+        List<ProductCardDto> content = products.stream().map(this::toProductCardDto).toList();
+        return new PageImpl<>(content, PageRequest.of(0, ShopListingConstants.PAGE_SIZE), content.size());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<SellerInfoDto> getSellerInfoByProductId(Long productId) {
         return productRepository.findByIdWithSellerInfo(productId).map(product -> {
             SellerInfoDto dto = new SellerInfoDto();
@@ -190,7 +204,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Page<Product> searchProducts(String searchTerm, int page) {
-        Pageable pageable = PageRequest.of(page, 12, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(page, ShopListingConstants.PAGE_SIZE,
+                Sort.by(Sort.Direction.DESC, "createdAt"));
         return searchProducts(searchTerm, pageable);
     }
 
@@ -201,7 +216,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Page<Product> findByCategory(Category category, int page) {
-        Pageable pageable = PageRequest.of(page, 12, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(page, ShopListingConstants.PAGE_SIZE,
+                Sort.by(Sort.Direction.DESC, "createdAt"));
         return findByCategory(category, pageable);
     }
 

@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- Responsive grid: 1 col mobile, 2 tablet, 3 desktop -->
+<th:block th:fragment="productGrid">
+    <div class="row shop_wrapper g-3 product-grid responsive-product-grid"
+         th:if="${page != null and page.hasContent()}"
+         th:classappend="'row-cols-1 row-cols-md-2 row-cols-lg-3'">
+        <div class="col mb-4" th:each="card : ${page.content}">
+            <th:block th:replace="~{fragments/_product-card :: card}"></th:block>
+        </div>
+    </div>
+</th:block>
+</html>

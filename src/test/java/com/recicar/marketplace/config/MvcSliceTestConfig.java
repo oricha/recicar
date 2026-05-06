@@ -1,6 +1,7 @@
 package com.recicar.marketplace.config;
 
 import com.recicar.marketplace.web.GlobalModelAttributes;
+import com.recicar.marketplace.web.ShopListingModelHelper;
 import com.recicar.marketplace.web.ux.ClientPreferencesService;
 import com.recicar.marketplace.web.ux.MarketDisplayPriceService;
 import com.recicar.marketplace.web.ux.PriceViewHelper;
@@ -18,7 +19,8 @@ import org.springframework.context.annotation.Import;
         ClientPreferencesService.class,
         MarketDisplayPriceService.class,
         PriceViewHelper.class,
-        GlobalModelAttributes.class
+        GlobalModelAttributes.class,
+        ShopListingModelHelper.class
 })
 public class MvcSliceTestConfig {
 }

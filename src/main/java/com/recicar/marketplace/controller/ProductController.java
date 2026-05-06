@@ -4,6 +4,8 @@ import com.recicar.marketplace.entity.Category;
 import com.recicar.marketplace.entity.Product;
 import com.recicar.marketplace.service.CategoryService;
 import com.recicar.marketplace.service.ProductService;
+import com.recicar.marketplace.web.ShopListingConstants;
+import com.recicar.marketplace.web.ShopListingModelHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -20,6 +22,7 @@ public class ProductController {
 
     private final ProductService productService;
     private final CategoryService categoryService;
+    private final ShopListingModelHelper shopListingModelHelper;
 
     @GetMapping("/shop-list")
     public String productList(
@@ -40,16 +43,15 @@ public class ProductController {
                 model.addAttribute("categorySlug", categorySlug);
             } else {
                 // Category not found, show all products
-                productPage = productService.findActiveProducts(page, 12);
+                productPage = productService.findActiveProducts(page, ShopListingConstants.PAGE_SIZE);
                 model.addAttribute("errorMessage", "Category not found");
             }
         } else {
             // Show all products
-            productPage = productService.findActiveProducts(page, 12);
+            productPage = productService.findActiveProducts(page, ShopListingConstants.PAGE_SIZE);
         }
-        
-        model.addAttribute("products", productPage.getContent());
-        model.addAttribute("page", productPage);
+
+        shopListingModelHelper.putPagedListing(model, productPage);
         
         // Add categories for sidebar
         List<Category> categories = categoryService.findAllActive();

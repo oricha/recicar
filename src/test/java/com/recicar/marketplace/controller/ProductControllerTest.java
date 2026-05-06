@@ -4,10 +4,12 @@ import com.recicar.marketplace.entity.Category;
 import com.recicar.marketplace.entity.Product;
 import com.recicar.marketplace.service.CategoryService;
 import com.recicar.marketplace.service.ProductService;
+import com.recicar.marketplace.web.ShopListingModelHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
@@ -17,9 +19,11 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -27,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class ProductControllerTest {
 
     @Mock
@@ -35,13 +40,21 @@ public class ProductControllerTest {
     @Mock
     private CategoryService categoryService;
 
-    @InjectMocks
+    private ShopListingModelHelper shopListingModelHelper;
+
     private ProductController productController;
 
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
+        when(productService.mapToProductCardPage(any(Page.class))).thenAnswer(invocation -> {
+            Page<Product> p = invocation.getArgument(0);
+            return new PageImpl<>(Collections.emptyList(), p.getPageable(), p.getTotalElements());
+        });
+        shopListingModelHelper = new ShopListingModelHelper(productService);
+        productController = new ProductController(productService, categoryService, shopListingModelHelper);
+
         // Use a proper ViewResolver that supports "redirect:" and "forward:" prefixes
         org.springframework.web.servlet.view.InternalResourceViewResolver viewResolver =
                 new org.springframework.web.servlet.view.InternalResourceViewResolver();

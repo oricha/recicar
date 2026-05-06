@@ -7,6 +7,7 @@ import com.recicar.marketplace.service.CategoryService;
 import com.recicar.marketplace.service.ProductService;
 import com.recicar.marketplace.service.SearchFilterOptionsService;
 import com.recicar.marketplace.service.SearchService;
+import com.recicar.marketplace.web.ShopListingConstants;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -68,7 +69,7 @@ class SearchControllerAdvancedWebMvcTest {
         p.setId(9L);
         p.setName("Filtro");
         when(searchService.searchAdvanced(any(), any(), any(), any(), any(), any(), any(), any(), any()))
-                .thenReturn(new PageImpl<>(List.of(p), PageRequest.of(0, 12), 1));
+                .thenReturn(new PageImpl<>(List.of(p), PageRequest.of(0, ShopListingConstants.PAGE_SIZE), 1));
 
         mockMvc.perform(get("/search/advanced")
                         .param("submitted", "true")

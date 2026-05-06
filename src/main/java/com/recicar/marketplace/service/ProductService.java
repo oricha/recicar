@@ -224,4 +224,14 @@ public interface ProductService {
      * Seller information associated with a product.
      */
     Optional<SellerInfoDto> getSellerInfoByProductId(Long productId);
+
+    /**
+     * Maps a page of products to listing cards (same projection as {@link #getProductCards(int, int)}).
+     */
+    Page<ProductCardDto> mapToProductCardPage(Page<Product> products);
+
+    /**
+     * Maps a non-paged result list to a single logical page of cards (for exact match and legacy flows).
+     */
+    Page<ProductCardDto> mapListToProductCardPage(List<Product> products);
 }

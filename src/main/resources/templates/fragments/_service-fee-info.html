@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- Reusable service-fee copy for listing cards (parts-listing-display) -->
+<th:block th:fragment="block">
+    <th:block th:if="${card.serviceFeePercent != null}">
+        <p class="small text-muted mb-0 mt-1 product-service-fee">
+            Tarifa de servicio:
+            <span th:text="${#numbers.formatDecimal(card.serviceFeePercent, 1, 2)}">1,50</span>%
+            <span th:if="${card.serviceFeeMin != null and card.serviceFeeMax != null}">
+                (entre
+                <span th:text="${@priceView.formatEur(clientPreferences, card.serviceFeeMin)}">1,99</span>
+                y
+                <span th:text="${@priceView.formatEur(clientPreferences, card.serviceFeeMax)}">3,99</span>)
+            </span>
+        </p>
+    </th:block>
+</th:block>
+</html>
