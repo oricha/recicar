@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +25,7 @@ import java.math.BigDecimal;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest
@@ -97,7 +97,6 @@ public class VendorIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "vendor@example.com", roles = {"VENDOR"})
     void testAddProductAsVendor() throws Exception {
         ProductRequest productRequest = new ProductRequest();
         productRequest.setName("Vendor Product");
@@ -109,6 +108,7 @@ public class VendorIntegrationTest {
         productRequest.setCategoryId(category.getId());
 
         mockMvc.perform(post("/api/vendor/products")
+                        .with(user(vendorUser.getEmail()).roles("VENDOR"))
                         .contentType("application/json")
                         .content(asJsonString(productRequest)))
                 .andExpect(status().isOk());

@@ -100,7 +100,7 @@ public class SecurityConfig {
                         "/user-dashboard/**",
                         "/api/v1/user/**"
                 ).authenticated()
-                .requestMatchers("/wishlist/**", "/cart/**", "/api/cart/**", "/checkout/**", "/my-account/**").authenticated()
+                .requestMatchers("/wishlist/**", "/checkout/**", "/my-account/**").authenticated()
                 .requestMatchers("/vendor/**", "/api/vendor/**", "/api/v1/vendor/**").hasAnyRole("VENDOR", "ADMIN")
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().permitAll()

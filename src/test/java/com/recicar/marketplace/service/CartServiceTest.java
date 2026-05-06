@@ -2,31 +2,32 @@ package com.recicar.marketplace.service;
 
 import com.recicar.marketplace.dto.CartDto;
 import com.recicar.marketplace.entity.Cart;
+import com.recicar.marketplace.entity.CartItem;
 import com.recicar.marketplace.entity.Product;
 import com.recicar.marketplace.entity.User;
 import com.recicar.marketplace.repository.CartRepository;
 import com.recicar.marketplace.repository.ProductRepository;
 import com.recicar.marketplace.repository.UserRepository;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@Disabled
-public class CartServiceTest {
-
-    @InjectMocks
-    private CartServiceImpl cartService;
+@ExtendWith(MockitoExtension.class)
+class CartServiceTest {
 
     @Mock
     private CartRepository cartRepository;
@@ -37,266 +38,94 @@ public class CartServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private CartPricingService cartPricingService;
+
+    @InjectMocks
+    private CartServiceImpl cartService;
+
+    private User user;
+    private Cart cart;
+    private Product product;
+
     @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
-
-    @Test
-    public void testGetCart() {
-        User user = new User();
+    void setUp() {
+        user = new User();
         user.setId(1L);
 
-        Cart cart = new Cart();
-        cart.setId(1L);
+        cart = new Cart();
+        cart.setId(10L);
         cart.setUser(user);
         cart.setItems(new ArrayList<>());
 
+        product = new Product();
+        product.setId(100L);
+        product.setName("Alternador Bosch");
+        product.setPrice(new BigDecimal("15.00"));
+        product.setStockQuantity(8);
+    }
+
+    @Test
+    void getCart_usesStoredSnapshotPriceForLineAndSubtotal() {
+        CartItem item = new CartItem();
+        item.setId(501L);
+        item.setCart(cart);
+        item.setProduct(product);
+        item.setQuantity(2);
+        item.setPrice(new BigDecimal("12.00"));
+        cart.getItems().add(item);
+
+        product.setPrice(new BigDecimal("18.50"));
         when(cartRepository.findByUserId(1L)).thenReturn(Optional.of(cart));
 
-        CartDto cartDto = cartService.getCart(1L);
+        CartDto dto = cartService.getCart(1L);
 
-        assertNotNull(cartDto);
-        assertEquals(1L, cartDto.getUserId());
+        assertEquals(new BigDecimal("24.00"), dto.getSubtotal());
+        assertEquals(new BigDecimal("12.00"), dto.getItems().get(0).getPrice());
+        verify(cartPricingService).applyPricing(eq(dto), eq(1L), eq(null), eq(null), eq(null));
     }
 
     @Test
-    public void testAddItemToCart() {
-        User user = new User();
-        user.setId(1L);
-
-        Cart cart = new Cart();
-        cart.setId(1L);
-        cart.setUser(user);
-        cart.setItems(new ArrayList<>());
-
-        Product product = new Product();
-        product.setId(1L);
-        product.setName("Test Product");
-        product.setPrice(new BigDecimal("10.00"));
-        product.setStockQuantity(10);
-
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+    void addItemToCart_capturesCurrentProductPriceAsSnapshot() {
+        when(cartRepository.save(any(Cart.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(cartRepository.findByUserId(1L)).thenReturn(Optional.of(cart));
-        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
-        when(cartRepository.save(any(Cart.class))).thenAnswer(i -> i.getArguments()[0]);
+        when(productRepository.findById(100L)).thenReturn(Optional.of(product));
 
-        CartDto cartDto = cartService.addItemToCart(1L, 1L, 1);
+        CartDto dto = cartService.addItemToCart(1L, 100L, 2);
 
-        assertNotNull(cartDto);
-        assertEquals(1, cartDto.getItems().size());
-        assertEquals(new BigDecimal("10.00"), cartDto.getSubtotal());
+        assertEquals(1, cart.getItems().size());
+        assertEquals(new BigDecimal("15.00"), cart.getItems().get(0).getPrice());
+        assertEquals(new BigDecimal("30.00"), dto.getSubtotal());
+        assertEquals(new BigDecimal("15.00"), dto.getItems().get(0).getPrice());
     }
 
     @Test
-    public void testAddItemToCart_notEnoughStock() {
-        User user = new User();
-        user.setId(1L);
-
-        Cart cart = new Cart();
-        cart.setId(1L);
-        cart.setUser(user);
-        cart.setItems(new ArrayList<>());
-
-        Product product = new Product();
-        product.setId(1L);
-        product.setName("Test Product");
-        product.setPrice(new BigDecimal("10.00"));
-        product.setStockQuantity(0);
-
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(cartRepository.findByUserId(1L)).thenReturn(Optional.of(cart));
-        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
-
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            cartService.addItemToCart(1L, 1L, 1);
-        });
-
-        assertEquals("Not enough stock for product: Test Product", exception.getMessage());
-    }
-
-    @Test
-    public void testAddItemToCart_quantityLimitExceeded() {
-        User user = new User();
-        user.setId(1L);
-
-        Cart cart = new Cart();
-        cart.setId(1L);
-        cart.setUser(user);
-        cart.setItems(new ArrayList<>());
-
-        Product product = new Product();
-        product.setId(1L);
-        product.setName("Test Product");
-        product.setPrice(new BigDecimal("10.00"));
-        product.setStockQuantity(10);
-
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(cartRepository.findByUserId(1L)).thenReturn(Optional.of(cart));
-        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
-
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            cartService.addItemToCart(1L, 1L, 11);
-        });
-
-        assertEquals("You can add a maximum of 10 items of the same product to the cart.", exception.getMessage());
-    }
-
-    @Test
-    public void testUpdateItemInCart() {
-        User user = new User();
-        user.setId(1L);
-
-        Cart cart = new Cart();
-        cart.setId(1L);
-        cart.setUser(user);
-        cart.setItems(new ArrayList<>());
-
-        Product product = new Product();
-        product.setId(1L);
-        product.setName("Test Product");
-        product.setPrice(new BigDecimal("10.00"));
-        product.setStockQuantity(10);
-
-        // Add an item to the cart first
-        cartService.addItemToCart(1L, 1L, 1);
-
-        // Now update the item
-        CartDto cartDto = cartService.updateItemInCart(1L, cart.getItems().get(0).getId(), 2);
-
-        assertNotNull(cartDto);
-        assertEquals(1, cartDto.getItems().size());
-        assertEquals(new BigDecimal("20.00"), cartDto.getSubtotal());
-    }
-
-    @Test
-    public void testUpdateItemInCart_notEnoughStock() {
-        User user = new User();
-        user.setId(1L);
-
-        Cart cart = new Cart();
-        cart.setId(1L);
-        cart.setUser(user);
-        cart.setItems(new ArrayList<>());
-
-        Product product = new Product();
-        product.setId(1L);
-        product.setName("Test Product");
-        product.setPrice(new BigDecimal("10.00"));
+    void addItemToCart_rejectsWhenStockIsInsufficient() {
         product.setStockQuantity(1);
+        when(cartRepository.findByUserId(1L)).thenReturn(Optional.of(cart));
+        when(productRepository.findById(100L)).thenReturn(Optional.of(product));
 
-        // Add an item to the cart first
-        cartService.addItemToCart(1L, 1L, 1);
+        RuntimeException error = assertThrows(RuntimeException.class,
+                () -> cartService.addItemToCart(1L, 100L, 2));
 
-        // Now try to update with more than stock
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            cartService.updateItemInCart(1L, cart.getItems().get(0).getId(), 2);
-        });
-
-        assertEquals("Not enough stock for product: Test Product", exception.getMessage());
+        assertEquals("Not enough stock for product: Alternador Bosch", error.getMessage());
     }
 
     @Test
-    public void testUpdateItemInCart_quantityLimitExceeded() {
-        User user = new User();
-        user.setId(1L);
+    void updateItemInCart_rejectsWhenQuantityExceedsLimit() {
+        product.setStockQuantity(20);
+        CartItem item = new CartItem();
+        item.setId(501L);
+        item.setCart(cart);
+        item.setProduct(product);
+        item.setQuantity(1);
+        item.setPrice(new BigDecimal("15.00"));
+        cart.getItems().add(item);
+        when(cartRepository.findByUserId(1L)).thenReturn(Optional.of(cart));
 
-        Cart cart = new Cart();
-        cart.setId(1L);
-        cart.setUser(user);
-        cart.setItems(new ArrayList<>());
+        RuntimeException error = assertThrows(RuntimeException.class,
+                () -> cartService.updateItemInCart(1L, 501L, 11));
 
-        Product product = new Product();
-        product.setId(1L);
-        product.setName("Test Product");
-        product.setPrice(new BigDecimal("10.00"));
-        product.setStockQuantity(10);
-
-        // Add an item to the cart first
-        cartService.addItemToCart(1L, 1L, 1);
-
-        // Now try to update with more than limit
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            cartService.updateItemInCart(1L, cart.getItems().get(0).getId(), 11);
-        });
-
-        assertEquals("You can add a maximum of 10 items of the same product to the cart.", exception.getMessage());
-    }
-
-    @Test
-    public void testValidateCart() {
-        User user = new User();
-        user.setId(1L);
-
-        Cart cart = new Cart();
-        cart.setId(1L);
-        cart.setUser(user);
-        cart.setItems(new ArrayList<>());
-
-        Product product = new Product();
-        product.setId(1L);
-        product.setName("Test Product");
-        product.setPrice(new BigDecimal("10.00"));
-        product.setStockQuantity(10);
-
-        // Add an item to the cart
-        cartService.addItemToCart(1L, 1L, 1);
-
-        // Validate cart (should not throw exception)
-        cartService.validateCart(1L);
-    }
-
-    @Test
-    public void testValidateCart_notEnoughStock() {
-        User user = new User();
-        user.setId(1L);
-
-        Cart cart = new Cart();
-        cart.setId(1L);
-        cart.setUser(user);
-        cart.setItems(new ArrayList<>());
-
-        Product product = new Product();
-        product.setId(1L);
-        product.setName("Test Product");
-        product.setPrice(new BigDecimal("10.00"));
-        product.setStockQuantity(0);
-
-        // Add an item to the cart
-        cartService.addItemToCart(1L, 1L, 1);
-
-        // Validate cart (should throw exception)
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            cartService.validateCart(1L);
-        });
-
-        assertEquals("Not enough stock for product: Test Product", exception.getMessage());
-    }
-
-    @Test
-    public void testValidateCart_quantityLimitExceeded() {
-        User user = new User();
-        user.setId(1L);
-
-        Cart cart = new Cart();
-        cart.setId(1L);
-        cart.setUser(user);
-        cart.setItems(new ArrayList<>());
-
-        Product product = new Product();
-        product.setId(1L);
-        product.setName("Test Product");
-        product.setPrice(new BigDecimal("10.00"));
-        product.setStockQuantity(10);
-
-        // Add an item to the cart
-        cartService.addItemToCart(1L, 1L, 11);
-
-        // Validate cart (should throw exception)
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            cartService.validateCart(1L);
-        });
-
-        assertEquals("You can add a maximum of 10 items of the same product to the cart.", exception.getMessage());
+        assertEquals("You can add a maximum of 10 items of the same product to the cart.", error.getMessage());
     }
 }

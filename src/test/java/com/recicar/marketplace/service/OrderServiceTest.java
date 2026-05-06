@@ -1,9 +1,10 @@
 package com.recicar.marketplace.service;
 
+import com.recicar.marketplace.dto.CartDto;
 import com.recicar.marketplace.dto.OrderItemRequest;
 import com.recicar.marketplace.dto.OrderRequest;
-import com.recicar.marketplace.dto.ShippingInfoRequest;
 import com.recicar.marketplace.dto.PaymentRequest;
+import com.recicar.marketplace.dto.ShippingInfoRequest;
 import com.recicar.marketplace.entity.Order;
 import com.recicar.marketplace.entity.Payment;
 import com.recicar.marketplace.entity.Product;
@@ -11,29 +12,28 @@ import com.recicar.marketplace.entity.User;
 import com.recicar.marketplace.repository.OrderRepository;
 import com.recicar.marketplace.repository.ProductRepository;
 import com.recicar.marketplace.repository.UserRepository;
-import com.recicar.marketplace.service.PaymentService;
-import com.recicar.marketplace.service.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class OrderServiceTest {
-
-    @InjectMocks
-    private OrderServiceImpl orderService;
+@ExtendWith(MockitoExtension.class)
+class OrderServiceTest {
 
     @Mock
     private OrderRepository orderRepository;
@@ -50,57 +50,98 @@ public class OrderServiceTest {
     @Mock
     private NotificationService notificationService;
 
+    @Mock
+    private CartService cartService;
+
+    @Mock
+    private CartPricingService cartPricingService;
+
+    @InjectMocks
+    private OrderServiceImpl orderService;
+
+    private OrderRequest orderRequest;
+    private Product product;
+
     @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
+    void setUp() {
+        orderRequest = new OrderRequest();
+        orderRequest.setCustomerId(1L);
+
+        OrderItemRequest item = new OrderItemRequest();
+        item.setProductId(100L);
+        item.setQuantity(1);
+        orderRequest.setItems(List.of(item));
+
+        ShippingInfoRequest shipping = new ShippingInfoRequest();
+        shipping.setAddress("Calle Alcalá 1");
+        shipping.setCity("Madrid");
+        shipping.setState("M");
+        shipping.setZipCode("28001");
+        shipping.setCountry("ES");
+        orderRequest.setShippingInfo(shipping);
+
+        PaymentRequest payment = new PaymentRequest();
+        payment.setPaymentMethod("VISA");
+        orderRequest.setPayment(payment);
+
+        product = new Product();
+        product.setId(100L);
+        product.setName("Faro delantero");
+        product.setPrice(new BigDecimal("75.00"));
+        product.setStockQuantity(4);
     }
 
     @Test
-    public void testCreateOrder() {
-        OrderRequest orderRequest = new OrderRequest();
-        orderRequest.setCustomerId(1L);
-
-        OrderItemRequest itemRequest = new OrderItemRequest();
-        itemRequest.setProductId(1L);
-        itemRequest.setQuantity(1);
-        orderRequest.setItems(Collections.singletonList(itemRequest));
-
-        ShippingInfoRequest shippingInfoRequest = new ShippingInfoRequest();
-        shippingInfoRequest.setAddress("123 Main St");
-        shippingInfoRequest.setCity("Anytown");
-        shippingInfoRequest.setState("CA");
-        shippingInfoRequest.setZipCode("12345");
-        shippingInfoRequest.setCountry("USA");
-        orderRequest.setShippingInfo(shippingInfoRequest);
-
-        PaymentRequest paymentRequest = new PaymentRequest();
-        paymentRequest.setPaymentMethod("Credit Card");
-        orderRequest.setPayment(paymentRequest);
-
+    void createOrder_usesComputedAmountsAndSendsConfirmation() {
         User customer = new User();
         customer.setId(1L);
 
-        Product product = new Product();
-        product.setId(1L);
-        product.setName("Test Product");
-        product.setPrice(new BigDecimal("10.00"));
-        product.setStockQuantity(10);
+        CartDto pricedCart = new CartDto();
+        pricedCart.setSubtotal(new BigDecimal("75.00"));
+
+        Payment processedPayment = new Payment();
+        processedPayment.setStatus(Payment.PaymentStatus.COMPLETED);
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(customer));
-        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
-        when(orderRepository.save(any(Order.class))).thenAnswer(i -> i.getArguments()[0]);
-        
-        // Mock payment and notification services
-        Payment mockPayment = new Payment();
-        mockPayment.setStatus(Payment.PaymentStatus.COMPLETED);
-        when(paymentService.processPayment(any(Order.class), anyString())).thenReturn(mockPayment);
+        when(productRepository.findById(100L)).thenReturn(Optional.of(product));
+        when(cartService.getCart(1L)).thenReturn(pricedCart);
+        when(cartPricingService.computeOrderAmounts(eq(1L), eq(pricedCart), eq(orderRequest.getShippingInfo())))
+                .thenReturn(new CartPricingService.OrderAmounts(
+                        new BigDecimal("75.00"),
+                        new BigDecimal("1.50"),
+                        new BigDecimal("18.17"),
+                        new BigDecimal("10.00"),
+                        new BigDecimal("104.67")));
+        when(paymentService.processPayment(any(Order.class), eq("VISA"))).thenReturn(processedPayment);
+        when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
         doNothing().when(notificationService).sendOrderConfirmationEmail(any(Order.class));
 
         Order order = orderService.createOrder(orderRequest);
 
-        assertNotNull(order);
-        assertEquals(1, order.getItems().size());
-        assertEquals(new BigDecimal("10.00"), order.getSubtotal());
-        assertEquals(9, product.getStockQuantity());
+        assertNotNull(order.getOrderNumber());
+        assertEquals(new BigDecimal("75.00"), order.getSubtotal());
+        assertEquals(new BigDecimal("1.50"), order.getServiceFee());
+        assertEquals(new BigDecimal("18.17"), order.getTaxAmount());
+        assertEquals(new BigDecimal("10.00"), order.getShippingAmount());
+        assertEquals(new BigDecimal("104.67"), order.getTotalAmount());
+        assertEquals(3, product.getStockQuantity());
+        verify(notificationService).sendOrderConfirmationEmail(order);
+    }
+
+    @Test
+    void createOrder_rejectsWhenCartSubtotalChanged() {
+        User customer = new User();
+        customer.setId(1L);
+
+        CartDto changedCart = new CartDto();
+        changedCart.setSubtotal(new BigDecimal("50.00"));
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(customer));
+        when(productRepository.findById(100L)).thenReturn(Optional.of(product));
+        when(cartService.getCart(1L)).thenReturn(changedCart);
+
+        RuntimeException error = assertThrows(RuntimeException.class, () -> orderService.createOrder(orderRequest));
+
+        assertEquals("Cart has changed; please review your order.", error.getMessage());
     }
 }

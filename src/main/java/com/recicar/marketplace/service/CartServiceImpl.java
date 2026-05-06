@@ -164,7 +164,7 @@ public class CartServiceImpl implements CartService {
         dto.setUserId(cart.getUser().getId());
         dto.setItems(cart.getItems().stream().map(this::toDto).collect(Collectors.toList()));
         dto.setSubtotal(cart.getItems().stream()
-                .map(item -> item.getProduct().getPrice().multiply(new BigDecimal(item.getQuantity())))
+                .map(item -> item.getPrice().multiply(new BigDecimal(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add));
         return dto;
     }
@@ -175,7 +175,7 @@ public class CartServiceImpl implements CartService {
         dto.setProductId(cartItem.getProduct().getId());
         dto.setProductName(cartItem.getProduct().getName());
         dto.setQuantity(cartItem.getQuantity());
-        dto.setPrice(cartItem.getProduct().getPrice());
+        dto.setPrice(cartItem.getPrice());
         // Resolve a safe image URL (avoid NPE if no images)
         String imageUrl = null;
         if (cartItem.getProduct() != null) {
