@@ -32,3 +32,16 @@ logging:
     root: WARN
     org.springframework: WARN
     com.recicar.marketplace: INFO
+
+# Same structure as dev profile: tests do not activate `dev`, so bind regions for ClientPreferences / header bar.
+app:
+  market:
+    default-region: ES
+    reference-vat: 0.21
+    regions:
+      - code: ES
+        name: España
+        vat: 0.21
+      - code: FR
+        name: France
+        vat: 0.20
