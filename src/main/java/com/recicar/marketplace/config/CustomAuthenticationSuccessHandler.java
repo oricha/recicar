@@ -1,130 +1,116 @@
 package com.recicar.marketplace.config;
 
-import com.recicar.marketplace.dto.CartItemDto;
 import com.recicar.marketplace.entity.UserRole;
-import com.recicar.marketplace.service.CartService;
 import com.recicar.marketplace.service.CustomUserDetailsService;
-import com.recicar.marketplace.service.WishlistService;
-import com.recicar.marketplace.repository.UserRepository;
+import com.recicar.marketplace.service.PostLoginActionsService;
+import com.recicar.marketplace.service.UserService;
+import com.recicar.marketplace.service.auth.AuthLoginAuditService;
+import com.recicar.marketplace.security.SessionAuthVersionFilter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
 
 import java.io.IOException;
-import java.util.List;
 
+/**
+ * After successful login: merge guest cart/wishlist, honor saved request, role-based landing,
+ * session auth stamp for {@link SessionAuthVersionFilter}.
+ */
 @Slf4j
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
-    private static final String SESSION_CART_KEY = "SESSION_CART";
-    
     private final RequestCache requestCache = new HttpSessionRequestCache();
-    private final CartService cartService;
-    private final UserRepository userRepository;
-    private final WishlistService wishlistService;
+    private final PostLoginActionsService postLoginActionsService;
+    private final UserService userService;
+    private final UserDetailsService userDetailsService;
+    private final AuthLoginAuditService authLoginAuditService;
 
     public CustomAuthenticationSuccessHandler(
-            CartService cartService, UserRepository userRepository, WishlistService wishlistService) {
-        this.cartService = cartService;
-        this.userRepository = userRepository;
-        this.wishlistService = wishlistService;
+            PostLoginActionsService postLoginActionsService,
+            UserService userService,
+            UserDetailsService userDetailsService,
+            AuthLoginAuditService authLoginAuditService) {
+        this.postLoginActionsService = postLoginActionsService;
+        this.userService = userService;
+        this.userDetailsService = userDetailsService;
+        this.authLoginAuditService = authLoginAuditService;
     }
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-                                      Authentication authentication) throws IOException, ServletException {
-        
-        // Get the user details
-        CustomUserDetailsService.CustomUserPrincipal userPrincipal = 
-            (CustomUserDetailsService.CustomUserPrincipal) authentication.getPrincipal();
-        
-        UserRole userRole = userPrincipal.getUser().getRole();
+                                        Authentication authentication) throws IOException, ServletException {
+
+        Authentication effective = authentication;
+
+        if (authentication.getPrincipal() instanceof OAuth2User oauth) {
+            String email = oauth.getAttribute("email");
+            if (email == null || email.isBlank()) {
+                response.sendRedirect("/login?error=oauth");
+                return;
+            }
+            String given = oauth.getAttribute("given_name");
+            String family = oauth.getAttribute("family_name");
+            userService.ensureOAuthUser(email, given, family);
+            UserDetails details = userDetailsService.loadUserByUsername(email);
+            UsernamePasswordAuthenticationToken token =
+                    new UsernamePasswordAuthenticationToken(details, null, details.getAuthorities());
+            token.setDetails(new WebAuthenticationDetails(request));
+            effective = token;
+            var context = org.springframework.security.core.context.SecurityContextHolder.createEmptyContext();
+            context.setAuthentication(effective);
+            org.springframework.security.core.context.SecurityContextHolder.setContext(context);
+            HttpSession session = request.getSession(true);
+            session.setAttribute(
+                    HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                    context);
+        }
+
+        if (!(effective.getPrincipal() instanceof CustomUserDetailsService.CustomUserPrincipal userPrincipal)) {
+            log.warn("Unexpected principal after login: {}", effective.getPrincipal());
+            response.sendRedirect("/login?error");
+            return;
+        }
+
         String userEmail = userPrincipal.getUsername();
-        
-        // Merge session cart with database cart
-        mergeSessionCartToDatabase(request.getSession(), userEmail);
-        mergeSessionWishlistToDatabase(request.getSession(), userEmail);
-        
-        // Check if there was a saved request (user was trying to access a protected page)
+        UserRole userRole = userPrincipal.getUser().getRole();
+        long authVersion = userPrincipal.getUser().getAuthVersion();
+
+        userService.resetFailedLoginsForEmail(userEmail);
+        authLoginAuditService.record(true, userEmail, userPrincipal.getUserId(), request);
+        postLoginActionsService.mergeGuestDataIntoUserSession(request.getSession(), userEmail);
+        stampAuthVersion(request.getSession(), authVersion);
+
         SavedRequest savedRequest = requestCache.getRequest(request, response);
         if (savedRequest != null) {
             String targetUrl = savedRequest.getRedirectUrl();
-            // Clear the saved request
             requestCache.removeRequest(request, response);
             response.sendRedirect(targetUrl);
             return;
         }
-        
-        // Default redirect based on user role
+
         String redirectUrl = switch (userRole) {
             case ADMIN -> "/admin/dashboard";
             case VENDOR -> "/vendor/dashboard";
             case CUSTOMER -> "/";
         };
-        
+
         response.sendRedirect(redirectUrl);
     }
-    
-    @SuppressWarnings("unchecked")
-    private void mergeSessionCartToDatabase(HttpSession session, String userEmail) {
-        try {
-            // Get session cart
-            List<CartItemDto> sessionCart = (List<CartItemDto>) session.getAttribute(SESSION_CART_KEY);
-            
-            if (sessionCart == null || sessionCart.isEmpty()) {
-                log.debug("No session cart to merge for user: {}", userEmail);
-                return;
-            }
-            
-            // Get user ID
-            Long userId = userRepository.findByEmailIgnoreCase(userEmail)
-                    .map(user -> user.getId())
-                    .orElse(null);
-            
-            if (userId == null) {
-                log.warn("User not found for email: {}", userEmail);
-                return;
-            }
-            
-            // Merge each item from session cart to database cart
-            log.info("Merging {} items from session cart to database cart for user: {}", sessionCart.size(), userEmail);
-            for (CartItemDto item : sessionCart) {
-                try {
-                    cartService.addItemToCart(userId, item.getProductId(), item.getQuantity());
-                    log.debug("Merged item {} (quantity: {}) to database cart", item.getProductId(), item.getQuantity());
-                } catch (Exception e) {
-                    log.error("Failed to merge item {} to database cart: {}", item.getProductId(), e.getMessage());
-                }
-            }
-            
-            // Clear session cart after successful merge
-            session.removeAttribute(SESSION_CART_KEY);
-            log.debug("Session cart cleared after merge");
-            
-        } catch (Exception e) {
-            log.error("Error merging session cart to database: {}", e.getMessage(), e);
-        }
-    }
 
-    private void mergeSessionWishlistToDatabase(HttpSession session, String userEmail) {
-        try {
-            Long userId = userRepository.findByEmailIgnoreCase(userEmail)
-                    .map(u -> u.getId())
-                    .orElse(null);
-            if (userId == null) {
-                return;
-            }
-            wishlistService.mergeSessionWishlistIntoDatabase(session, userId);
-            log.debug("Wishlist merged for user: {}", userEmail);
-        } catch (Exception e) {
-            log.error("Error merging session wishlist: {}", e.getMessage(), e);
-        }
+    private void stampAuthVersion(HttpSession session, long authVersion) {
+        session.setAttribute(SessionAuthVersionFilter.SESSION_AUTH_VERSION_ATTR, authVersion);
     }
 }

@@ -2,6 +2,7 @@ package com.recicar.marketplace.service;
 
 import com.recicar.marketplace.entity.User;
 import com.recicar.marketplace.repository.UserRepository;
+import com.recicar.marketplace.repository.UserRoleGrantRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,17 +11,20 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final UserRoleGrantRepository userRoleGrantRepository;
 
-    public CustomUserDetailsService(UserRepository userRepository) {
+    public CustomUserDetailsService(UserRepository userRepository, UserRoleGrantRepository userRoleGrantRepository) {
         this.userRepository = userRepository;
+        this.userRoleGrantRepository = userRoleGrantRepository;
     }
 
     @Override
@@ -28,21 +32,24 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
-        return new CustomUserPrincipal(user);
+        List<String> grantRoles = userRoleGrantRepository.findRoleNamesByUserId(user.getId());
+        List<String> roleNames = grantRoles.isEmpty() ? List.of(user.getRole().name()) : grantRoles;
+
+        return new CustomUserPrincipal(user, roleNames);
     }
 
     public static class CustomUserPrincipal implements UserDetails {
         private final User user;
+        private final List<String> roleNames;
 
-        public CustomUserPrincipal(User user) {
+        public CustomUserPrincipal(User user, List<String> roleNames) {
             this.user = user;
+            this.roleNames = roleNames;
         }
 
         @Override
         public Collection<? extends GrantedAuthority> getAuthorities() {
-            return Collections.singletonList(
-                new SimpleGrantedAuthority("ROLE_" + user.getRole().name())
-            );
+            return roleNames.stream().map(r -> new SimpleGrantedAuthority("ROLE_" + r)).toList();
         }
 
         @Override
@@ -62,7 +69,10 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         @Override
         public boolean isAccountNonLocked() {
-            return user.isActive();
+            if (!user.isActive()) {
+                return false;
+            }
+            return user.getLockedUntil() == null || !user.getLockedUntil().isAfter(LocalDateTime.now());
         }
 
         @Override
@@ -75,7 +85,6 @@ public class CustomUserDetailsService implements UserDetailsService {
             return user.isActive() && user.isEmailVerified();
         }
 
-        // Getter for the User entity
         public User getUser() {
             return user;
         }

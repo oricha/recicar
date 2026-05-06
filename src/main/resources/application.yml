@@ -5,6 +5,24 @@ spring:
     default: dev
   application:
     name: car-parts-marketplace
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_OAUTH_CLIENT_ID:google-client-placeholder}
+            client-secret: ${GOOGLE_OAUTH_CLIENT_SECRET:google-secret-placeholder}
+            scope: openid,profile,email
+          facebook:
+            provider: facebook
+            client-id: ${FACEBOOK_OAUTH_APP_ID:facebook-client-placeholder}
+            client-secret: ${FACEBOOK_OAUTH_APP_SECRET:facebook-secret-placeholder}
+            scope: public_profile,email
+        provider:
+          facebook:
+            authorization-uri: https://www.facebook.com/v18.0/dialog/oauth
+            token-uri: https://graph.facebook.com/v18.0/oauth/access_token
+            user-info-uri: https://graph.facebook.com/me?fields=id,name,email,first_name,last_name
 
 server:
   port: 8080
