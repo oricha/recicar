@@ -3,6 +3,8 @@ package com.recicar.marketplace.service;
 import com.recicar.marketplace.entity.Product;
 import com.recicar.marketplace.entity.Category;
 import com.recicar.marketplace.entity.ProductCondition;
+import com.recicar.marketplace.entity.SavedSearch;
+import com.recicar.marketplace.entity.User;
 import com.recicar.marketplace.entity.Vendor;
 import com.recicar.marketplace.repository.ProductRepository;
 import com.recicar.marketplace.repository.SavedSearchRepository;
@@ -21,13 +23,16 @@ import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
-
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class SearchServiceTest {
 
@@ -417,5 +422,42 @@ class SearchServiceTest {
         assertNotNull(result);
         verify(searchRepository).searchSimple(expectedTrimmedTerm, pageable);
     }
-}
 
+    @Test
+    void saveSearch_trimsQuery() {
+        User u = new User();
+        u.setId(33L);
+        when(userRepository.findById(33L)).thenReturn(Optional.of(u));
+        when(savedSearchRepository.save(any(SavedSearch.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        SavedSearch r = searchService.saveSearch(33L, "  escobilla  ", "{\"brand\":\"FORD\"}");
+
+        assertEquals("escobilla", r.getSearchQuery());
+        verify(savedSearchRepository).save(any(SavedSearch.class));
+    }
+
+    @Test
+    void deleteSavedSearch_deletesWhenOwned() {
+        User owner = new User();
+        owner.setId(1L);
+        SavedSearch s = new SavedSearch();
+        s.setUser(owner);
+        when(savedSearchRepository.findById(77L)).thenReturn(Optional.of(s));
+
+        searchService.deleteSavedSearch(1L, 77L);
+
+        verify(savedSearchRepository).delete(s);
+    }
+
+    @Test
+    void deleteSavedSearch_blocksOtherUser() {
+        User owner = new User();
+        owner.setId(1L);
+        SavedSearch s = new SavedSearch();
+        s.setUser(owner);
+        when(savedSearchRepository.findById(9L)).thenReturn(Optional.of(s));
+
+        assertThrows(IllegalArgumentException.class, () -> searchService.deleteSavedSearch(2L, 9L));
+        verify(savedSearchRepository, never()).delete(any());
+    }
+}

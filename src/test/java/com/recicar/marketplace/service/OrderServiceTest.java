@@ -19,6 +19,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import org.springframework.data.domain.PageRequest;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -143,5 +145,19 @@ class OrderServiceTest {
         RuntimeException error = assertThrows(RuntimeException.class, () -> orderService.createOrder(orderRequest));
 
         assertEquals("Cart has changed; please review your order.", error.getMessage());
+    }
+
+    @Test
+    void findOrdersByCustomerId_delegatesToRepository() {
+        PageRequest pg = PageRequest.of(1, 10);
+        Order o = new Order();
+        o.setId(3L);
+        when(orderRepository.findByCustomer_IdOrderByCreatedAtDesc(5L, pg)).thenReturn(List.of(o));
+
+        List<Order> got = orderService.findOrdersByCustomerId(5L, pg);
+
+        assertEquals(1, got.size());
+        assertEquals(3L, got.get(0).getId());
+        verify(orderRepository).findByCustomer_IdOrderByCreatedAtDesc(5L, pg);
     }
 }

@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 public interface SavedSearchRepository extends JpaRepository<SavedSearch, Long> {
 
-    List<SavedSearch> findByUserIdOrderByCreatedAtDesc(Long userId);
+    List<SavedSearch> findByUser_IdOrderByCreatedAtDesc(Long userId);
 }

@@ -146,10 +146,18 @@ public class SecurityConfig {
                                 "/error",
                                 "/products/**",
                                 "/shop**",
-                                "/product-details**"
+                                "/product-details**",
+                                "/orders/confirmation"
                         ).permitAll()
                         .requestMatchers(
                                 "/user-dashboard/**",
+                                "/dashboard",
+                                "/dashboard/**",
+                                "/messages",
+                                "/messages/**",
+                                "/saved-searches",
+                                "/saved-searches/**",
+                                "/orders",
                                 "/api/v1/user/**"
                         ).authenticated()
                         .requestMatchers("/wishlist/**", "/checkout/**", "/my-account/**").authenticated()

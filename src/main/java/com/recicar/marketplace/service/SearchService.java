@@ -178,7 +178,16 @@ public class SearchService {
 
     @Transactional(readOnly = true)
     public List<SavedSearch> getSavedSearches(Long userId) {
-        return savedSearchRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        return savedSearchRepository.findByUser_IdOrderByCreatedAtDesc(userId);
+    }
+
+    public void deleteSavedSearch(Long userId, Long savedSearchId) {
+        SavedSearch saved = savedSearchRepository.findById(savedSearchId)
+                .orElseThrow(() -> new IllegalArgumentException("Saved search not found"));
+        if (!saved.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("Saved search not found");
+        }
+        savedSearchRepository.delete(saved);
     }
 
     /**

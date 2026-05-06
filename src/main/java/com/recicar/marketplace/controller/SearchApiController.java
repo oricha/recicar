@@ -109,6 +109,22 @@ public class SearchApiController {
         return ResponseEntity.ok(savedSearches);
     }
 
+    @DeleteMapping("/user/saved-searches/{id}")
+    public ResponseEntity<?> deleteSavedSearch(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        User user = resolveUser(userDetails);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Authentication required"));
+        }
+        try {
+            searchService.deleteSavedSearch(user.getId(), id);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Not found"));
+        }
+    }
+
     private Pageable toPageable(int page, int size, String sort) {
         return switch (sort) {
             case "price_asc" -> PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "price"));

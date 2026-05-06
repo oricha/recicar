@@ -19,19 +19,23 @@
                             <ul>
                                 <!-- Authenticated: show full My Account dropdown -->
                                 <li class="top_links" th:if="${isAuthenticated}">
-                                    <a href="#"><i class="ion-android-person"></i> My account<i class="ion-ios-arrow-down"></i></a>
+                                    <a href="#"><i class="ion-android-person"></i> Mi cuenta<i class="ion-ios-arrow-down"></i></a>
                                     <ul class="dropdown_links">
-                                        <li><a href="/checkout">Checkout</a></li>
-                                        <li><a href="/my-account">My account</a></li>
-                                        <li><a href="/cart">Cart</a></li>
-                                        <li><a href="/wishlist">Wishlist</a></li>
-                                        <li><a href="/logout">Logout</a></li>
+                                        <li><a th:href="@{/dashboard}">Mi panel</a></li>
+                                        <li><a th:href="@{/my-profile}">Mi perfil</a></li>
+                                        <li><a th:href="@{/orders}">Mis pedidos</a></li>
+                                        <li><a th:href="@{/wishlist}">Wishlist</a></li>
+                                        <li><a th:href="@{/saved-searches}">Búsquedas guardadas</a></li>
+                                        <li><a th:href="@{/messages}">Mensajes</a></li>
+                                        <li><a th:href="@{/cart}">Carrito</a></li>
+                                        <li><a th:href="@{/checkout}">Checkout</a></li>
+                                        <li><a th:href="@{/logout}">Salir</a></li>
                                     </ul>
                                 </li>
 
                                 <!-- Unauthenticated: show Login only (no dropdown) -->
                                 <li class="top_links" th:if="${!isAuthenticated}">
-                                    <a href="/login"><i class="ion-android-person"></i> Login</a>
+                                    <a th:href="@{/login}"><i class="ion-android-person"></i> Entrar</a>
                                 </li>
                             </ul>
                         </div>

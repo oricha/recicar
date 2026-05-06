@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ReciCar - Mi panel</title>
+    <title th:text="${pageTitle}">Mis pedidos</title>
     <link rel="shortcut icon" type="image/x-icon" th:href="@{/assets/img/favicon.ico}">
     <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/assets/css/style.css}">
@@ -14,47 +14,25 @@
 
 <div class="breadcrumbs_area">
     <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <div class="breadcrumb_content">
-                    <ul>
-                        <li><a th:href="@{/}">Inicio</a></li>
-                        <li>Mi panel</li>
-                    </ul>
-                </div>
-            </div>
+        <div class="breadcrumb_content">
+            <ul>
+                <li><a th:href="@{/}">Inicio</a></li>
+                <li>Mis pedidos</li>
+            </ul>
         </div>
     </div>
 </div>
 
 <section class="main_content_area py-5">
     <div class="container">
-        <h2 class="mb-4" th:text="'Hola, ' + ${user.firstName} + ' ' + ${user.lastName}">Hola</h2>
-        <p class="text-muted mb-4" th:text="${user.email}">email</p>
-        <div class="row mb-4 g-2">
-            <div class="col-md-6 col-lg-4">
-                <a class="btn btn-primary w-100" th:href="@{/messages}">Mensajes con vendedores</a>
-            </div>
-            <div class="col-md-6 col-lg-4">
-                <a class="btn btn-outline-primary w-100" th:href="@{/wishlist}">Lista de deseos</a>
-            </div>
-            <div class="col-md-6 col-lg-4">
-                <a class="btn btn-outline-primary w-100" th:href="@{/saved-searches}">Búsquedas guardadas</a>
-            </div>
-            <div class="col-md-6 col-lg-4">
-                <a class="btn btn-outline-primary w-100" th:href="@{/orders}">Ver todos los pedidos</a>
-            </div>
-            <div class="col-md-6 col-lg-4">
-                <a class="btn btn-outline-secondary w-100" th:href="@{/my-profile}">Mi perfil</a>
-            </div>
-        </div>
+        <h1 class="h3 mb-4">Mis pedidos</h1>
+        <p class="small text-muted mb-4"><a th:href="@{/dashboard}">← Volver al panel</a></p>
 
-        <h3 class="mb-3">Pedidos recientes</h3>
         <div class="table-responsive" th:if="${orders != null and !orders.isEmpty()}">
             <table class="table">
                 <thead>
                 <tr>
-                    <th>Nº</th>
+                    <th>Nº pedido</th>
                     <th>Fecha</th>
                     <th>Estado</th>
                     <th>Total</th>
@@ -70,7 +48,7 @@
                 </tbody>
             </table>
         </div>
-        <p th:if="${orders == null or orders.isEmpty()}" class="text-muted">Aún no tienes pedidos.</p>
+        <p th:if="${orders == null or orders.isEmpty()}" class="text-muted py-4">No hay pedidos todavía. <a th:href="@{/shop}">Explorar tienda</a></p>
     </div>
 </section>
 
