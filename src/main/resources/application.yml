@@ -62,6 +62,17 @@ spring:
     
   thymeleaf:
     cache: false
+
+  # Search/category hints: 5m TTL locally; use profile redis-cache + Redis for distributed cache.
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=8000,expireAfterWrite=5m
+  
+  data:
+    redis:
+      repositories:
+        enabled: false
     
 server:
   error:
@@ -247,6 +258,15 @@ spring:
   thymeleaf:
     cache: false
 
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=500,expireAfterWrite=5m
+
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+
 server:
   error:
     include-stacktrace: never
@@ -257,7 +277,23 @@ logging:
   level:
     com.recicar.marketplace: INFO
 
-# Test: PostgreSQL en la misma red que la app (p. ej. servicio Dokploy / Docker). Sin SSL interno suele bastar jdbc:postgresql://host:5432/db
+# Test: PostgreSQL en la misma red que la app (p. ej. servicio Dokploy test). Sin SSL interno suele bastar jdbc:postgresql://host:5432/db
+
+# Optional: distributed cache (5 minutes). Start Redis (e.g. docker compose) and run with --spring.profiles.active=dev,redis-cache
+---
+spring:
+  config:
+    activate:
+      on-profile: redis-cache
+  cache:
+    type: redis
+    redis:
+      time-to-live: 300000
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2s
 
 ---
 spring:

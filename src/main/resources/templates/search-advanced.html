@@ -1,0 +1,193 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      class="no-js" lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${pageTitle}">Búsqueda avanzada — ReciCar</title>
+    <link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.ico">
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/font.awesome.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        .adv-results-grid .card-img-top { height: 160px; object-fit: cover; }
+        #adv-live-results { min-height: 3rem; }
+        .header-search-suggestions button { display: block; width: 100%; text-align: left; border: 0; background: #fff; padding: 6px 10px; }
+        .header-search-suggestions button:hover { background: #f5f5f5; }
+    </style>
+</head>
+<body>
+<th:block th:replace="fragments/_header :: header"></th:block>
+<th:block th:replace="fragments/_offcanvasmenu :: offcanvasmenu"></th:block>
+
+<div class="breadcrumbs_area">
+    <div class="container">
+        <div class="breadcrumb_content">
+            <ul>
+                <li><a href="/">Inicio</a></li>
+                <li>Búsqueda avanzada</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="container py-4" id="adv-root">
+    <h1 class="h3">Búsqueda avanzada</h1>
+    <p class="text-muted">Siete criterios: marca, modelo, modificación (motor/variante), texto de pieza, precio mín/máx, condición y disponibilidad.</p>
+
+    <form id="adv-search-form" class="row g-3 mb-4" method="get" th:action="@{/search/advanced}">
+        <input type="hidden" name="submitted" value="true"/>
+        <div class="col-md-4">
+            <label class="form-label" for="adv-q">Nombre / referencia pieza</label>
+            <div class="position-relative">
+                <input class="form-control" id="adv-q" name="q" type="search" autocomplete="off"
+                       th:value="${q}" placeholder="Ej. pastillas freno" maxlength="100"/>
+                <div id="adv-q-suggestions" class="header-search-suggestions border rounded shadow-sm position-absolute w-100 bg-white"
+                     style="z-index:20;top:100%;left:0" hidden></div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label" for="adv-brand">Marca (vehículo)</label>
+            <select class="form-select" id="adv-brand" name="brand">
+                <option value="">— Todas —</option>
+                <option th:each="b : ${brandOptions}"
+                        th:value="${b.name()}"
+                        th:text="${b.name()}"
+                        th:attr="data-slug=${b.slug()}"
+                        th:selected="${advBrand != null && advBrand == b.name()}"></option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label" for="adv-vehicle-model">Modelo</label>
+            <select class="form-select" id="adv-vehicle-model" name="vehicleModel">
+                <option value="">—</option>
+                <option th:if="${advModel != null and !#strings.isEmpty(advModel)}"
+                        th:value="${advModel}" th:text="${advModel}" selected></option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label" for="adv-mod">Modificación (motor / variante)</label>
+            <input class="form-control" id="adv-mod" name="modification" type="text"
+                   th:value="${advModification}" placeholder="Ej. 1.6 TDI" maxlength="80"/>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label" for="adv-min">Precio min (€)</label>
+            <input class="form-control" id="adv-min" name="minPrice" type="number" step="0.01" min="0"
+                   th:value="${advMinPrice}"/>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label" for="adv-max">Precio max (€)</label>
+            <input class="form-control" id="adv-max" name="maxPrice" type="number" step="0.01" min="0"
+                   th:value="${advMaxPrice}"/>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label" for="adv-cond">Condición</label>
+            <select class="form-select" id="adv-cond" name="condition">
+                <option value="">— Cualquiera —</option>
+                <option th:each="c : ${conditions}"
+                        th:value="${c.name()}"
+                        th:text="${c.name()}"
+                        th:selected="${advCondition != null && advCondition == c.name()}"></option>
+            </select>
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="adv-stock" name="inStock" value="true"
+                       th:checked="${advInStock == true}"/>
+                <label class="form-check-label" for="adv-stock">Solo en stock</label>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label" for="adv-sort">Orden</label>
+            <select class="form-select" id="adv-sort" name="sort">
+                <option value="relevance" th:selected="${sort == 'relevance'}">Relevancia</option>
+                <option value="price_asc" th:selected="${sort == 'price_asc'}">Precio: menor a mayor</option>
+                <option value="price_desc" th:selected="${sort == 'price_desc'}">Precio: mayor a menor</option>
+            </select>
+        </div>
+        <div class="col-12 d-flex flex-wrap gap-2 align-items-center">
+            <button type="submit" class="btn btn-primary">Buscar</button>
+            <a class="btn btn-outline-secondary" th:href="@{/search/advanced}">Limpiar</a>
+            <button type="button" class="btn btn-outline-primary" id="btn-save-search" sec:authorize="isAuthenticated()">
+                Guardar búsqueda
+            </button>
+            <span class="text-muted small" sec:authorize="!isAuthenticated()">Inicia sesión para guardar búsquedas.</span>
+        </div>
+    </form>
+
+    <div class="mb-3" th:if="${!searchExecuted}">
+        <div id="adv-live-results" class="adv-results-grid border rounded p-3 bg-light"></div>
+    </div>
+
+    <div class="row" th:if="${searchExecuted}">
+        <div class="col-12 mb-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <p class="mb-0" th:if="${page != null}">
+                <span th:text="${page.totalElements}">0</span> resultados
+            </p>
+        </div>
+        <div class="col-12" th:if="${page != null}">
+            <div class="row" th:if="${!products.isEmpty()}">
+                <div class="col-md-4 mb-3" th:each="p : ${products}">
+                    <div class="card h-100 shadow-sm">
+                        <a th:href="@{/product-details(id=${p.id})}">
+                            <img class="card-img-top" th:src="${p.primaryImage != null ? p.primaryImage.url : '/img/product/product10.jpg'}" alt=""/>
+                        </a>
+                        <div class="card-body d-flex flex-column">
+                            <h2 class="h6">
+                                <a th:href="@{/product-details(id=${p.id})}" th:text="${p.name}">Pieza</a>
+                            </h2>
+                            <p class="small text-muted mb-1" th:text="${p.category != null ? p.category.name : ''}">Cat</p>
+                            <div class="mt-auto d-flex justify-content-between align-items-center">
+                                <span class="fw-bold" th:text="${@priceView.formatEur(clientPreferences, p.price)}">€</span>
+                                <span class="badge" th:classappend="${p.inStock ? 'bg-success' : 'bg-secondary'}"
+                                      th:text="${p.inStock ? 'En stock' : 'Sin stock'}">Stock</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p class="text-center text-muted py-5" th:if="${products.isEmpty()}">Sin resultados con estos filtros.</p>
+
+            <nav class="mt-3" th:if="${page != null && page.totalPages > 1}" aria-label="Paginación">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:classappend="${page.first} ? 'disabled'">
+                        <a class="page-link"
+                           th:if="${!page.first and advPages != null}"
+                           th:href="${advPages.page(page.number - 1)}">Anterior</a>
+                        <span class="page-link" th:if="${page.first}">Anterior</span>
+                    </li>
+                    <li class="page-item"
+                        th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+                        th:classappend="${i == page.number} ? 'active'">
+                        <a class="page-link"
+                           th:if="${advPages != null}"
+                           th:href="${advPages.page(i)}"
+                           th:text="${i + 1}">1</a>
+                    </li>
+                    <li class="page-item" th:classappend="${page.last} ? 'disabled'">
+                        <a class="page-link"
+                           th:if="${!page.last and advPages != null}"
+                           th:href="${advPages.page(page.number + 1)}">Siguiente</a>
+                        <span class="page-link" th:if="${page.last}">Siguiente</span>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <div class="alert alert-secondary" th:if="${!searchExecuted}">
+        Elige filtros y pulsa <strong>Buscar</strong>. Puedes ver una vista previa rápida debajo mientras ajustas los campos.
+    </div>
+</div>
+
+<th:block th:replace="fragments/_calltoaction :: calltoaction"></th:block>
+<th:block th:replace="fragments/_footer :: footer"></th:block>
+<script src="assets/js/vendor/jquery-3.4.1.min.js"></script>
+<script src="assets/js/popper.js"></script>
+<script src="assets/js/bootstrap.min.js"></script>
+<script src="assets/js/main.js"></script>
+<script th:src="@{/assets/js/technical-ux.js}"></script>
+<script th:src="@{/assets/js/search-advanced-page.js}"></script>
+</body>
+</html>

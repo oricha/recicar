@@ -5,6 +5,9 @@ import com.recicar.marketplace.entity.Category;
 import com.recicar.marketplace.entity.ProductCondition;
 import com.recicar.marketplace.entity.Vendor;
 import com.recicar.marketplace.repository.ProductRepository;
+import com.recicar.marketplace.repository.SavedSearchRepository;
+import com.recicar.marketplace.repository.SearchRepository;
+import com.recicar.marketplace.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +25,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,6 +33,15 @@ class SearchServiceTest {
 
     @Mock
     private ProductRepository productRepository;
+
+    @Mock
+    private SearchRepository searchRepository;
+
+    @Mock
+    private SavedSearchRepository savedSearchRepository;
+
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private SearchService searchService;
@@ -68,7 +81,7 @@ class SearchServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Product> expectedPage = new PageImpl<>(List.of(testProduct), pageable, 1);
         
-        when(productRepository.searchByNameOrPartNumber(anyString(), any(Pageable.class)))
+        when(searchRepository.searchSimple(eq(searchTerm), any(Pageable.class)))
                 .thenReturn(expectedPage);
 
         // Act
@@ -78,7 +91,7 @@ class SearchServiceTest {
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
         assertEquals(testProduct, result.getContent().get(0));
-        verify(productRepository).searchByNameOrPartNumber(searchTerm, pageable);
+        verify(searchRepository).searchSimple(searchTerm, pageable);
     }
 
     @Test
@@ -92,7 +105,7 @@ class SearchServiceTest {
             searchService.searchProducts(searchTerm, pageable);
         });
         
-        verify(productRepository, never()).searchByNameOrPartNumber(anyString(), any(Pageable.class));
+        verify(searchRepository, never()).searchSimple(anyString(), any(Pageable.class));
     }
 
     @Test
@@ -106,7 +119,7 @@ class SearchServiceTest {
             searchService.searchProducts(searchTerm, pageable);
         });
         
-        verify(productRepository, never()).searchByNameOrPartNumber(anyString(), any(Pageable.class));
+        verify(searchRepository, never()).searchSimple(anyString(), any(Pageable.class));
     }
 
     @Test
@@ -120,7 +133,7 @@ class SearchServiceTest {
             searchService.searchProducts(searchTerm, pageable);
         });
         
-        verify(productRepository, never()).searchByNameOrPartNumber(anyString(), any(Pageable.class));
+        verify(searchRepository, never()).searchSimple(anyString(), any(Pageable.class));
     }
 
     @Test
@@ -134,7 +147,7 @@ class SearchServiceTest {
             searchService.searchProducts(searchTerm, pageable);
         });
         
-        verify(productRepository, never()).searchByNameOrPartNumber(anyString(), any(Pageable.class));
+        verify(searchRepository, never()).searchSimple(anyString(), any(Pageable.class));
     }
 
     @Test
@@ -145,7 +158,7 @@ class SearchServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Product> expectedPage = new PageImpl<>(List.of(testProduct), pageable, 1);
         
-        when(productRepository.searchByNameOrPartNumber(anyString(), any(Pageable.class)))
+        when(searchRepository.searchSimple(eq(expectedTruncatedTerm), any(Pageable.class)))
                 .thenReturn(expectedPage);
 
         // Act
@@ -153,7 +166,7 @@ class SearchServiceTest {
 
         // Assert
         assertNotNull(result);
-        verify(productRepository).searchByNameOrPartNumber(expectedTruncatedTerm, pageable);
+        verify(searchRepository).searchSimple(expectedTruncatedTerm, pageable);
     }
 
     @Test
@@ -329,6 +342,7 @@ class SearchServiceTest {
     void getSearchSuggestions_WithValidPartialTerm_ShouldReturnEmptyList() {
         // Arrange
         String partialTerm = "bra";
+        when(searchRepository.fetchSuggestions(partialTerm)).thenReturn(List.of());
 
         // Act
         List<String> result = searchService.getSearchSuggestions(partialTerm);
@@ -336,8 +350,7 @@ class SearchServiceTest {
         // Assert
         assertNotNull(result);
         assertTrue(result.isEmpty());
-        // Note: This currently returns empty list as per the basic implementation
-        // In a real application, this would return actual suggestions
+        verify(searchRepository).fetchSuggestions(partialTerm);
     }
 
     @Test
@@ -394,7 +407,7 @@ class SearchServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Product> expectedPage = new PageImpl<>(List.of(testProduct), pageable, 1);
         
-        when(productRepository.searchByNameOrPartNumber(anyString(), any(Pageable.class)))
+        when(searchRepository.searchSimple(eq(expectedTrimmedTerm), any(Pageable.class)))
                 .thenReturn(expectedPage);
 
         // Act
@@ -402,7 +415,7 @@ class SearchServiceTest {
 
         // Assert
         assertNotNull(result);
-        verify(productRepository).searchByNameOrPartNumber(expectedTrimmedTerm, pageable);
+        verify(searchRepository).searchSimple(expectedTrimmedTerm, pageable);
     }
 }
 

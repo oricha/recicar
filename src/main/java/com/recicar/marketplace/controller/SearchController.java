@@ -2,22 +2,29 @@ package com.recicar.marketplace.controller;
 
 import com.recicar.marketplace.entity.Category;
 import com.recicar.marketplace.entity.Product;
+import com.recicar.marketplace.entity.ProductCondition;
 import com.recicar.marketplace.service.CategoryService;
 import com.recicar.marketplace.service.ProductService;
+import com.recicar.marketplace.service.SearchFilterOptionsService;
 import com.recicar.marketplace.service.SearchService;
+import com.recicar.marketplace.web.search.AdvancedSearchPageLinks;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 
 @Controller
@@ -28,6 +35,7 @@ public class SearchController {
     private final ProductService productService;
     private final CategoryService categoryService;
     private final SearchService searchService;
+    private final SearchFilterOptionsService searchFilterOptionsService;
 
     /**
      * Main search endpoint - handles general search, part number, and OEM number searches
@@ -299,5 +307,130 @@ public class SearchController {
             model.addAttribute("categories", categoryService.findRootCategories());
             return "shop-list";
         }
+    }
+
+    /**
+     * Advanced search UI (seven filters) backed by {@link SearchService#searchAdvanced}
+     * and brand list from {@link SearchFilterOptionsService} / {@link com.recicar.marketplace.service.BrandService}.
+     */
+    @GetMapping("/advanced")
+    public String advanced(
+            @RequestParam(value = "q", required = false) String q,
+            @RequestParam(required = false) String brand,
+            @RequestParam(value = "vehicleModel", required = false) String vehicleModel,
+            @RequestParam(required = false) String modification,
+            @RequestParam(required = false) String condition,
+            @RequestParam(required = false) Boolean inStock,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(defaultValue = "relevance") String sort,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "false") boolean submitted,
+            Model model
+    ) {
+        model.addAttribute("pageTitle", "Búsqueda avanzada — ReciCar");
+        model.addAttribute("brandOptions", searchFilterOptionsService.listBrandOptions());
+        model.addAttribute("conditions", ProductCondition.values());
+        model.addAttribute("categories", categoryService.findRootCategories());
+
+        model.addAttribute("q", q != null ? q : "");
+        model.addAttribute("advBrand", brand != null ? brand : "");
+        model.addAttribute("advModel", vehicleModel != null ? vehicleModel : "");
+        model.addAttribute("advModification", modification != null ? modification : "");
+        model.addAttribute("advCondition", condition != null ? condition : "");
+        model.addAttribute("advInStock", inStock);
+        model.addAttribute("advMinPrice", minPrice);
+        model.addAttribute("advMaxPrice", maxPrice);
+        model.addAttribute("sort", sort);
+
+        if (!submitted) {
+            model.addAttribute("products", Collections.emptyList());
+            model.addAttribute("page", null);
+            model.addAttribute("searchExecuted", false);
+            return "search-advanced";
+        }
+
+        Page<Product> productPage = searchService.searchAdvanced(
+                emptyToNull(q),
+                emptyToNull(brand),
+                emptyToNull(vehicleModel),
+                emptyToNull(modification),
+                emptyToNull(condition),
+                inStock,
+                minPrice,
+                maxPrice,
+                pageableForSort(page, 12, sort)
+        );
+
+        model.addAttribute("products", productPage.getContent());
+        model.addAttribute("page", productPage);
+        model.addAttribute("searchExecuted", true);
+        model.addAttribute("searchType", "advanced");
+        model.addAttribute("totalElements", productPage.getTotalElements());
+        model.addAttribute("advPages", new AdvancedSearchPageLinks(buildAdvancedPageLinkFunction(
+                q, brand, vehicleModel, modification, condition, inStock, minPrice, maxPrice, sort)));
+        return "search-advanced";
+    }
+
+    private IntFunction<String> buildAdvancedPageLinkFunction(
+            String q,
+            String brand,
+            String vehicleModel,
+            String modification,
+            String condition,
+            Boolean inStock,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            String sort
+    ) {
+        return pageIdx -> {
+            UriComponentsBuilder b = UriComponentsBuilder.fromPath("/search/advanced")
+                    .queryParam("submitted", "true")
+                    .queryParam("page", pageIdx)
+                    .queryParam("sort", sort == null || sort.isBlank() ? "relevance" : sort);
+            if (q != null && !q.isBlank()) {
+                b.queryParam("q", q);
+            }
+            if (brand != null && !brand.isBlank()) {
+                b.queryParam("brand", brand);
+            }
+            if (vehicleModel != null && !vehicleModel.isBlank()) {
+                b.queryParam("vehicleModel", vehicleModel);
+            }
+            if (modification != null && !modification.isBlank()) {
+                b.queryParam("modification", modification);
+            }
+            if (condition != null && !condition.isBlank()) {
+                b.queryParam("condition", condition);
+            }
+            if (Boolean.TRUE.equals(inStock)) {
+                b.queryParam("inStock", "true");
+            }
+            if (minPrice != null) {
+                b.queryParam("minPrice", minPrice.stripTrailingZeros().toPlainString());
+            }
+            if (maxPrice != null) {
+                b.queryParam("maxPrice", maxPrice.stripTrailingZeros().toPlainString());
+            }
+            return b.encode().build().toUriString();
+        };
+    }
+
+    private static PageRequest pageableForSort(int page, int size, String sort) {
+        if (sort == null || sort.isBlank()) {
+            return PageRequest.of(page, size);
+        }
+        return switch (sort) {
+            case "price_asc" -> PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "price"));
+            case "price_desc" -> PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "price"));
+            default -> PageRequest.of(page, size);
+        };
+    }
+
+    private static String emptyToNull(String s) {
+        if (s == null || s.isBlank()) {
+            return null;
+        }
+        return s.trim();
     }
 }
