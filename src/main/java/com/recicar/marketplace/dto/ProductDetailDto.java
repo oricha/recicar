@@ -16,11 +16,18 @@ public class ProductDetailDto {
     private Integer stockQuantity;
     private String sellerName;
     private String sellerContact;
+    private BigDecimal sellerRating;
+    private boolean sellerTopSeller;
+    private BigDecimal serviceFeePercent;
+    private BigDecimal serviceFeeMin;
+    private BigDecimal serviceFeeMax;
     private List<String> productImageUrls = new ArrayList<>();
     private List<String> vehiclePhotoUrls = new ArrayList<>();
     private Map<String, String> productSpecs;
     private Map<String, String> vehicleSpecs;
     private List<ProductCardDto> relatedParts = new ArrayList<>();
+    private List<CategoryBreadcrumbDto> categoryBreadcrumb = new ArrayList<>();
+    private List<VehicleCompatibilityDto> compatibleVehicles = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -94,6 +101,46 @@ public class ProductDetailDto {
         this.sellerContact = sellerContact;
     }
 
+    public BigDecimal getSellerRating() {
+        return sellerRating;
+    }
+
+    public void setSellerRating(BigDecimal sellerRating) {
+        this.sellerRating = sellerRating;
+    }
+
+    public boolean isSellerTopSeller() {
+        return sellerTopSeller;
+    }
+
+    public void setSellerTopSeller(boolean sellerTopSeller) {
+        this.sellerTopSeller = sellerTopSeller;
+    }
+
+    public BigDecimal getServiceFeePercent() {
+        return serviceFeePercent;
+    }
+
+    public void setServiceFeePercent(BigDecimal serviceFeePercent) {
+        this.serviceFeePercent = serviceFeePercent;
+    }
+
+    public BigDecimal getServiceFeeMin() {
+        return serviceFeeMin;
+    }
+
+    public void setServiceFeeMin(BigDecimal serviceFeeMin) {
+        this.serviceFeeMin = serviceFeeMin;
+    }
+
+    public BigDecimal getServiceFeeMax() {
+        return serviceFeeMax;
+    }
+
+    public void setServiceFeeMax(BigDecimal serviceFeeMax) {
+        this.serviceFeeMax = serviceFeeMax;
+    }
+
     public List<String> getProductImageUrls() {
         return productImageUrls;
     }
@@ -132,5 +179,21 @@ public class ProductDetailDto {
 
     public void setRelatedParts(List<ProductCardDto> relatedParts) {
         this.relatedParts = relatedParts;
+    }
+
+    public List<CategoryBreadcrumbDto> getCategoryBreadcrumb() {
+        return categoryBreadcrumb;
+    }
+
+    public void setCategoryBreadcrumb(List<CategoryBreadcrumbDto> categoryBreadcrumb) {
+        this.categoryBreadcrumb = categoryBreadcrumb;
+    }
+
+    public List<VehicleCompatibilityDto> getCompatibleVehicles() {
+        return compatibleVehicles;
+    }
+
+    public void setCompatibleVehicles(List<VehicleCompatibilityDto> compatibleVehicles) {
+        this.compatibleVehicles = compatibleVehicles;
     }
 }

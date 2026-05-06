@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- Product detail fragments: expect model attribute `detail` (ProductDetailDto) -->
+<th:block th:fragment="breadcrumb">
+    <nav class="pd-breadcrumb-wrap breadcrumbs_area" aria-label="Migas de pan">
+        <div class="container">
+            <ol class="breadcrumb breadcrumb_content mb-0">
+                <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="/shop-list">Tienda</a></li>
+                <li class="breadcrumb-item" th:each="c : ${detail.categoryBreadcrumb}">
+                    <a th:href="@{/shop-list(category=${c.slug})}" th:text="${c.name}">Categoría</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page"><span th:text="${detail.title}">Producto</span></li>
+            </ol>
+        </div>
+    </nav>
+</th:block>
+
+<th:block th:fragment="imageGallery">
+    <section class="pd-gallery" aria-label="Galería de imágenes del producto" data-pd-gallery>
+        <div class="pd-gallery-main">
+            <img id="pd-main-img"
+                 th:data-pd-current-index="0"
+                 th:src="${detail.productImageUrls != null and !detail.productImageUrls.isEmpty()} ? ${detail.productImageUrls[0]} : @{/img/product/product15.jpg}"
+                 th:alt="${detail.title}"
+                 width="800"
+                 height="600"
+                 fetchpriority="high"
+                 decoding="async">
+            <button type="button" class="pd-gallery-open" data-pd-open-lightbox>
+                Ampliar
+            </button>
+        </div>
+        <div class="pd-gallery-thumbs" role="tablist" aria-label="Miniaturas" th:if="${detail.productImageUrls != null and detail.productImageUrls.size() > 1}">
+            <button type="button"
+                    class="pd-thumb"
+                    th:each="img, iter : ${detail.productImageUrls}"
+                    th:classappend="${iter.first} ? ' is-active'"
+                    th:attr="data-pd-thumb-index=${iter.index},
+                             aria-label=${'Imagen ' + (iter.index + 1)}">
+                <img th:src="${img}"
+                     loading="lazy"
+                     width="80"
+                     height="80"
+                     th:alt="|${detail.title}, miniatura ${iter.index + 1}|">
+            </button>
+        </div>
+    </section>
+    <div id="pd-lightbox" class="pd-lightbox" hidden role="dialog" aria-modal="true" aria-label="Visor de imágenes ampliadas">
+        <div class="pd-lightbox-inner">
+            <button type="button" class="pd-lightbox-close" aria-label="Cerrar visor">×</button>
+            <button type="button" class="pd-lightbox-prev" data-pd-lb-prev aria-label="Imagen anterior">‹</button>
+            <img id="pd-lightbox-img" alt="">
+            <button type="button" class="pd-lightbox-next" data-pd-lb-next aria-label="Imagen siguiente">›</button>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="purchasePanel">
+    <!-- Desktop sticky panel -->
+    <div class="pd-purchase-desktop d-none d-lg-block pd-aside mt-4 mt-lg-0">
+        <div class="pd-panel pb-3">
+            <div class="price_box mb-2">
+                <span class="current_price h5 mb-0 d-block"
+                      th:text="${@priceView.formatEur(clientPreferences, detail.price)}">€0</span>
+            </div>
+            <th:block th:if="${detail.serviceFeePercent != null}">
+                <p class="small text-muted product-service-fee mb-3">
+                    Tarifa de servicio:
+                    <span th:text="${#numbers.formatDecimal(detail.serviceFeePercent, 1, 2)}">1,50</span>%
+                    <span th:if="${detail.serviceFeeMin != null and detail.serviceFeeMax != null}">
+                        (entre
+                        <span th:text="${@priceView.formatEur(clientPreferences, detail.serviceFeeMin)}">1,99</span>
+                        y
+                        <span th:text="${@priceView.formatEur(clientPreferences, detail.serviceFeeMax)}">3,99</span>)
+                    </span>
+                </p>
+            </th:block>
+            <form id="add-to-cart-form" action="#">
+                <input type="hidden" name="productId" th:value="${detail.id}">
+                <div class="product_variant quantity mb-2">
+                    <label for="quantity-input-desktop" class="form-label mb-1">Cantidad</label>
+                    <input id="quantity-input-desktop"
+                           name="quantity"
+                           class="form-control"
+                           min="1"
+                           th:max="${detail.stockQuantity != null ? detail.stockQuantity : 999}"
+                           value="1"
+                           type="number"
+                           autocomplete="off"
+                           aria-describedby="pd-stock-msg">
+                </div>
+                <button class="btn btn-primary w-100 mb-2" type="submit" id="pd-desktop-add-submit">Añadir al carrito</button>
+                <p id="pd-stock-msg"
+                   class="small text-muted mb-0"
+                   th:if="${detail.stockQuantity != null and detail.stockQuantity > 0 and detail.stockQuantity <= 8}"
+                   th:text="|Solo quedan ${detail.stockQuantity} disponibles.|">Stock bajo.</p>
+            </form>
+            <div class="d-flex gap-2 flex-wrap mt-2">
+                <button type="button"
+                        class="btn btn-outline-secondary btn-sm js-wishlist-toggle"
+                        th:classappend="${!isAuthenticated}? 'opacity-75'"
+                        th:disabled="${!isAuthenticated}"
+                        th:attr="data-product-id=${detail.id}"
+                        title="Inicia sesión para usar la lista de deseos">
+                    Lista de deseos
+                </button>
+                <button th:if="${!isAuthenticated}"
+                        type="button"
+                        class="btn btn-outline-secondary btn-sm text-secondary"
+                        disabled
+                        title="Inicia sesión para contactar al vendedor">
+                    Contactar vendedor
+                </button>
+                <button th:if="${isAuthenticated}"
+                        type="button"
+                        class="btn btn-outline-secondary btn-sm"
+                        onclick="alert('Próximamente podrás contactar desde tu cuenta.');">
+                    Contactar vendedor
+                </button>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="mobilePurchaseBar">
+    <div class="pd-mobile-purchase-shell d-lg-none" role="region" aria-label="Comprar">
+        <div class="container">
+            <div class="pd-mobile-actions flex-column align-items-stretch">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="fw-semibold"
+                          th:text="${@priceView.formatEur(clientPreferences, detail.price)}">€</span>
+                    <span class="small text-muted" th:if="${detail.stockQuantity != null}"
+                          th:text="|Stock: ${detail.stockQuantity}|">Stock</span>
+                </div>
+                <div class="d-flex gap-2">
+                <input id="quantity-input-mobile"
+                       class="form-control qty"
+                       min="1"
+                       th:max="${detail.stockQuantity != null ? detail.stockQuantity : 999}"
+                       value="1"
+                       type="number"
+                       inputmode="numeric"
+                       aria-label="Cantidad">
+                <button type="button" class="btn btn-primary btn-submit" id="pd-mobile-add-submit">Añadir al carrito</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="sellerCard">
+    <aside class="pd-panel" aria-labelledby="pd-seller-heading">
+        <h2 id="pd-seller-heading" class="h6">Vendedor</h2>
+        <p class="mb-1">
+            <span th:text="${detail.sellerName}">Vendedor</span>
+            <span th:if="${detail.sellerTopSeller}" class="badge bg-success ms-1">Top seller</span>
+        </p>
+        <p class="small text-muted mb-2" th:if="${detail.sellerRating != null}">
+            <span th:text="${#numbers.formatDecimal(detail.sellerRating, 1, 2)}">4,50</span> ★
+        </p>
+        <p class="small mb-1">Ubicación: España · tiempo estimado de envío típico: 2‑4 laborables.</p>
+        <p class="small mb-0">Garantía conforme política del vendedor · revisa antes de comprar.</p>
+    </aside>
+</th:block>
+
+<th:block th:fragment="specsTables">
+    <section class="mt-4" aria-labelledby="pd-spec-heading" th:if="${detail.productSpecs != null and !detail.productSpecs.isEmpty()}">
+        <h2 id="pd-spec-heading" class="h5">Especificaciones técnicas</h2>
+        <div class="pd-spec-table-wrapper">
+            <table class="table table-sm table-bordered pd-table-spec">
+                <tbody>
+                <tr th:each="e, iterStat : ${detail.productSpecs}"
+                    th:if="${e.value != null and !#strings.isEmpty(e.value)}"
+                    th:classappend="${iterStat.index >= 10} ? ' pd-spec-extra-row d-none'">
+                    <th scope="row">
+                        <span th:switch="${e.key}">
+                            <span th:case="'manufacturerCode'">Código fabricante</span>
+                            <span th:case="'oemCode'">Código OEM</span>
+                            <span th:case="'condition'">Estado</span>
+                            <span th:case="'quality'">Disponibilidad</span>
+                            <span th:case="'position'">Posición</span>
+                            <span th:case="'category'">Categoría</span>
+                            <span th:case="'weightKg'">Peso (kg)</span>
+                            <span th:case="'availableStock'">Stock</span>
+                            <span th:case="*" th:text="${e.key}">key</span>
+                        </span>
+                    </th>
+                    <td th:text="${e.value}">—</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <button type="button"
+                id="pd-spec-toggle"
+                class="btn btn-outline-primary btn-sm mt-2"
+                th:if="${detail.productSpecs.size() > 10}">
+            Ver más especificaciones
+        </button>
+    </section>
+    <section class="mt-4"
+             aria-labelledby="pd-vehicle-spec-heading"
+             th:with="vs=${detail.vehicleSpecs}">
+        <h2 id="pd-vehicle-spec-heading" class="h5"
+            th:if="${vs != null and (vs['make'] != '' or vs['model'] != '' or vs['year'] != '' or vs['mileageKm'] != '' or vs['vin'] != '')}">
+            Vehículo / origen
+        </h2>
+        <div class="pd-spec-table-wrapper"
+             th:if="${vs != null and (vs['make'] != '' or vs['model'] != '' or vs['year'] != '' or vs['mileageKm'] != '' or vs['vin'] != '')}">
+            <table class="table table-sm table-striped">
+                <tbody>
+                <tr th:if="${vs != null && vs['make'] != null && !vs['make'].isEmpty()}">
+                    <th scope="row">Marca</th>
+                    <td th:text="${vs['make']}">—</td>
+                </tr>
+                <tr th:if="${vs != null && vs['model'] != null && !vs['model'].isEmpty()}">
+                    <th scope="row">Modelo</th>
+                    <td th:text="${vs['model']}">—</td>
+                </tr>
+                <tr th:if="${vs != null && vs['generation'] != null && !vs['generation'].isEmpty()}">
+                    <th scope="row">Generación</th>
+                    <td th:text="${vs['generation']}">—</td>
+                </tr>
+                <tr th:if="${vs != null && vs['year'] != null && !vs['year'].isEmpty()}">
+                    <th scope="row">Año</th>
+                    <td th:text="${vs['year']}">—</td>
+                </tr>
+                <tr th:if="${vs != null && vs['engineDisplacementCc'] != null && !vs['engineDisplacementCc'].isEmpty()}">
+                    <th scope="row">Cilindrada (cc)</th>
+                    <td th:text="${vs['engineDisplacementCc']}">—</td>
+                </tr>
+                <tr th:if="${vs != null && vs['enginePowerKw'] != null && !vs['enginePowerKw'].isEmpty()}">
+                    <th scope="row">Potencia (kW)</th>
+                    <td th:text="${vs['enginePowerKw']}">—</td>
+                </tr>
+                <tr th:if="${vs != null && vs['mileageKm'] != null && !vs['mileageKm'].isEmpty()}">
+                    <th scope="row">Kilometraje</th>
+                    <td th:text="${vs['mileageKm']} + ' km'">—</td>
+                </tr>
+                <tr th:if="${vs != null && vs['vin'] != null && !vs['vin'].isEmpty()}">
+                    <th scope="row">Referencia bastidor/VIN</th>
+                    <td th:text="${vs['vin']}">—</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</th:block>
+
+<th:block th:fragment="vehicleCompatibility">
+    <section class="mt-4"
+             aria-labelledby="pd-compat-heading"
+             th:if="${detail.compatibleVehicles != null and !detail.compatibleVehicles.isEmpty()}">
+        <h2 id="pd-compat-heading" class="h5">Compatibilidad de vehículos</h2>
+        <label for="pd-vehicle-fit-filter"
+               class="visually-hidden"
+               th:if="${detail.compatibleVehicles.size() > 20}">
+            Filtrar por texto</label>
+        <input id="pd-vehicle-fit-filter"
+               type="search"
+               class="form-control form-control-sm pd-veh-filter mb-3"
+               placeholder="Filtrar marca, modelo o motor..."
+               autocomplete="off"
+               th:if="${detail.compatibleVehicles.size() > 20}">
+        <div class="pd-spec-table-wrapper">
+            <table class="table table-sm pd-compat-table align-middle">
+                <thead><tr><th>Marca</th><th>Modelo</th><th>Años</th><th>Motor</th></tr></thead>
+                <tbody>
+                <tr th:each="v, iterStat : ${detail.compatibleVehicles}"
+                    th:classappend="${iterStat.first or (iterStat.index > 0 and detail.compatibleVehicles[iterStat.index - 1].make != v.make)} ? 'table-group-divider'"
+                    th:attr="data-fit-row=1,
+                             data-fit-text=${#strings.trim((v.make != null ? v.make : '')
+                                + ' ' + (v.model != null ? v.model : '')
+                                + ' ' + (v.yearRangeLabel != null ? v.yearRangeLabel : '')
+                                + ' ' + (v.engine != null ? v.engine : ''))}">
+                    <td><span class="fw-semibold"
+                          th:if="${iterStat.first or (iterStat.index > 0 and detail.compatibleVehicles[iterStat.index - 1].make != v.make)}"
+                          th:text="${v.make}">Marca</span></td>
+                    <td th:text="${v.model}">—</td>
+                    <td th:text="${v.yearRangeLabel}">—</td>
+                    <td th:text="${v.engine != null ? v.engine : '—'}">—</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</th:block>
+
+<th:block th:fragment="vehicleDonorGallery">
+    <section class="mt-4 product_d_info pd-donor" th:if="${isUsedPart}">
+        <h2 class="h6">
+            <button type="button" id="pd-donor-toggle" class="btn btn-link px-0" aria-expanded="false" aria-controls="pd-donor-panel">
+                Fotos del vehículo donante
+                <span class="small text-muted ms-2">(pieza usada)</span>
+            </button>
+        </h2>
+        <div id="pd-donor-panel" hidden>
+            <div class="row g-2 mb-3" th:if="${detail.vehiclePhotoUrls != null and !detail.vehiclePhotoUrls.isEmpty()}">
+                <div class="col-6 col-md-4" th:each="u : ${detail.vehiclePhotoUrls}">
+                    <figure class="mb-2">
+                        <img class="img-fluid rounded border"
+                             loading="lazy"
+                             width="400"
+                             height="300"
+                             alt="Detalle fotográfico del vehículo de origen correspondiente al recambio usado."
+                             th:src="${u}">
+                        <figcaption class="small text-muted">Vehículo de desguace · documentación antes del envío</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <p class="small text-muted" th:if="${detail.vehiclePhotoUrls == null or detail.vehiclePhotoUrls.isEmpty()}">
+                Aún no hay fotos públicas del donante para esta pieza.
+            </p>
+            <div class="pd-spec-table-wrapper" th:with="vs=${detail.vehicleSpecs}">
+                <ul class="list-unstyled small mb-0" th:if="${vs != null}">
+                    <li th:if="${vs['year'] != null and !vs['year'].isEmpty()}">
+                        <strong>Año declarado:</strong> <span th:text="${vs['year']}">—</span></li>
+                    <li th:if="${vs['mileageKm'] != null and !vs['mileageKm'].isEmpty()}">
+                        <strong>Kilometraje:</strong> <span th:text="${vs['mileageKm']} + ' km'">—</span></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+</th:block>
+
+<th:block th:fragment="relatedProducts">
+    <section class="product_area mb-5 mt-5"
+             aria-labelledby="pd-related-heading"
+             th:if="${detail.relatedParts != null and !detail.relatedParts.isEmpty()}">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 mb-3">
+                    <h2 id="pd-related-heading" class="h5 section_title mb-0">
+                        También te puede interesar
+                    </h2>
+                </div>
+            </div>
+            <div class="row row-cols-2 row-cols-lg-4 g-3">
+                <div class="col mb-4 d-flex align-items-stretch" th:each="card : ${detail.relatedParts}">
+                    <div class="inner__box w-100">
+                        <th:block th:replace="~{fragments/_product-card :: card}"></th:block>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</th:block>
+</html>

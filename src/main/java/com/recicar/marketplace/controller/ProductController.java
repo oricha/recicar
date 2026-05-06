@@ -3,9 +3,12 @@ package com.recicar.marketplace.controller;
 import com.recicar.marketplace.entity.Category;
 import com.recicar.marketplace.entity.Product;
 import com.recicar.marketplace.service.CategoryService;
+import com.recicar.marketplace.service.ProductDetailService;
 import com.recicar.marketplace.service.ProductService;
+import com.recicar.marketplace.web.ProductDetailSeoHelper;
 import com.recicar.marketplace.web.ShopListingConstants;
 import com.recicar.marketplace.web.ShopListingModelHelper;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -23,6 +26,8 @@ public class ProductController {
     private final ProductService productService;
     private final CategoryService categoryService;
     private final ShopListingModelHelper shopListingModelHelper;
+    private final ProductDetailService productDetailService;
+    private final ProductDetailSeoHelper productDetailSeoHelper;
 
     @GetMapping("/shop-list")
     public String productList(
@@ -61,18 +66,31 @@ public class ProductController {
     }
 
     @GetMapping("/product-details")
-    public String productDetails(@RequestParam("id") Long id, Model model) {
-        Optional<Product> productOptional = productService.findById(id);
-        if (productOptional.isPresent()) {
-            Product product = productOptional.get();
-            model.addAttribute("product", product);
+    public String productDetails(@RequestParam("id") Long id, HttpServletRequest request, Model model) {
+        return productDetailService.getProductDetail(id)
+                .map(detail -> {
+                    String origin = productDetailSeoHelper.resolvePublicOrigin(request);
+                    String canonicalUrl = origin + "/product-details?id=" + id;
+                    String ogImage = detail.getProductImageUrls() != null && !detail.getProductImageUrls().isEmpty()
+                            ? productDetailSeoHelper.toAbsoluteUrl(origin, detail.getProductImageUrls().getFirst())
+                            : "";
 
-            // Get related products for the product details page
-            List<Product> relatedProducts = productService.findRelatedProducts(id);
-            model.addAttribute("relatedProducts", relatedProducts);
+                    model.addAttribute("detail", detail);
+                    model.addAttribute("productSeoDescription", productDetailSeoHelper.metaDescription(detail));
+                    model.addAttribute("productJsonLd", productDetailSeoHelper.productJsonLd(detail, canonicalUrl));
+                    model.addAttribute("breadcrumbJsonLd",
+                            productDetailSeoHelper.breadcrumbJsonLd(detail.getCategoryBreadcrumb(),
+                                    detail.getTitle(), canonicalUrl, origin));
+                    model.addAttribute("canonicalProductUrl", canonicalUrl);
+                    model.addAttribute("ogImageUrl", ogImage);
+                    model.addAttribute("isUsedPart",
+                            detail.getCondition() != null && "USED".equalsIgnoreCase(detail.getCondition()));
 
-            return "product-details";
-        }
-        return "redirect:/";
+                    model.addAttribute("pageTitle",
+                            detail.getTitle() != null ? detail.getTitle() + " | ReciCar" : "ReciCar — Detalle");
+
+                    return "product-details";
+                })
+                .orElse("redirect:/");
     }
 }
