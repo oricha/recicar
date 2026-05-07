@@ -26,6 +26,9 @@ public class DataLoader implements CommandLineRunner {
             ObjectMapper mapper = new ObjectMapper();
             TypeReference<List<Map<String, Object>>> typeReference = new TypeReference<List<Map<String, Object>>>() {};
             InputStream inputStream = TypeReference.class.getResourceAsStream("/all-vehicles-model.json");
+            if (inputStream == null) {
+                return;
+            }
             List<Map<String, Object>> vehicles = mapper.readValue(inputStream, typeReference);
 
             for (Map<String, Object> vehicle : vehicles) {

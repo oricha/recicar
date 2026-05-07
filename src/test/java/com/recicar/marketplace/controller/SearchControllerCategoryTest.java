@@ -5,11 +5,15 @@ import com.recicar.marketplace.entity.Category;
 import com.recicar.marketplace.entity.Product;
 import com.recicar.marketplace.service.CategoryService;
 import com.recicar.marketplace.service.ProductService;
+import com.recicar.marketplace.web.ShopListingConstants;
+import com.recicar.marketplace.service.SearchFilterOptionsService;
 import com.recicar.marketplace.service.SearchService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.web.servlet.MockMvc;
@@ -19,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,6 +49,21 @@ class SearchControllerCategoryTest {
 
     @MockBean
     private SearchService searchService;
+
+    @MockBean
+    private SearchFilterOptionsService searchFilterOptionsService;
+
+    @BeforeEach
+    void listingCardStubs() {
+        when(productService.mapToProductCardPage(any(Page.class))).thenAnswer(invocation -> {
+            Page<Product> p = invocation.getArgument(0);
+            return new PageImpl<>(Collections.emptyList(), p.getPageable(), p.getTotalElements());
+        });
+        when(productService.mapListToProductCardPage(anyList())).thenAnswer(invocation -> {
+            List<Product> list = invocation.getArgument(0);
+            return new PageImpl<>(Collections.emptyList(), PageRequest.of(0, ShopListingConstants.PAGE_SIZE), list.size());
+        });
+    }
 
     @Test
     public void testSearchByCategory_Success() throws Exception {
@@ -113,7 +133,7 @@ class SearchControllerCategoryTest {
         product.setCategory(category);
 
         when(categoryService.findBySlug("motor")).thenReturn(Optional.of(category));
-        when(productService.findByCategory(eq(category), eq(PageRequest.of(1, 12))))
+        when(productService.findByCategory(eq(category), eq(PageRequest.of(1, ShopListingConstants.PAGE_SIZE))))
                 .thenReturn(new PageImpl<>(Collections.singletonList(product)));
         when(categoryService.findRootCategories()).thenReturn(Collections.emptyList());
 

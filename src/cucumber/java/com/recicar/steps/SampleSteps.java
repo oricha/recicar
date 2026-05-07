@@ -1,6 +1,5 @@
 package com.recicar.steps;
 
-import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -22,15 +21,6 @@ public class SampleSteps {
         }
     }
 
-    @And("I have number {int}")
-    public void i_also_have_number(Integer n) {
-        if (a == 0) {
-            a = n;
-        } else {
-            b = n;
-        }
-    }
-
     @When("I add the numbers")
     public void i_add_the_numbers() {
         result = a + b;
@@ -41,4 +31,3 @@ public class SampleSteps {
         assertEquals(expected.intValue(), result);
     }
 }
-

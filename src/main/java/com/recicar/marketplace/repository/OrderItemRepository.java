@@ -16,4 +16,25 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
     BigDecimal sumLineTotalForVendorSince(
             @Param("vid") Long vendorId,
             @Param("start") LocalDateTime startInclusive);
+
+    @Query("SELECT COALESCE(SUM(oi.totalPrice), 0) FROM OrderItem oi WHERE oi.vendorId = :vid "
+            + "AND oi.order.status <> 'CANCELED' AND oi.order.createdAt >= :start AND oi.order.createdAt < :endExclusive")
+    BigDecimal sumLineTotalForVendorBetween(
+            @Param("vid") Long vendorId,
+            @Param("start") LocalDateTime startInclusive,
+            @Param("endExclusive") LocalDateTime endExclusive);
+
+    @Query("SELECT COUNT(DISTINCT oi.order.id) FROM OrderItem oi WHERE oi.vendorId = :vid "
+            + "AND oi.order.status <> 'CANCELED' AND oi.order.createdAt >= :start AND oi.order.createdAt < :endExclusive")
+    long countDistinctOrdersForVendorBetween(
+            @Param("vid") Long vendorId,
+            @Param("start") LocalDateTime startInclusive,
+            @Param("endExclusive") LocalDateTime endExclusive);
+
+    @Query("SELECT COUNT(oi) FROM OrderItem oi WHERE oi.vendorId = :vid "
+            + "AND oi.order.status <> 'CANCELED' AND oi.order.createdAt >= :start AND oi.order.createdAt < :endExclusive")
+    long countLinesForVendorBetween(
+            @Param("vid") Long vendorId,
+            @Param("start") LocalDateTime startInclusive,
+            @Param("endExclusive") LocalDateTime endExclusive);
 }

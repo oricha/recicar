@@ -1,5 +1,6 @@
 package com.recicar.marketplace.dto;
 
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -30,7 +31,22 @@ public class UserRegistrationDto {
 
     private boolean agreeToTerms;
 
-    // Constructors
+    private boolean agreePrivacyPolicy;
+
+    /** Optional Cookie / GDPR consent (informational checkbox). */
+    private boolean agreeCookiesPolicy;
+
+    private boolean registeringAsVendor;
+
+    @Size(max = 255)
+    private String vendorBusinessName;
+
+    @Size(max = 50)
+    private String vendorTaxId;
+
+    /** Google reCAPTCHA v3 / hCaptcha response — validated when app.auth.captcha.secret is set. */
+    private String captchaToken;
+
     public UserRegistrationDto() {}
 
     public UserRegistrationDto(String firstName, String lastName, String email, String password) {
@@ -40,7 +56,25 @@ public class UserRegistrationDto {
         this.password = password;
     }
 
-    // Getters and Setters
+    @AssertTrue(message = "You must accept the terms and conditions")
+    public boolean isTermsAcceptedForSubmission() {
+        return agreeToTerms;
+    }
+
+    @AssertTrue(message = "You must accept the privacy policy")
+    public boolean isPrivacyAcceptedForSubmission() {
+        return agreePrivacyPolicy;
+    }
+
+    @AssertTrue(message = "Complete business name and tax id for vendor registration")
+    public boolean isVendorSectionComplete() {
+        if (!registeringAsVendor) {
+            return true;
+        }
+        return vendorBusinessName != null && !vendorBusinessName.isBlank()
+                && vendorTaxId != null && !vendorTaxId.isBlank();
+    }
+
     public String getFirstName() {
         return firstName;
     }
@@ -97,7 +131,54 @@ public class UserRegistrationDto {
         this.agreeToTerms = agreeToTerms;
     }
 
-    // Helper methods
+    public boolean isAgreePrivacyPolicy() {
+        return agreePrivacyPolicy;
+    }
+
+    public void setAgreePrivacyPolicy(boolean agreePrivacyPolicy) {
+        this.agreePrivacyPolicy = agreePrivacyPolicy;
+    }
+
+    public boolean isAgreeCookiesPolicy() {
+        return agreeCookiesPolicy;
+    }
+
+    public void setAgreeCookiesPolicy(boolean agreeCookiesPolicy) {
+        this.agreeCookiesPolicy = agreeCookiesPolicy;
+    }
+
+    public boolean isRegisteringAsVendor() {
+        return registeringAsVendor;
+    }
+
+    public void setRegisteringAsVendor(boolean registeringAsVendor) {
+        this.registeringAsVendor = registeringAsVendor;
+    }
+
+    public String getVendorBusinessName() {
+        return vendorBusinessName;
+    }
+
+    public void setVendorBusinessName(String vendorBusinessName) {
+        this.vendorBusinessName = vendorBusinessName;
+    }
+
+    public String getVendorTaxId() {
+        return vendorTaxId;
+    }
+
+    public void setVendorTaxId(String vendorTaxId) {
+        this.vendorTaxId = vendorTaxId;
+    }
+
+    public String getCaptchaToken() {
+        return captchaToken;
+    }
+
+    public void setCaptchaToken(String captchaToken) {
+        this.captchaToken = captchaToken;
+    }
+
     public String getFullName() {
         return firstName + " " + lastName;
     }

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- Product grid card: expects variable `card` (ProductCardDto) -->
+<th:block th:fragment="card">
+    <article class="single_product h-100 d-flex flex-column">
+        <div class="product_name grid_name">
+            <h3 class="h6 mb-1">
+                <a th:href="@{/product-details(id=${card.id})}" th:text="${card.name}">Pieza</a>
+            </h3>
+            <p class="manufacture_product small mb-0" th:if="${card.partNumber != null}">
+                <span class="text-muted">Ref.</span>
+                <span th:text="${card.partNumber}">PN</span>
+            </p>
+            <p class="small mb-0" th:if="${card.condition != null}">
+                <span class="badge bg-light text-dark border" th:text="${card.condition}">USED</span>
+                <span th:if="${card.inStock}" class="text-success ms-1">En stock</span>
+                <span th:if="${!card.inStock}" class="text-warning ms-1">Sin stock</span>
+            </p>
+        </div>
+        <div class="product_thumb">
+            <a class="primary_img" th:href="@{/product-details(id=${card.id})}">
+                <img th:src="${card.imageUrl != null ? card.imageUrl : '/img/product/product10.jpg'}"
+                     th:alt="${card.name}" loading="lazy" width="300" height="300" class="img-fluid">
+            </a>
+        </div>
+        <div class="product_content grid_content mt-auto">
+            <div class="content_inner">
+                <div class="product_ratings" th:if="${card.sellerRating != null}">
+                    <span class="small text-muted" th:text="${card.sellerName}">Vendedor</span>
+                    <span th:if="${card.topSeller}" class="badge bg-success ms-1">Top</span>
+                    <span class="small ms-1" th:text="${#numbers.formatDecimal(card.sellerRating,1,2) + ' ★'}">4.50 ★</span>
+                </div>
+                <th:block th:replace="~{fragments/_service-fee-info :: block}"></th:block>
+                <div class="product_footer d-flex align-items-center mt-2">
+                    <div class="price_box">
+                        <span class="current_price"
+                              th:text="${@priceView.formatEur(clientPreferences, card.price)}">0,00</span>
+                    </div>
+                    <div class="add_to_cart">
+                        <a href="#" class="js-add-to-cart" th:attr="data-product-id=${card.id}" title="añadir al carrito">
+                            <span class="lnr lnr-cart"></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </article>
+</th:block>
+</html>

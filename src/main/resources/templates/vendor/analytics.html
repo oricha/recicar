@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/new-base :: html}">
+<head>
+    <th:block th:fragment="head-extra">
+        <title th:text="${pageTitle}">Vendor analytics</title>
+    </th:block>
+</head>
+<body>
+<div th:fragment="content">
+    <section class="vendor_analytics_area py-5">
+        <div class="container">
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+                <div>
+                    <h1 class="h3 mb-0">Analytics</h1>
+                    <p class="text-muted mb-0" th:text="${vendor.businessName}">Store</p>
+                </div>
+                <div>
+                    <a class="btn btn-outline-secondary me-2" th:href="@{/vendor/dashboard}">Dashboard</a>
+                    <a class="btn btn-outline-secondary me-2" th:href="@{/vendor/inventory}">Inventory</a>
+                    <a class="btn btn-outline-secondary" th:href="@{/vendor/orders}">Orders</a>
+                </div>
+            </div>
+
+            <form class="row g-2 mb-4 align-items-end" method="get" th:action="@{/vendor/analytics}">
+                <div class="col-md-3">
+                    <label class="form-label">From</label>
+                    <input class="form-control" type="date" name="from" th:value="${filterFrom}"/>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">To</label>
+                    <input class="form-control" type="date" name="to" th:value="${filterTo}"/>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-primary" type="submit">Apply range</button>
+                </div>
+            </form>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="border rounded p-3 bg-light h-100">
+                        <div class="small text-muted">Gross revenue (your lines)</div>
+                        <div class="h4 mb-0" th:text="${@priceView.plainEur(sales.grossLineRevenue())}">0</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="border rounded p-3 bg-light h-100">
+                        <div class="small text-muted">Orders touching your lines</div>
+                        <div class="h4 mb-0" th:text="${sales.distinctOrderCount()}">0</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="border rounded p-3 bg-light h-100">
+                        <div class="small text-muted">Line items</div>
+                        <div class="h4 mb-0" th:text="${sales.lineItemCount()}">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <p class="small text-muted">Excludes canceled orders. Data is cached briefly for performance.</p>
+
+            <canvas id="vendorSalesBar" height="120" aria-label="Sales visualization"></canvas>
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+    <script th:inline="javascript">
+      (function () {
+        const rev = /*[[${chartRevenue}]]*/ 0;
+        const ctx = document.getElementById('vendorSalesBar');
+        if (!ctx || typeof Chart === 'undefined') return;
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['Revenue (EUR)'],
+            datasets: [{label: 'Period total', data: [Number(rev)], backgroundColor: '#0d6efd'}]
+          },
+          options: {
+            responsive: true,
+            plugins: {legend: {display: false}}
+          }
+        });
+      })();
+    </script>
+</div>
+</body>
+</html>

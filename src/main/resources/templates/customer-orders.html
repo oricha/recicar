@@ -1,0 +1,57 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" class="no-js" lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${pageTitle}">Mis pedidos</title>
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/assets/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+</head>
+<body>
+<th:block th:replace="fragments/_header :: header"></th:block>
+<th:block th:replace="fragments/_offcanvasmenu :: offcanvasmenu"></th:block>
+
+<div class="breadcrumbs_area">
+    <div class="container">
+        <div class="breadcrumb_content">
+            <ul>
+                <li><a th:href="@{/}">Inicio</a></li>
+                <li>Mis pedidos</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<section class="main_content_area py-5">
+    <div class="container">
+        <h1 class="h3 mb-4">Mis pedidos</h1>
+        <p class="small text-muted mb-4"><a th:href="@{/dashboard}">← Volver al panel</a></p>
+
+        <div class="table-responsive" th:if="${orders != null and !orders.isEmpty()}">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Nº pedido</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Total</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="o : ${orders}">
+                    <td th:text="${o.orderNumber}">—</td>
+                    <td th:text="${#temporals.format(o.createdAt, 'dd/MM/yyyy HH:mm')}">—</td>
+                    <td th:text="${o.status}">—</td>
+                    <td th:text="${@priceView.plainEur(o.totalAmount)}">—</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <p th:if="${orders == null or orders.isEmpty()}" class="text-muted py-4">No hay pedidos todavía. <a th:href="@{/shop}">Explorar tienda</a></p>
+    </div>
+</section>
+
+<th:block th:replace="fragments/_footer :: footer"></th:block>
+</body>
+</html>

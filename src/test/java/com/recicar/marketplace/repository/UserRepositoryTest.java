@@ -4,23 +4,21 @@ import com.recicar.marketplace.entity.User;
 import com.recicar.marketplace.entity.UserRole;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Slices the JPA layer: schema is created by Hibernate (ddl-auto) instead of Flyway, because
- * PostgreSQL-specific migrations (e.g. GIN in V15) are not valid on the embedded H2 test DB.
+ * Slices the JPA layer on the real PostgreSQL test database using the Flyway-managed schema.
  */
-@DataJpaTest(excludeAutoConfiguration = FlywayAutoConfiguration.class)
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
-@TestPropertySource(properties = "spring.jpa.hibernate.ddl-auto=create-drop")
 class UserRepositoryTest {
 
     @Autowired
@@ -96,6 +94,9 @@ class UserRepositoryTest {
 
     @Test
     void shouldFindUsersByRole() {
+        long customerCountBefore = userRepository.countByRole(UserRole.CUSTOMER);
+        long vendorCountBefore = userRepository.countByRole(UserRole.VENDOR);
+
         // Given
         User customer = new User("customer@example.com", "password123", "Customer", "User");
         customer.setRole(UserRole.CUSTOMER);
@@ -112,15 +113,18 @@ class UserRepositoryTest {
         var vendors = userRepository.findByRole(UserRole.VENDOR);
 
         // Then
-        assertThat(customers).hasSize(1);
-        assertThat(customers.get(0).getEmail()).isEqualTo("customer@example.com");
-
-        assertThat(vendors).hasSize(1);
-        assertThat(vendors.get(0).getEmail()).isEqualTo("vendor@example.com");
+        assertThat(customers).extracting(User::getEmail).contains("customer@example.com");
+        assertThat(vendors).extracting(User::getEmail).contains("vendor@example.com");
+        assertThat(customers).hasSize((int) customerCountBefore + 1);
+        assertThat(vendors).hasSize((int) vendorCountBefore + 1);
     }
 
     @Test
     void shouldCountUsersByRole() {
+        long customerCountBefore = userRepository.countByRole(UserRole.CUSTOMER);
+        long vendorCountBefore = userRepository.countByRole(UserRole.VENDOR);
+        long adminCountBefore = userRepository.countByRole(UserRole.ADMIN);
+
         // Given
         User customer1 = new User("customer1@example.com", "password123", "Customer", "One");
         customer1.setRole(UserRole.CUSTOMER);
@@ -137,8 +141,8 @@ class UserRepositoryTest {
         entityManager.flush();
 
         // When & Then
-        assertThat(userRepository.countByRole(UserRole.CUSTOMER)).isEqualTo(2);
-        assertThat(userRepository.countByRole(UserRole.VENDOR)).isEqualTo(1);
-        assertThat(userRepository.countByRole(UserRole.ADMIN)).isEqualTo(0);
+        assertThat(userRepository.countByRole(UserRole.CUSTOMER)).isEqualTo(customerCountBefore + 2);
+        assertThat(userRepository.countByRole(UserRole.VENDOR)).isEqualTo(vendorCountBefore + 1);
+        assertThat(userRepository.countByRole(UserRole.ADMIN)).isEqualTo(adminCountBefore);
     }
 }

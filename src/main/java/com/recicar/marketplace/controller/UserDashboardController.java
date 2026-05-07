@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/user-dashboard")
 public class UserDashboardController {
 
     private final UserService userService;
@@ -22,7 +21,7 @@ public class UserDashboardController {
         this.orderService = orderService;
     }
 
-    @GetMapping
+    @GetMapping({"/user-dashboard", "/dashboard"})
     public String dashboard(Model model, @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
             return "redirect:/login";
@@ -36,7 +35,25 @@ public class UserDashboardController {
                 .orElse("redirect:/login");
     }
 
-    @GetMapping("/chat")
+    /**
+     * Full customer order history (HTML); complements JSON {@code GET /api/v1/user/orders}.
+     */
+    @GetMapping("/orders")
+    public String customerOrders(Model model, @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return "redirect:/login";
+        }
+        return userService.findByEmail(userDetails.getUsername())
+                .map(user -> {
+                    model.addAttribute("user", user);
+                    model.addAttribute("orders", orderService.findOrdersByCustomerId(user.getId(), PageRequest.of(0, 200)));
+                    model.addAttribute("pageTitle", "Mis pedidos — ReciCar");
+                    return "customer-orders";
+                })
+                .orElse("redirect:/login");
+    }
+
+    @GetMapping({"/user-dashboard/chat", "/messages"})
     public String chat(Model model, @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
             return "redirect:/login";

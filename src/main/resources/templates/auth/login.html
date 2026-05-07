@@ -1,152 +1,77 @@
 <!doctype html>
-<html xmlns:th="http://www.thymeleaf.org" class="no-js" lang="en">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" class="no-js" lang="es">
 
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Recicar - Login</title>
-    <meta name="description" content="">
+    <title>Recicar — Iniciar sesión</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Favicon -->
     <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico">
-
-    <!-- CSS
-   ========================= -->
-    <!--bootstrap min css-->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <!--owl carousel min css-->
-    <link rel="stylesheet" href="/css/owl.carousel.min.css">
-    <!--slick min css-->
-    <link rel="stylesheet" href="/css/slick.css">
-    <!--magnific popup min css-->
-    <link rel="stylesheet" href="/css/magnific-popup.css">
-    <!--font awesome css-->
-    <link rel="stylesheet" href="/css/font.awesome.css">
-    <!--ionicons min css-->
-    <link rel="stylesheet" href="/css/ionicons.min.css">
-    <!--animate css-->
-    <link rel="stylesheet" href="/css/animate.css">
-    <!--jquery ui min css-->
-    <link rel="stylesheet" href="/css/jquery-ui.min.css">
-    <!--slinky menu css-->
-    <link rel="stylesheet" href="/css/slinky.menu.css">
-    <!-- Plugins CSS -->
-    <link rel="stylesheet" href="/css/plugins.css">
-
-    <!-- Main Style CSS -->
     <link rel="stylesheet" href="/css/style.css">
-
-    <!--modernizr min js here-->
-    <script src="/js/vendor/modernizr-3.7.1.min.js"></script>
-
 </head>
-
 <body>
 
-<!--header area start-->
 <th:block th:replace="fragments/_header :: header"></th:block>
-<!--header area end-->
-
-<!--Offcanvas menu area start-->
 <th:block th:replace="fragments/_offcanvasmenu :: offcanvasmenu"></th:block>
-<!--Offcanvas menu area end-->
 
-<!--breadcrumbs area start-->
 <div class="breadcrumbs_area">
     <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <div class="breadcrumb_content">
-                    <ul>
-                        <li><a href="/">inicio</a></li>
-                        <li>Login</li>
-                    </ul>
-                </div>
-            </div>
+        <div class="breadcrumb_content">
+            <ul>
+                <li><a href="/">inicio</a></li>
+                <li>Iniciar sesión</li>
+            </ul>
         </div>
     </div>
 </div>
-<!--breadcrumbs area end-->
 
-
-<!-- customer login start -->
-<div class="customer_login mt-32">
+<div class="customer_login mt-32 mb-5">
     <div class="container">
-        <div class="row">
-            <!--login area start-->
-            <div class="col-lg-6 col-md-6">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
                 <div class="account_form">
                     <h2>Iniciar sesión</h2>
-                    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
-                    <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
-                    <form th:action="@{/login}" method="post" th:object="${loginForm}">
+                    <div th:if="${error}" class="alert alert-danger" th:text="${error}" role="alert"></div>
+                    <div th:if="${message}" class="alert alert-success" th:text="${message}" role="status"></div>
+
+                    <form th:action="@{/login}" method="post" th:object="${loginForm}" class="mb-4" id="loginForm">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                         <p>
-                            <label>Correo electrónico <span>*</span></label>
-                            <input type="email" name="email" th:field="*{email}" placeholder="you@example.com" required>
+                            <label for="email">Correo electrónico <span>*</span></label>
+                            <input id="email" type="email" autocomplete="username" th:field="*{email}" required>
                         </p>
                         <p>
-                            <label>Contraseña <span>*</span></label>
-                            <input type="password" name="password" th:field="*{password}" placeholder="••••••••" required>
+                            <label for="password">Contraseña <span>*</span></label>
+                            <input id="password" type="password" autocomplete="current-password" th:field="*{password}" required>
                         </p>
-                        <div class="login_submit d-flex align-items-center justify-content-between">
+                        <div class="login_submit d-flex align-items-center justify-content-between flex-wrap gap-2">
                             <a href="/forgot-password">¿Olvidaste tu contraseña?</a>
-                            <label for="remember" class="mb-0 d-flex align-items-center">
+                            <label class="mb-0 d-flex align-items-center">
                                 <input id="remember" type="checkbox" name="remember-me" class="me-2">
                                 Recuérdame
                             </label>
                         </div>
                         <div class="mt-3">
-                            <button type="submit" class="btn btn-primary">Login</button>
+                            <button type="submit" class="btn btn-primary">Entrar</button>
+                            <a href="/register" class="btn btn-outline-secondary ms-2">Crear cuenta</a>
                         </div>
                     </form>
+
+                    <p class="text-muted small">O continúa con</p>
+                    <div class="d-flex flex-column flex-sm-row gap-2">
+                        <a class="btn btn-light border" th:href="@{/oauth2/authorization/google}" style="color:#4285F4;font-weight:600">Google</a>
+                        <a class="btn btn-light border" th:href="@{/oauth2/authorization/facebook}" style="color:#1877F2;font-weight:600">Facebook</a>
+                    </div>
                 </div>
             </div>
-            <!--login area start-->
         </div>
     </div>
 </div>
-<!-- customer login end -->
 
-<!--call to action start-->
 <th:block th:replace="fragments/_calltoaction :: calltoaction"></th:block>
-<!--call to action end-->
-
-<!--footer area start-->
 <th:block th:replace="fragments/_footer :: footer"></th:block>
-<!--footer area end-->
-
-<!-- JS
- ============================================ -->
-<!--jquery min js-->
 <script src="/js/vendor/jquery-3.4.1.min.js"></script>
-<!--popper min js-->
-<script src="/js/popper.js"></script>
-<!--bootstrap min js-->
 <script src="/js/bootstrap.min.js"></script>
-<!--owl carousel min js-->
-<script src="/js/owl.carousel.min.js"></script>
-<!--slick min js-->
-<script src="/js/slick.min.js"></script>
-<!--magnific popup min js-->
-<script src="/js/jquery.magnific-popup.min.js"></script>
-<!--jquery countdown min js-->
-<script src="/js/jquery.countdown.js"></script>
-<!--jquery ui min js-->
-<script src="/js/jquery.ui.js"></script>
-<!--jquery elevatezoom min js-->
-<script src="/js/jquery.elevatezoom.js"></script>
-<!--isotope packaged min js-->
-<script src="/js/isotope.pkgd.min.js"></script>
-<!--slinky menu js-->
-<script src="/js/slinky.menu.js"></script>
-<!-- Plugins JS -->
-<script src="/js/plugins.js"></script>
-
-<!-- Main JS -->
 <script src="/js/main.js"></script>
-
-
-
 </body>
-
 </html>

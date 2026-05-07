@@ -23,6 +23,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -75,6 +76,7 @@ class CartControllerIntegrationTest {
     @WithMockUser(username = "buyer@example.com", roles = {"CUSTOMER"})
     void addItem_viaWebController_redirectsToCart() throws Exception {
         mockMvc.perform(post("/cart/items")
+                        .with(csrf())
                         .param("productId", "100")
                         .param("quantity", "2"))
                 .andExpect(status().is3xxRedirection())
@@ -106,7 +108,8 @@ class CartControllerIntegrationTest {
     @Test
     @WithMockUser(username = "buyer@example.com", roles = {"CUSTOMER"})
     void proceedToCheckout_redirectsToCheckout() throws Exception {
-        mockMvc.perform(post("/cart/checkout"))
+        mockMvc.perform(post("/cart/checkout")
+                        .with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/checkout"));
     }

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- Bottom pagination + «Más artículos» for shop-list -->
+<th:block th:fragment="bottom">
+    <div class="shop_toolbar t_bottom">
+        <div class="pagination" th:if="${page != null and page.totalPages > 0}">
+            <ul>
+                <li th:if="${page.hasPrevious()}">
+                    <a th:if="${searchType == 'category'}"
+                       th:href="@{/search(category=${categorySlug}, page=${page.number-1})}">Anterior</a>
+                    <a th:if="${categorySlug != null and searchType == null}"
+                       th:href="@{/shop-list(category=${categorySlug}, page=${page.number-1})}">Anterior</a>
+                    <a th:if="${searchType == 'vehicle'}"
+                       th:href="@{/search/vehicle(make=${vehicleMake}, model=${vehicleModel}, engineType=${vehicleEngine}, partName=${partName}, page=${page.number-1})}">Anterior</a>
+                    <a th:if="${searchType == 'partName'}"
+                       th:href="@{/search/part-name(partName=${partName}, page=${page.number-1})}">Anterior</a>
+                    <a th:if="${searchQuery != null and (searchType == 'general' or searchType == 'partNumberContaining' or searchType == 'oemNumberContaining')}"
+                       th:href="@{/search(query=${searchQuery}, page=${page.number-1})}">Anterior</a>
+                    <a th:if="${searchType == 'advancedVehicle'}"
+                       th:href="@{/search(query=${searchQuery}, brand=${vehicleMake}, model=${vehicleModel}, page=${page.number-1})}">Anterior</a>
+                    <a th:if="${searchType == 'categories'}"
+                       th:href="@{/search/categories(category=${categoryIdsParam}, page=${page.number-1})}">Anterior</a>
+                    <a th:if="${searchType == null and searchQuery == null and partName == null and vehicleMake == null and categorySlug == null}"
+                       th:href="@{/shop-list(page=${page.number-1})}">Anterior</a>
+                </li>
+
+                <li th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+                    th:class="${i == page.number ? 'current' : ''}">
+                    <a th:if="${searchType == 'category'}"
+                       th:href="@{/search(category=${categorySlug}, page=${i})}"
+                       th:text="${i + 1}">1</a>
+                    <a th:if="${categorySlug != null and searchType == null}"
+                       th:href="@{/shop-list(category=${categorySlug}, page=${i})}"
+                       th:text="${i + 1}">1</a>
+                    <a th:if="${searchType == 'vehicle'}"
+                       th:href="@{/search/vehicle(make=${vehicleMake}, model=${vehicleModel}, engineType=${vehicleEngine}, partName=${partName}, page=${i})}"
+                       th:text="${i + 1}">1</a>
+                    <a th:if="${searchType == 'partName'}"
+                       th:href="@{/search/part-name(partName=${partName}, page=${i})}"
+                       th:text="${i + 1}">1</a>
+                    <a th:if="${searchQuery != null and (searchType == 'general' or searchType == 'partNumberContaining' or searchType == 'oemNumberContaining')}"
+                       th:href="@{/search(query=${searchQuery}, page=${i})}"
+                       th:text="${i + 1}">1</a>
+                    <a th:if="${searchType == 'advancedVehicle'}"
+                       th:href="@{/search(query=${searchQuery}, brand=${vehicleMake}, model=${vehicleModel}, page=${i})}"
+                       th:text="${i + 1}">1</a>
+                    <a th:if="${searchType == 'categories'}"
+                       th:href="@{/search/categories(category=${categoryIdsParam}, page=${i})}"
+                       th:text="${i + 1}">1</a>
+                    <a th:if="${searchType == null and searchQuery == null and partName == null and vehicleMake == null and categorySlug == null}"
+                       th:href="@{/shop-list(page=${i})}"
+                       th:text="${i + 1}">1</a>
+                    <span th:if="${searchType == 'partNumber' or searchType == 'oemNumber'}"
+                          th:text="${i + 1}">1</span>
+                </li>
+
+                <li th:if="${page.hasNext()}">
+                    <a th:if="${searchType == 'category'}"
+                       th:href="@{/search(category=${categorySlug}, page=${page.number+1})}">Siguiente</a>
+                    <a th:if="${categorySlug != null and searchType == null}"
+                       th:href="@{/shop-list(category=${categorySlug}, page=${page.number+1})}">Siguiente</a>
+                    <a th:if="${searchType == 'vehicle'}"
+                       th:href="@{/search/vehicle(make=${vehicleMake}, model=${vehicleModel}, engineType=${vehicleEngine}, partName=${partName}, page=${page.number+1})}">Siguiente</a>
+                    <a th:if="${searchType == 'partName'}"
+                       th:href="@{/search/part-name(partName=${partName}, page=${page.number+1})}">Siguiente</a>
+                    <a th:if="${searchQuery != null and (searchType == 'general' or searchType == 'partNumberContaining' or searchType == 'oemNumberContaining')}"
+                       th:href="@{/search(query=${searchQuery}, page=${page.number+1})}">Siguiente</a>
+                    <a th:if="${searchType == 'advancedVehicle'}"
+                       th:href="@{/search(query=${searchQuery}, brand=${vehicleMake}, model=${vehicleModel}, page=${page.number+1})}">Siguiente</a>
+                    <a th:if="${searchType == 'categories'}"
+                       th:href="@{/search/categories(category=${categoryIdsParam}, page=${page.number+1})}">Siguiente</a>
+                    <a th:if="${searchType == null and searchQuery == null and partName == null and vehicleMake == null and categorySlug == null}"
+                       th:href="@{/shop-list(page=${page.number+1})}">Siguiente</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="text-center mt-3 mb-1" th:if="${page != null and page.hasNext()}">
+            <a th:if="${searchType == 'category'}" class="btn btn-outline-primary"
+               th:href="@{/search(category=${categorySlug}, page=${page.number+1})}">Más artículos</a>
+            <a th:if="${categorySlug != null and searchType == null}" class="btn btn-outline-primary"
+               th:href="@{/shop-list(category=${categorySlug}, page=${page.number+1})}">Más artículos</a>
+            <a th:if="${searchType == 'vehicle'}" class="btn btn-outline-primary"
+               th:href="@{/search/vehicle(make=${vehicleMake}, model=${vehicleModel}, engineType=${vehicleEngine}, partName=${partName}, page=${page.number+1})}">Más artículos</a>
+            <a th:if="${searchType == 'partName'}" class="btn btn-outline-primary"
+               th:href="@{/search/part-name(partName=${partName}, page=${page.number+1})}">Más artículos</a>
+            <a th:if="${searchQuery != null and (searchType == 'general' or searchType == 'partNumberContaining' or searchType == 'oemNumberContaining')}"
+               class="btn btn-outline-primary"
+               th:href="@{/search(query=${searchQuery}, page=${page.number+1})}">Más artículos</a>
+            <a th:if="${searchType == 'advancedVehicle'}" class="btn btn-outline-primary"
+               th:href="@{/search(query=${searchQuery}, brand=${vehicleMake}, model=${vehicleModel}, page=${page.number+1})}">Más artículos</a>
+            <a th:if="${searchType == 'categories'}" class="btn btn-outline-primary"
+               th:href="@{/search/categories(category=${categoryIdsParam}, page=${page.number+1})}">Más artículos</a>
+            <a th:if="${searchType == null and searchQuery == null and partName == null and vehicleMake == null and categorySlug == null}"
+               class="btn btn-outline-primary"
+               th:href="@{/shop-list(page=${page.number+1})}">Más artículos</a>
+        </div>
+    </div>
+</th:block>
+</html>

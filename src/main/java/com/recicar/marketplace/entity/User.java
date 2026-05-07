@@ -58,6 +58,18 @@ public class User {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    @Column(name = "locked_until")
+    private LocalDateTime lockedUntil;
+
+    @Column(name = "failed_login_attempts", nullable = false)
+    private int failedLoginAttempts;
+
+    @Column(name = "auth_version", nullable = false)
+    private long authVersion;
+
+    @Column(name = "password_changed_at")
+    private LocalDateTime passwordChangedAt;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Address> addresses = new ArrayList<>();
 
@@ -172,6 +184,38 @@ public class User {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public LocalDateTime getLockedUntil() {
+        return lockedUntil;
+    }
+
+    public void setLockedUntil(LocalDateTime lockedUntil) {
+        this.lockedUntil = lockedUntil;
+    }
+
+    public int getFailedLoginAttempts() {
+        return failedLoginAttempts;
+    }
+
+    public void setFailedLoginAttempts(int failedLoginAttempts) {
+        this.failedLoginAttempts = failedLoginAttempts;
+    }
+
+    public long getAuthVersion() {
+        return authVersion;
+    }
+
+    public void setAuthVersion(long authVersion) {
+        this.authVersion = authVersion;
+    }
+
+    public LocalDateTime getPasswordChangedAt() {
+        return passwordChangedAt;
+    }
+
+    public void setPasswordChangedAt(LocalDateTime passwordChangedAt) {
+        this.passwordChangedAt = passwordChangedAt;
     }
 
     public List<Address> getAddresses() {

@@ -6,6 +6,7 @@ import com.recicar.marketplace.entity.ProductCondition;
 import com.recicar.marketplace.entity.Vendor;
 import com.recicar.marketplace.service.CategoryService;
 import com.recicar.marketplace.service.ProductService;
+import com.recicar.marketplace.web.ShopListingConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,8 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -69,6 +71,15 @@ class SearchControllerIntegrationTest {
         testProduct.setActive(true);
 
         when(categoryService.findRootCategories()).thenReturn(Collections.singletonList(testCategory));
+
+        when(productService.mapToProductCardPage(any(org.springframework.data.domain.Page.class))).thenAnswer(invocation -> {
+            org.springframework.data.domain.Page<Product> p = invocation.getArgument(0);
+            return new PageImpl<>(Collections.emptyList(), p.getPageable(), p.getTotalElements());
+        });
+        when(productService.mapListToProductCardPage(anyList())).thenAnswer(invocation -> {
+            List<Product> list = invocation.getArgument(0);
+            return new PageImpl<>(Collections.emptyList(), PageRequest.of(0, ShopListingConstants.PAGE_SIZE), list.size());
+        });
     }
 
     @Test
@@ -104,7 +115,7 @@ class SearchControllerIntegrationTest {
         Page<Product> productPage = new PageImpl<>(Collections.singletonList(testProduct));
         when(productService.findByPartNumber("P123")).thenReturn(Collections.emptyList());
         when(productService.findByOemNumber("P123")).thenReturn(Collections.emptyList());
-        when(productService.findByPartNumberContaining("P123", PageRequest.of(0, 12))).thenReturn(productPage);
+        when(productService.findByPartNumberContaining("P123", PageRequest.of(0, ShopListingConstants.PAGE_SIZE))).thenReturn(productPage);
 
         mockMvc.perform(get("/search").param("query", "P123"))
                 .andExpect(status().isOk())
@@ -121,7 +132,7 @@ class SearchControllerIntegrationTest {
         Page<Product> productPage = new PageImpl<>(Collections.singletonList(testProduct));
         when(productService.findByPartNumber("brake")).thenReturn(Collections.emptyList());
         when(productService.findByOemNumber("brake")).thenReturn(Collections.emptyList());
-        when(productService.searchProducts("brake", PageRequest.of(0, 12))).thenReturn(productPage);
+        when(productService.searchProducts("brake", PageRequest.of(0, ShopListingConstants.PAGE_SIZE))).thenReturn(productPage);
 
         mockMvc.perform(get("/search").param("query", "brake"))
                 .andExpect(status().isOk())
@@ -135,7 +146,7 @@ class SearchControllerIntegrationTest {
     @Test
     void searchByPartName_ShouldReturnResults() throws Exception {
         Page<Product> productPage = new PageImpl<>(Collections.singletonList(testProduct));
-        when(productService.findByProductName("Brake Pad", PageRequest.of(0, 12))).thenReturn(productPage);
+        when(productService.findByProductName("Brake Pad", PageRequest.of(0, ShopListingConstants.PAGE_SIZE))).thenReturn(productPage);
 
         mockMvc.perform(get("/search/part-name").param("partName", "Brake Pad"))
                 .andExpect(status().isOk())
@@ -149,7 +160,7 @@ class SearchControllerIntegrationTest {
     @Test
     void searchByVehicle_ShouldReturnResults() throws Exception {
         Page<Product> productPage = new PageImpl<>(Collections.singletonList(testProduct));
-        when(productService.findByMakeModelEngineAndPartName("Honda", "Civic", "1.8L", null, PageRequest.of(0, 12)))
+        when(productService.findByMakeModelEngineAndPartName("Honda", "Civic", "1.8L", null, PageRequest.of(0, ShopListingConstants.PAGE_SIZE)))
                 .thenReturn(productPage);
 
         mockMvc.perform(get("/search/vehicle")
@@ -169,7 +180,7 @@ class SearchControllerIntegrationTest {
     @Test
     void searchByVehicleWithPartName_ShouldReturnResults() throws Exception {
         Page<Product> productPage = new PageImpl<>(Collections.singletonList(testProduct));
-        when(productService.findByMakeModelEngineAndPartName("Toyota", "Camry", "2.0L", "filter", PageRequest.of(0, 12)))
+        when(productService.findByMakeModelEngineAndPartName("Toyota", "Camry", "2.0L", "filter", PageRequest.of(0, ShopListingConstants.PAGE_SIZE)))
                 .thenReturn(productPage);
 
         mockMvc.perform(get("/search/vehicle")
@@ -241,7 +252,7 @@ class SearchControllerIntegrationTest {
         Page<Product> productPage = new PageImpl<>(Collections.singletonList(testProduct));
         when(productService.findByPartNumber("brake")).thenReturn(Collections.emptyList());
         when(productService.findByOemNumber("brake")).thenReturn(Collections.emptyList());
-        when(productService.searchProducts("brake", PageRequest.of(0, 12))).thenReturn(productPage);
+        when(productService.searchProducts("brake", PageRequest.of(0, ShopListingConstants.PAGE_SIZE))).thenReturn(productPage);
 
         mockMvc.perform(get("/search").param("q", "brake"))
                 .andExpect(status().isOk())
@@ -258,7 +269,7 @@ class SearchControllerIntegrationTest {
         Page<Product> productPage = new PageImpl<>(Collections.singletonList(testProduct));
         when(productService.findByPartNumber("brake")).thenReturn(Collections.emptyList());
         when(productService.findByOemNumber("brake")).thenReturn(Collections.emptyList());
-        when(productService.searchProducts("brake", PageRequest.of(1, 12))).thenReturn(productPage);
+        when(productService.searchProducts("brake", PageRequest.of(1, ShopListingConstants.PAGE_SIZE))).thenReturn(productPage);
 
         mockMvc.perform(get("/search").param("query", "brake").param("page", "1"))
                 .andExpect(status().isOk())

@@ -4,7 +4,10 @@ import com.recicar.marketplace.config.MvcSliceTestConfig;
 import com.recicar.marketplace.entity.Product;
 import com.recicar.marketplace.service.CategoryService;
 import com.recicar.marketplace.service.ProductService;
+import com.recicar.marketplace.service.SearchFilterOptionsService;
 import com.recicar.marketplace.service.SearchService;
+import com.recicar.marketplace.web.ShopListingConstants;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -15,9 +18,12 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -40,9 +46,24 @@ class SearchControllerVehicleSearchTest {
     @MockBean
     private SearchService searchService;
 
+    @MockBean
+    private SearchFilterOptionsService searchFilterOptionsService;
+
+    @BeforeEach
+    void listingCardStubs() {
+        when(productService.mapToProductCardPage(any(Page.class))).thenAnswer(invocation -> {
+            Page<Product> p = invocation.getArgument(0);
+            return new PageImpl<>(Collections.emptyList(), p.getPageable(), p.getTotalElements());
+        });
+        when(productService.mapListToProductCardPage(anyList())).thenAnswer(invocation -> {
+            List<Product> list = invocation.getArgument(0);
+            return new PageImpl<>(Collections.emptyList(), PageRequest.of(0, ShopListingConstants.PAGE_SIZE), list.size());
+        });
+    }
+
     @Test
     void searchByMakeModelEngineAndPartName_returnsShopList() throws Exception {
-        Page<Product> page = new PageImpl<>(List.of(), PageRequest.of(0, 12), 0);
+        Page<Product> page = new PageImpl<>(List.of(), PageRequest.of(0, ShopListingConstants.PAGE_SIZE), 0);
         when(productService.findByMakeModelEngineAndPartName(anyString(), anyString(), anyString(), any(), any())).thenReturn(page);
 
         mockMvc.perform(get("/search/vehicle")

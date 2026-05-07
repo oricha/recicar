@@ -5,7 +5,10 @@ import com.recicar.marketplace.entity.Category;
 import com.recicar.marketplace.entity.Product;
 import com.recicar.marketplace.service.CategoryService;
 import com.recicar.marketplace.service.ProductService;
+import com.recicar.marketplace.service.SearchFilterOptionsService;
 import com.recicar.marketplace.service.SearchService;
+import com.recicar.marketplace.web.ShopListingConstants;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -17,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
@@ -40,6 +44,21 @@ class SearchControllerTest {
 
     @MockBean
     private SearchService searchService;
+
+    @MockBean
+    private SearchFilterOptionsService searchFilterOptionsService;
+
+    @BeforeEach
+    void listingCardStubs() {
+        when(productService.mapToProductCardPage(any(org.springframework.data.domain.Page.class))).thenAnswer(invocation -> {
+            org.springframework.data.domain.Page<com.recicar.marketplace.entity.Product> p = invocation.getArgument(0);
+            return new PageImpl<>(Collections.emptyList(), p.getPageable(), p.getTotalElements());
+        });
+        when(productService.mapListToProductCardPage(anyList())).thenAnswer(invocation -> {
+            List<com.recicar.marketplace.entity.Product> list = invocation.getArgument(0);
+            return new PageImpl<>(Collections.emptyList(), PageRequest.of(0, ShopListingConstants.PAGE_SIZE), list.size());
+        });
+    }
 
     @Test
     public void testSearchByPartNumber() throws Exception {
@@ -87,7 +106,7 @@ class SearchControllerTest {
     @Test
     public void searchByBrandModel_delegatesToSearchService() throws Exception {
         when(searchService.searchAdvanced(anyString(), anyString(), anyString(), isNull(), isNull(), isNull(), isNull(), isNull(), any(Pageable.class)))
-                .thenReturn(new org.springframework.data.domain.PageImpl<>(Collections.emptyList(), PageRequest.of(0, 12), 0));
+                .thenReturn(new org.springframework.data.domain.PageImpl<>(Collections.emptyList(), PageRequest.of(0, ShopListingConstants.PAGE_SIZE), 0));
         when(categoryService.findRootCategories()).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/search").param("brand", "Audi").param("model", "A4"))
@@ -110,7 +129,7 @@ class SearchControllerTest {
 
         when(productService.findByPartNumber("test")).thenReturn(Collections.emptyList());
         when(productService.findByOemNumber("test")).thenReturn(Collections.emptyList());
-        when(productService.searchProducts("test", PageRequest.of(0, 12))).thenReturn(new PageImpl<>(Collections.singletonList(product)));
+        when(productService.searchProducts("test", PageRequest.of(0, ShopListingConstants.PAGE_SIZE))).thenReturn(new PageImpl<>(Collections.singletonList(product)));
         when(categoryService.findRootCategories()).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/search").param("query", "test"))
@@ -126,7 +145,7 @@ class SearchControllerTest {
     public void testSearchWithNoResults() throws Exception {
         when(productService.findByPartNumber("no-results")).thenReturn(Collections.emptyList());
         when(productService.findByOemNumber("no-results")).thenReturn(Collections.emptyList());
-        when(productService.searchProducts("no-results", PageRequest.of(0, 12))).thenReturn(new PageImpl<>(Collections.emptyList()));
+        when(productService.searchProducts("no-results", PageRequest.of(0, ShopListingConstants.PAGE_SIZE))).thenReturn(new PageImpl<>(Collections.emptyList()));
         when(categoryService.findRootCategories()).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/search").param("query", "no-results"))

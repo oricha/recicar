@@ -87,7 +87,7 @@ public class CartPricingService {
             return BigDecimal.valueOf(10.00);
         }
         BigDecimal subtotal = cart.getItems().stream()
-                .map((CartItem item) -> item.getProduct().getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .map((CartItem item) -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         if (subtotal.compareTo(BigDecimal.valueOf(100)) < 0) {
             return BigDecimal.valueOf(10.00);

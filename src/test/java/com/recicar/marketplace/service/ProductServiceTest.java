@@ -531,4 +531,16 @@ class ProductServiceTest {
         verify(productRepository).findById(1L);
         verify(productRepository).findByPartNumberContaining(eq("PN123"), any(Pageable.class));
     }
+
+    @Test
+    void shouldFindAllProductsByVendorForManagement() {
+        Pageable pg = PageRequest.of(0, 20, Sort.by(Sort.Direction.ASC, "name"));
+        Page<Product> page = new PageImpl<>(List.of(testProduct));
+        when(productRepository.findByVendorOrderByNameAsc(testVendor, pg)).thenReturn(page);
+
+        Page<Product> got = productService.findAllProductsByVendorForManagement(testVendor, pg);
+
+        assertThat(got.getContent()).containsExactly(testProduct);
+        verify(productRepository).findByVendorOrderByNameAsc(testVendor, pg);
+    }
 }

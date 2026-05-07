@@ -38,6 +38,12 @@ public class VendorApiController {
         this.vendorOrderMetricsService = vendorOrderMetricsService;
     }
 
+    /** Same payload as {@link #getSummary(UserDetails)} — REST alias for dashboards / mobile clients. */
+    @GetMapping("/dashboard")
+    public ResponseEntity<?> getDashboard(@AuthenticationPrincipal UserDetails userDetails) {
+        return getSummary(userDetails);
+    }
+
     @GetMapping("/summary")
     public ResponseEntity<?> getSummary(@AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {

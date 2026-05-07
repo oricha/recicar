@@ -1,0 +1,87 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" class="no-js" lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${pageTitle}">Búsquedas guardadas</title>
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/assets/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+</head>
+<body>
+<th:block th:replace="fragments/_header :: header"></th:block>
+<th:block th:replace="fragments/_offcanvasmenu :: offcanvasmenu"></th:block>
+
+<div class="breadcrumbs_area">
+    <div class="container">
+        <div class="breadcrumb_content">
+            <ul>
+                <li><a th:href="@{/}">Inicio</a></li>
+                <li>Búsquedas guardadas</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<section class="main_content_area py-5">
+    <div class="container">
+        <h1 class="h3 mb-3">Tus búsquedas guardadas</h1>
+        <p class="text-muted mb-4">Ejecuta de nuevo la misma búsqueda o elimínala. Los recordatorios por email se pueden ampliar en una versión futura.</p>
+
+        <div th:if="${savedRows == null or savedRows.isEmpty()}" class="text-center py-5 border rounded bg-light">
+            <p class="mb-3">Aún no has guardado ninguna búsqueda.</p>
+            <a class="btn btn-primary" th:href="@{/search/advanced}">Ir a búsqueda avanzada</a>
+        </div>
+
+        <div class="table-responsive" th:if="${savedRows != null and !savedRows.isEmpty()}">
+            <table class="table align-middle">
+                <thead>
+                <tr>
+                    <th>Búsqueda</th>
+                    <th>Guardada</th>
+                    <th class="text-end">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="row : ${savedRows}">
+                    <td th:text="${row.label}">—</td>
+                    <td th:text="${#temporals.format(row.createdAt, 'dd/MM/yyyy HH:mm')}">—</td>
+                    <td class="text-end text-nowrap">
+                        <a class="btn btn-sm btn-outline-primary"
+                           th:href="${row.runSearchUrl}">Ejecutar</a>
+                        <button type="button" class="btn btn-sm btn-outline-danger btn-delete-search"
+                                th:data-id="${row.id}" aria-label="Eliminar búsqueda guardada">Eliminar</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<th:block th:replace="fragments/_footer :: footer"></th:block>
+<script src="/assets/js/vendor/jquery-3.4.1.min.js"></script>
+<script src="/assets/js/bootstrap.min.js"></script>
+<script src="/assets/js/main.js"></script>
+<script>
+(function () {
+  document.querySelectorAll('.btn-delete-search').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var id = btn.getAttribute('data-id');
+      if (!id || !confirm('¿Eliminar esta búsqueda guardada?')) {
+        return;
+      }
+      fetch('/api/v1/user/saved-searches/' + encodeURIComponent(id), { method: 'DELETE', credentials: 'same-origin' })
+        .then(function (r) {
+          if (r.status === 204 || r.ok) {
+            window.location.reload();
+            return;
+          }
+          alert('No se pudo eliminar.');
+        }).catch(function () { alert('Error de red'); });
+    });
+  });
+})();
+</script>
+</body>
+</html>

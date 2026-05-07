@@ -31,18 +31,23 @@
     <div class="container">
         <h2 class="mb-4" th:text="'Hola, ' + ${user.firstName} + ' ' + ${user.lastName}">Hola</h2>
         <p class="text-muted mb-4" th:text="${user.email}">email</p>
-        <div class="row mb-4">
-            <div class="col-md-4 mb-2">
-                <a class="btn btn-primary" th:href="@{/user-dashboard/chat}">Mensajería con vendedores</a>
+        <div class="row mb-4 g-2">
+            <div class="col-md-6 col-lg-4">
+                <a class="btn btn-primary w-100" th:href="@{/messages}">Mensajes con vendedores</a>
             </div>
-            <div class="col-md-4 mb-2">
-                <a class="btn btn-outline-primary" th:href="@{/wishlist}">Mi lista de deseos</a>
+            <div class="col-md-6 col-lg-4">
+                <a class="btn btn-outline-primary w-100" th:href="@{/wishlist}">Lista de deseos</a>
             </div>
-            <div class="col-md-4 mb-2">
-                <a class="btn btn-outline-secondary" th:href="@{/my-account}">Cuenta clásica</a>
+            <div class="col-md-6 col-lg-4">
+                <a class="btn btn-outline-primary w-100" th:href="@{/saved-searches}">Búsquedas guardadas</a>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <a class="btn btn-outline-primary w-100" th:href="@{/orders}">Ver todos los pedidos</a>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <a class="btn btn-outline-secondary w-100" th:href="@{/my-profile}">Mi perfil</a>
             </div>
         </div>
-        <p class="small text-muted">Búsquedas guardadas: <code>GET/POST /api/v1/user/saved-searches</code> (ya existente).</p>
 
         <h3 class="mb-3">Pedidos recientes</h3>
         <div class="table-responsive" th:if="${orders != null and !orders.isEmpty()}">

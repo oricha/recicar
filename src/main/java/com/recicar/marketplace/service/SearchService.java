@@ -10,6 +10,7 @@ import com.recicar.marketplace.repository.ProductRepository;
 import com.recicar.marketplace.repository.SavedSearchRepository;
 import com.recicar.marketplace.repository.SearchRepository;
 import com.recicar.marketplace.repository.UserRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -133,6 +134,11 @@ public class SearchService {
     /**
      * Get search suggestions
      */
+    @Cacheable(
+            cacheNames = "searchSuggestions",
+            key = "#partialTerm == null ? '_' : #partialTerm.trim().toLowerCase()",
+            unless = "#partialTerm == null || #partialTerm.trim().length() < 2 || #result == null || #result.isEmpty()"
+    )
     @Transactional(readOnly = true)
     public List<String> getSearchSuggestions(String partialTerm) {
         if (partialTerm == null || partialTerm.trim().length() < 2) {
@@ -172,7 +178,16 @@ public class SearchService {
 
     @Transactional(readOnly = true)
     public List<SavedSearch> getSavedSearches(Long userId) {
-        return savedSearchRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        return savedSearchRepository.findByUser_IdOrderByCreatedAtDesc(userId);
+    }
+
+    public void deleteSavedSearch(Long userId, Long savedSearchId) {
+        SavedSearch saved = savedSearchRepository.findById(savedSearchId)
+                .orElseThrow(() -> new IllegalArgumentException("Saved search not found"));
+        if (!saved.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("Saved search not found");
+        }
+        savedSearchRepository.delete(saved);
     }
 
     /**

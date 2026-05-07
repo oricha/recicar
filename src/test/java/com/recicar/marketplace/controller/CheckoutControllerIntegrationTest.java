@@ -31,6 +31,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -119,6 +120,7 @@ public class CheckoutControllerIntegrationTest {
     void testPlaceOrderFlow() throws Exception {
         MockHttpSession session = new MockHttpSession();
         mockMvc.perform(post("/checkout/shipping")
+                        .with(csrf())
                         .param("firstName", "John")
                         .param("lastName", "Doe")
                         .param("address", "123 Main St")
@@ -131,6 +133,7 @@ public class CheckoutControllerIntegrationTest {
                 .andExpect(redirectedUrl("/checkout/payment"));
 
         mockMvc.perform(post("/checkout/confirm")
+                        .with(csrf())
                         .param("paymentMethod", "VISA")
                         .session(session))
                 .andExpect(status().is3xxRedirection())

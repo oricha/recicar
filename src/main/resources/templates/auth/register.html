@@ -1,172 +1,133 @@
 <!doctype html>
-<html xmlns:th="http://www.thymeleaf.org" class="no-js" lang="en">
+<html xmlns:th="http://www.thymeleaf.org" class="no-js" lang="es">
 
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>ReciCar - login</title>
-    <meta name="description" content="">
+    <title>Recicar — Crear cuenta</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Favicon -->
     <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico">
-
-      <!-- CSS
-     ========================= -->
-      <!--bootstrap min css-->
-     <link rel="stylesheet" href="/css/bootstrap.min.css">
-     <!--owl carousel min css-->
-     <link rel="stylesheet" href="/css/owl.carousel.min.css">
-     <!--slick min css-->
-     <link rel="stylesheet" href="/css/slick.css">
-     <!--magnific popup min css-->
-     <link rel="stylesheet" href="/css/magnific-popup.css">
-     <!--font awesome css-->
-     <link rel="stylesheet" href="/css/font.awesome.css">
-     <!--ionicons min css-->
-     <link rel="stylesheet" href="/css/ionicons.min.css">
-     <!--animate css-->
-     <link rel="stylesheet" href="/css/animate.css">
-     <!--jquery ui min css-->
-     <link rel="stylesheet" href="/css/jquery-ui.min.css">
-     <!--slinky menu css-->
-     <link rel="stylesheet" href="/css/slinky.menu.css">
-     <!-- Plugins CSS -->
-     <link rel="stylesheet" href="/css/plugins.css">
-
-     <!-- Main Style CSS -->
-     <link rel="stylesheet" href="/css/style.css">
-
-     <!--modernizr min js here-->
-     <script src="/js/vendor/modernizr-3.7.1.min.js"></script>
-
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/style.css">
 </head>
-
 <body>
 
-    <!--header area start-->
 <th:block th:replace="fragments/_header :: header"></th:block>
-<!--header area end-->
-
-
-<!--Offcanvas menu area start-->
 <th:block th:replace="fragments/_offcanvasmenu :: offcanvasmenu"></th:block>
-<!--Offcanvas menu area end-->
 
-    <!--breadcrumbs area start-->
-    <div class="breadcrumbs_area">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <div class="breadcrumb_content">
-                        <ul>
-                            <li><a href="/">home</a></li>
-                            <li>Login</li>
-                        </ul>
+<div class="breadcrumbs_area">
+    <div class="container">
+        <div class="breadcrumb_content">
+            <ul>
+                <li><a href="/">inicio</a></li>
+                <li>Registro</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="customer_login mt-32 mb-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="account_form register">
+                    <h2>Crear cuenta</h2>
+                    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+                    <form th:action="@{/register}" th:object="${registrationForm}" method="post" novalidate>
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <label for="firstName">Nombre <span>*</span></label>
+                                <input id="firstName" type="text" th:field="*{firstName}" required maxlength="100">
+                                <div class="text-danger small" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></div>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label for="lastName">Apellidos <span>*</span></label>
+                                <input id="lastName" type="text" th:field="*{lastName}" required maxlength="100">
+                                <div class="text-danger small" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></div>
+                            </div>
+                        </div>
+
+                        <p>
+                            <label for="email">Correo electrónico <span>*</span></label>
+                            <input id="email" type="email" th:field="*{email}" required>
+                            <div class="text-danger small" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                        </p>
+                        <p>
+                            <label for="phone">Teléfono</label>
+                            <input id="phone" type="text" th:field="*{phone}">
+                        </p>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <label for="password">Contraseña <span>*</span></label>
+                                <input id="password" type="password" th:field="*{password}" required minlength="8"
+                                       autocomplete="new-password" aria-describedby="pwdHelp">
+                                <small id="pwdHelp" class="form-text text-muted">Mín. 8 caracteres: mayúscula, minúscula, número y símbolo.</small>
+                                <div class="text-danger small" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label for="confirmPassword">Confirmar contraseña <span>*</span></label>
+                                <input id="confirmPassword" type="password" th:field="*{confirmPassword}" required autocomplete="new-password">
+                                <div class="text-danger small" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="terms" th:field="*{agreeToTerms}" required>
+                            <label class="form-check-label" for="terms">Acepto los términos y condiciones <span>*</span></label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="privacy" th:field="*{agreePrivacyPolicy}" required>
+                            <label class="form-check-label" for="privacy">Acepto la política de privacidad (RGPD) <span>*</span></label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="cookies" th:field="*{agreeCookiesPolicy}">
+                            <label class="form-check-label" for="cookies">Información sobre cookies / preferencias</label>
+                        </div>
+
+                        <hr/>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="asVendor" th:field="*{registeringAsVendor}">
+                            <label class="form-check-label" for="asVendor">Solicitar alta como vendedor (revisión manual)</label>
+                        </div>
+                        <div class="d-none" id="vendorFields">
+                            <p>
+                                <label for="vendorBusinessName">Razón social / nombre comercial</label>
+                                <input id="vendorBusinessName" type="text" th:field="*{vendorBusinessName}">
+                            </p>
+                            <p>
+                                <label for="vendorTaxId">NIF / CIF</label>
+                                <input id="vendorTaxId" type="text" th:field="*{vendorTaxId}">
+                            </p>
+                        </div>
+
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-primary">Registrarse</button>
+                            <a href="/login" class="btn btn-link">Ya tengo cuenta</a>
+                        </div>
+                    </form>
+
+                    <p class="text-muted small mt-3">O regístrate con</p>
+                    <div class="d-flex flex-column flex-sm-row gap-2">
+                        <a class="btn btn-light border" th:href="@{/oauth2/authorization/google}">Google</a>
+                        <a class="btn btn-light border" th:href="@{/oauth2/authorization/facebook}">Facebook</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <!--breadcrumbs area end-->
+</div>
 
-
-    <!-- customer login start -->
-    <div class="customer_login mt-32">
-        <div class="container">
-            <div class="row">
-                <!--login area start-->
-                <div class="col-lg-6 col-md-6">
-                    <div class="account_form">
-                        <h2>login</h2>
-                        <form action="#">
-                            <p>
-                                <label>Username or email <span>*</span></label>
-                                <input type="text">
-                            </p>
-                            <p>
-                                <label>Passwords <span>*</span></label>
-                                <input type="password">
-                            </p>
-                            <div class="login_submit">
-                                <a href="#">Lost your password?</a>
-                                <label for="remember">
-                                    <input id="remember" type="checkbox">
-                                    Remember me
-                                </label>
-                                <button type="submit">login</button>
-
-                            </div>
-
-                        </form>
-                    </div>
-                </div>
-                <!--login area start-->
-
-                <!--register area start-->
-                <div class="col-lg-6 col-md-6">
-                    <div class="account_form register">
-                        <h2>Register</h2>
-                        <form action="#">
-                            <p>
-                                <label>Email address <span>*</span></label>
-                                <input type="text">
-                            </p>
-                            <p>
-                                <label>Passwords <span>*</span></label>
-                                <input type="password">
-                            </p>
-                            <div class="login_submit">
-                                <button type="submit">Register</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                <!--register area end-->
-            </div>
-        </div>
-    </div>
-    <!-- customer login end -->
-
-<!--call to action start-->
 <th:block th:replace="fragments/_calltoaction :: calltoaction"></th:block>
-<!--call to action end-->
-
-<!--footer area start-->
 <th:block th:replace="fragments/_footer :: footer"></th:block>
-<!--footer area end-->
-    
-<!-- JS
- ============================================ -->
-<!--jquery min js-->
 <script src="/js/vendor/jquery-3.4.1.min.js"></script>
-<!--popper min js-->
-<script src="/js/popper.js"></script>
-<!--bootstrap min js-->
 <script src="/js/bootstrap.min.js"></script>
-<!--owl carousel min js-->
-<script src="/js/owl.carousel.min.js"></script>
-<!--slick min js-->
-<script src="/js/slick.min.js"></script>
-<!--magnific popup min js-->
-<script src="/js/jquery.magnific-popup.min.js"></script>
-<!--jquery countdown min js-->
-<script src="/js/jquery.countdown.js"></script>
-<!--jquery ui min js-->
-<script src="/js/jquery.ui.js"></script>
-<!--jquery elevatezoom min js-->
-<script src="/js/jquery.elevatezoom.js"></script>
-<!--isotope packaged min js-->
-<script src="/js/isotope.pkgd.min.js"></script>
-<!--slinky menu js-->
-<script src="/js/slinky.menu.js"></script>
-<!-- Plugins JS -->
-<script src="/js/plugins.js"></script>
-
-<!-- Main JS -->
-<script src="/js/main.js"></script>
-
-
-
+<script>
+  document.getElementById('asVendor')?.addEventListener('change', function() {
+    document.getElementById('vendorFields').classList.toggle('d-none', !this.checked);
+  });
+</script>
 </body>
-
 </html>

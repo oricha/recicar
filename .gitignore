@@ -126,6 +126,7 @@ Thumbs.db
 .vscode/
 .idea/
 .metals/
+.bloop/
 .gradle/
 bin/
 build/
@@ -138,5 +139,6 @@ target/
 /recicar/
 /.codex
 .claude/
-openspec/
+openspec/*
 node_modules/
+TODO.md
