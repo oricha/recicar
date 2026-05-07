@@ -1,3 +1,4 @@
+# Flyway off + H2: slices like @DataJpaTest can use ddl-auto. Full SQL migrations (e.g. GIN) need PostgreSQL — see integration tests.
 spring:
   datasource:
     url: ${TEST_DATABASE_URL:${DATABASE_URL:jdbc:postgresql://localhost:5432/marketplace_dev?currentSchema=recicar}}
