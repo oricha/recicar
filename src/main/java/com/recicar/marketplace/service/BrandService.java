@@ -4,6 +4,7 @@ import com.recicar.marketplace.entity.Brand;
 import com.recicar.marketplace.entity.BrandModel;
 import com.recicar.marketplace.repository.BrandModelRepository;
 import com.recicar.marketplace.repository.BrandRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,21 +24,25 @@ public class BrandService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "navBrands", key = "'all'", unless = "#result == null || #result.isEmpty()")
     public List<Brand> findAll() {
         return brandRepository.findAllByOrderByNameAsc();
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "navBrandBySlug", key = "#slug")
     public Optional<Brand> findBySlug(String slug) {
         return brandRepository.findBySlug(slug);
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "navBrandSlugs", key = "'all'", unless = "#result == null || #result.isEmpty()")
     public List<String> findAllSlugs() {
         return brandRepository.findAllSlugs();
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "navBrandModels", key = "#brandId", unless = "#result == null || #result.isEmpty()")
     public List<BrandModel> findByBrandId(Long brandId) {
         return brandModelRepository.findByBrandIdOrderByModelNameAsc(brandId);
     }

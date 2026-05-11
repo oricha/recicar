@@ -18,7 +18,7 @@
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <h1 th:text="${pageTitle}">Términos de uso</h1>
-                <p class="text-muted">Última actualización: documento informativo; revisa la versión vinculada al registro o al pedido en producción.</p>
+                <th:block th:replace="~{fragments/_legal_version_notice :: legalVersionNotice (versionLabel=${legalVersion}, effectiveDate=${legalEffectiveDate})}"></th:block>
                 <h2>1. Objeto</h2>
                 <p><strong>ReciCar</strong> es un marketplace en el que terceros vendedores ofertan recambios; el operador de la plataforma facilita la interacción, el catálogo y el proceso de compra según se configure. La relación de compraventa concreta es entre tú y el vendedor, sin perjuicio de las obligaciones que correspondan a ReciCar como intermediario o prestador de servicios adicionales.</p>
                 <h2>2. Cuenta y uso</h2>

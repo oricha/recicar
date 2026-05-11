@@ -2,6 +2,9 @@ package com.recicar.marketplace.service;
 
 import com.recicar.marketplace.entity.Category;
 import com.recicar.marketplace.repository.CategoryRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,8 +49,11 @@ public class CategoryService {
      * Get all root categories (no parent)
      */
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "navCategoryRoots", key = "'roots'", unless = "#result == null || #result.isEmpty()")
     public List<Category> findRootCategories() {
-        return categoryRepository.findByParentIsNullAndActiveTrueOrderBySortOrderAsc();
+        List<Category> roots = categoryRepository.findByParentIsNullAndActiveTrueOrderBySortOrderAsc();
+        roots.forEach(this::initializeNavigationBranch);
+        return roots;
     }
 
     /**
@@ -62,6 +68,7 @@ public class CategoryService {
      * Get child categories of a parent id.
      */
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "navCategoryChildren", key = "#parentId", unless = "#result == null || #result.isEmpty()")
     public List<Category> findByParentId(Long parentId) {
         return categoryRepository.findByParentIdAndActiveTrueOrderBySortOrderAsc(parentId);
     }
@@ -101,6 +108,12 @@ public class CategoryService {
     /**
      * Save or update category
      */
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "navCategoryBySlug", allEntries = true),
+            @CacheEvict(cacheNames = "navCategoryRoots", allEntries = true),
+            @CacheEvict(cacheNames = "navCategoryChildren", allEntries = true),
+            @CacheEvict(cacheNames = "navCategoryAll", allEntries = true)
+    })
     public Category save(Category category) {
         return categoryRepository.save(category);
     }
@@ -108,6 +121,12 @@ public class CategoryService {
     /**
      * Create new category
      */
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "navCategoryBySlug", allEntries = true),
+            @CacheEvict(cacheNames = "navCategoryRoots", allEntries = true),
+            @CacheEvict(cacheNames = "navCategoryChildren", allEntries = true),
+            @CacheEvict(cacheNames = "navCategoryAll", allEntries = true)
+    })
     public Category createCategory(String name, String description, Category parent) {
         Category category = new Category();
         category.setName(name);
@@ -122,6 +141,12 @@ public class CategoryService {
     /**
      * Update category
      */
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "navCategoryBySlug", allEntries = true),
+            @CacheEvict(cacheNames = "navCategoryRoots", allEntries = true),
+            @CacheEvict(cacheNames = "navCategoryChildren", allEntries = true),
+            @CacheEvict(cacheNames = "navCategoryAll", allEntries = true)
+    })
     public Category updateCategory(Long id, String name, String description, Category parent) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Category not found"));
@@ -141,6 +166,12 @@ public class CategoryService {
     /**
      * Deactivate category
      */
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "navCategoryBySlug", allEntries = true),
+            @CacheEvict(cacheNames = "navCategoryRoots", allEntries = true),
+            @CacheEvict(cacheNames = "navCategoryChildren", allEntries = true),
+            @CacheEvict(cacheNames = "navCategoryAll", allEntries = true)
+    })
     public void deactivateCategory(Long id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Category not found"));
@@ -152,6 +183,12 @@ public class CategoryService {
     /**
      * Activate category
      */
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "navCategoryBySlug", allEntries = true),
+            @CacheEvict(cacheNames = "navCategoryRoots", allEntries = true),
+            @CacheEvict(cacheNames = "navCategoryChildren", allEntries = true),
+            @CacheEvict(cacheNames = "navCategoryAll", allEntries = true)
+    })
     public void activateCategory(Long id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Category not found"));
@@ -225,7 +262,13 @@ public class CategoryService {
      * Get all categories (for admin)
      */
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "navCategoryAll", key = "'all'", unless = "#result == null || #result.isEmpty()")
     public List<Category> findAll() {
         return categoryRepository.findAll();
+    }
+
+    private void initializeNavigationBranch(Category root) {
+        root.getChildren().size();
+        root.getChildren().forEach(child -> child.getChildren().size());
     }
 }

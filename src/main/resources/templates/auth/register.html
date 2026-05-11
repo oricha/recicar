@@ -76,16 +76,31 @@
 
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="terms" th:field="*{agreeToTerms}" required>
-                            <label class="form-check-label" for="terms">Acepto los términos y condiciones <span>*</span></label>
+                            <label class="form-check-label" for="terms">
+                                Acepto los <a th:href="@{/terminos-de-uso}" target="_blank" rel="noopener">términos y condiciones</a>
+                                <span>*</span>
+                            </label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="privacy" th:field="*{agreePrivacyPolicy}" required>
-                            <label class="form-check-label" for="privacy">Acepto la política de privacidad (RGPD) <span>*</span></label>
+                            <label class="form-check-label" for="privacy">
+                                Acepto la <a th:href="@{/politica-de-privacidad}" target="_blank" rel="noopener">política de privacidad</a>
+                                (RGPD) <span>*</span>
+                            </label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="cookies" th:field="*{agreeCookiesPolicy}">
-                            <label class="form-check-label" for="cookies">Información sobre cookies / preferencias</label>
+                            <label class="form-check-label" for="cookies">
+                                Información sobre cookies / preferencias y
+                                <a th:href="@{/politica-de-comunicacion-por-chat}" target="_blank" rel="noopener">política de comunicación por chat</a>
+                            </label>
                         </div>
+                        <p class="text-muted small mt-2">
+                            La versión legal vinculante para el alta es
+                            <strong th:text="${legalVersion}">v2026.05</strong>,
+                            en vigor desde
+                            <strong th:text="${legalEffectiveDate}">11 de mayo de 2026</strong>.
+                        </p>
 
                         <hr/>
                         <div class="form-check mb-2">

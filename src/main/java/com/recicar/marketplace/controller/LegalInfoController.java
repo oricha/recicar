@@ -1,6 +1,8 @@
 package com.recicar.marketplace.controller;
 
+import com.recicar.marketplace.legal.LegalDocumentMetadata;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -10,6 +12,16 @@ import org.springframework.web.bind.annotation.GetMapping;
  */
 @Controller
 public class LegalInfoController {
+
+    @ModelAttribute("legalVersion")
+    public String legalVersion() {
+        return LegalDocumentMetadata.VERSION_LABEL;
+    }
+
+    @ModelAttribute("legalEffectiveDate")
+    public String legalEffectiveDate() {
+        return LegalDocumentMetadata.EFFECTIVE_DATE;
+    }
 
     @GetMapping("/info-de-envio")
     public String infoEnvio(Model model) {

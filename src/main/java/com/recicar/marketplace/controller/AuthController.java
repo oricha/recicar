@@ -3,6 +3,7 @@ package com.recicar.marketplace.controller;
 import com.recicar.marketplace.dto.LoginForm;
 import com.recicar.marketplace.dto.UserRegistrationDto;
 import com.recicar.marketplace.entity.User;
+import com.recicar.marketplace.legal.LegalDocumentMetadata;
 import com.recicar.marketplace.security.PasswordPolicy;
 import com.recicar.marketplace.security.SessionAuthVersionFilter;
 import com.recicar.marketplace.service.UserService;
@@ -69,6 +70,8 @@ public class AuthController {
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
         model.addAttribute("registrationForm", new UserRegistrationDto());
+        model.addAttribute("legalVersion", LegalDocumentMetadata.VERSION_LABEL);
+        model.addAttribute("legalEffectiveDate", LegalDocumentMetadata.EFFECTIVE_DATE);
         return "auth/register";
     }
 
@@ -79,21 +82,29 @@ public class AuthController {
                                RedirectAttributes redirectAttributes) {
 
         if (result.hasErrors()) {
+            model.addAttribute("legalVersion", LegalDocumentMetadata.VERSION_LABEL);
+            model.addAttribute("legalEffectiveDate", LegalDocumentMetadata.EFFECTIVE_DATE);
             return "auth/register";
         }
 
         if (!registrationDto.getPassword().equals(registrationDto.getConfirmPassword())) {
             result.rejectValue("confirmPassword", "error.user", "Las contraseñas no coinciden.");
+            model.addAttribute("legalVersion", LegalDocumentMetadata.VERSION_LABEL);
+            model.addAttribute("legalEffectiveDate", LegalDocumentMetadata.EFFECTIVE_DATE);
             return "auth/register";
         }
 
         if (!PasswordPolicy.isAcceptable(registrationDto.getPassword())) {
             result.rejectValue("password", "error.passwordpolicy", PasswordPolicy.requirementSummaryEs());
+            model.addAttribute("legalVersion", LegalDocumentMetadata.VERSION_LABEL);
+            model.addAttribute("legalEffectiveDate", LegalDocumentMetadata.EFFECTIVE_DATE);
             return "auth/register";
         }
 
         if (userService.existsByEmail(registrationDto.getEmail())) {
             result.reject("error.registration", "No se pudo completar el registro.");
+            model.addAttribute("legalVersion", LegalDocumentMetadata.VERSION_LABEL);
+            model.addAttribute("legalEffectiveDate", LegalDocumentMetadata.EFFECTIVE_DATE);
             return "auth/register";
         }
 
@@ -104,9 +115,13 @@ public class AuthController {
             return "redirect:/login";
         } catch (IllegalArgumentException ex) {
             model.addAttribute("error", ex.getMessage());
+            model.addAttribute("legalVersion", LegalDocumentMetadata.VERSION_LABEL);
+            model.addAttribute("legalEffectiveDate", LegalDocumentMetadata.EFFECTIVE_DATE);
             return "auth/register";
         } catch (Exception e) {
             model.addAttribute("error", "No se pudo completar el registro. Inténtalo de nuevo.");
+            model.addAttribute("legalVersion", LegalDocumentMetadata.VERSION_LABEL);
+            model.addAttribute("legalEffectiveDate", LegalDocumentMetadata.EFFECTIVE_DATE);
             return "auth/register";
         }
     }

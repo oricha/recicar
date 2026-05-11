@@ -445,8 +445,7 @@
                                                         <i class="fa fa-cog" aria-hidden="true"></i>
                                                         <span class="cat__links__name" th:text="${category.name}">Category Name</span>
                                                         <span class="cat__links__count"
-                                                              th:text="${category.products.size()}"
-                                                              th:attr="aria-label=${category.products.size()} + ' products'">0</span>
+                                                              aria-label="Category link">›</span>
                                                     </a>
                                                     <button th:if="${!category.children.isEmpty()}"
                                                             type="button"
@@ -467,8 +466,7 @@
                                                            th:id="'cat-link-' + ${subcategory.id}">
                                                             <span class="cat__sub_links__name" th:text="${subcategory.name}">Subcategory Name</span>
                                                             <span class="cat__sub_links__count"
-                                                                  th:text="${subcategory.products.size()}"
-                                                                  th:attr="aria-label=${subcategory.products.size()} + ' products'">0</span>
+                                                                  aria-label="Subcategory link">›</span>
                                                         </a>
                                                     </li>
                                                 </ul>

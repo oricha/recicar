@@ -18,6 +18,7 @@
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <h1 th:text="${pageTitle}">Política de devoluciones</h1>
+                <th:block th:replace="~{fragments/_legal_version_notice :: legalVersionNotice (versionLabel=${legalVersion}, effectiveDate=${legalEffectiveDate})}"></th:block>
                 <h2>Plazo: 14 días naturales</h2>
                 <p>Como consumidor en la Unión Europea, dispones de un plazo de <strong>14 días naturales</strong> para desistir de la compra a distancia a partir de la entrega de la pieza, sin necesidad de justificar el motivo, de conformidad con la normativa aplicable de consumo, salvo excepciones legales (p. ej. piezas hechas a medida, bienes desprecintados o montados con pérdida de integridad, cuando proceda según ley).</p>
                 <h2>Cómo ejercer el desistimiento</h2>

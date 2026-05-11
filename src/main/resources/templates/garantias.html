@@ -18,6 +18,7 @@
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <h1 th:text="${pageTitle}">Garantías</h1>
+                <th:block th:replace="~{fragments/_legal_version_notice :: legalVersionNotice (versionLabel=${legalVersion}, effectiveDate=${legalEffectiveDate})}"></th:block>
                 <p class="lead">Transparencia sobre lo que cubre el marketplace y lo que aplica a cada vendedor.</p>
                 <h2>Garantía legal (consumidor)</h2>
                 <p>Como consumidor en la UE, en piezas con defectos de <strong>conformidad</strong> (distinto del desgaste natural o daños posteriores a la entrega) puedes exigir reparación, sustitución, rebaja o resolución según plazos y condiciones del marco legal de consumo aplicable al vendedor y al canal de venta. La responsabilidad frente a ti corresponde al <strong>vendedor</strong> del producto; ReciCar puede facilitar la mediación o los datos de contacto.</p>

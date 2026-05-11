@@ -18,6 +18,7 @@
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <h1 th:text="${pageTitle}">Política de comunicación por chat</h1>
+                <th:block th:replace="~{fragments/_legal_version_notice :: legalVersionNotice (versionLabel=${legalVersion}, effectiveDate=${legalEffectiveDate})}"></th:block>
                 <h2>Objeto</h2>
                 <p>El <strong>chat en ReciCar</strong> sirve para coordinar dudas sobre la pieza, el envío o el pedido con el vendedor. No sustituye el registro de pedido ni constituye, por sí solo, aceptación contractual de condiciones adicionales.</p>
                 <h2>Conducta</h2>

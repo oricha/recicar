@@ -18,6 +18,7 @@
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <h1 th:text="${pageTitle}">Información de envío</h1>
+                <th:block th:replace="~{fragments/_legal_version_notice :: legalVersionNotice (versionLabel=${legalVersion}, effectiveDate=${legalEffectiveDate})}"></th:block>
                 <p class="lead">Transparencia en plazos, coste y compañía de transporte.</p>
                 <h2>Transporte y seguimiento</h2>
                 <p>Los envíos a clientes en la Unión Europea se realizan, cuando corresponda, mediante operadores de paquetería (por ejemplo, <strong>DPD</strong> y otros) que permiten trazabilidad. Recibirás la información de seguimiento cuando el vendedor o el transportista la publique.</p>

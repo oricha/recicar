@@ -18,6 +18,7 @@
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <h1 th:text="${pageTitle}">Información de pago</h1>
+                <th:block th:replace="~{fragments/_legal_version_notice :: legalVersionNotice (versionLabel=${legalVersion}, effectiveDate=${legalEffectiveDate})}"></th:block>
                 <p class="lead">Cómo pagas y cómo protegemos tus datos de pago.</p>
                 <h2>Métodos disponibles en checkout</h2>
                 <p>En la confirmación de pedido puedes elegir, según la configuración activa, entre: <strong>PayPal</strong>, tarjeta (Visa, Mastercard, Maestro), <strong>Paysera</strong> o <strong>transferencia bancaria</strong>. La disponibilidad exacta se muestra en el paso de pago.</p>
