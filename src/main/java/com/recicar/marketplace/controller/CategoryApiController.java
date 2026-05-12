@@ -44,6 +44,11 @@ public class CategoryApiController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/{slug}/hierarchy")
+    public ResponseEntity<List<CategoryBreadcrumbItemDto>> hierarchy(@PathVariable("slug") String slug) {
+        return breadcrumb(slug);
+    }
+
     private CategorySummaryDto toSummary(Category c) {
         List<Category> children = categoryService.findByParentId(c.getId());
         int n = children.size();

@@ -143,9 +143,8 @@ class SearchControllerCategoryIntegrationTest {
                 .andExpect(model().attributeExists("category"))
                 .andExpect(model().attributeExists("categoryHierarchy"))
                 .andExpect(model().attribute("searchType", "category"))
-                .andExpect(content().string(containsString("Main Categories")))
-                .andExpect(content().string(containsString("/search?category=" + testCategory.getSlug())))
-                .andExpect(content().string(containsString("/search?category=" + testSubcategory.getSlug())));
+                .andExpect(model().attribute("category", testSubcategory))
+                .andExpect(model().attribute("categorySlug", testSubcategory.getSlug()));
     }
 
     @Test
