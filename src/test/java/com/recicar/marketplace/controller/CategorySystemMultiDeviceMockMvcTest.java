@@ -6,6 +6,7 @@ import com.recicar.marketplace.entity.BrandModel;
 import com.recicar.marketplace.entity.Category;
 import com.recicar.marketplace.service.BrandService;
 import com.recicar.marketplace.service.CategoryService;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -18,6 +19,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -106,6 +108,24 @@ class CategorySystemMultiDeviceMockMvcTest {
                 .andExpect(view().name("marcas"))
                 .andExpect(content().string(containsString("viewport")))
                 .andExpect(content().string(containsString("Toyota")));
+    }
+
+    @Test
+    void marcas_secondPage_showsPaginationNav() throws Exception {
+        List<Brand> many = new ArrayList<>();
+        for (int i = 0; i < 50; i++) {
+            Brand b = new Brand();
+            b.setId((long) (i + 1));
+            b.setName("Brand " + i);
+            b.setSlug("brand-" + i);
+            many.add(b);
+        }
+        when(brandService.findAll()).thenReturn(many);
+
+        mockMvc.perform(get("/marcas").param("page", "1"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Paginación de marcas")))
+                .andExpect(content().string(containsString("brand-48")));
     }
 
     @ParameterizedTest(name = "[4.8 model-selection] {0}")

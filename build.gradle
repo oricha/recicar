@@ -179,6 +179,10 @@ flyway {
     schemas = ['recicar']
     defaultSchema = 'recicar'
     createSchemas = true
+    // Allow applying a late-inserted migration (e.g. V26.5) after higher versions already ran locally.
+    outOfOrder = true
+    // Allow `./gradlew flywayClean` against local dev DB only — never point GRADLE flyway at prod.
+    cleanDisabled = false
 }
 
 application {
@@ -195,7 +199,22 @@ tasks.register('runLocal', BootRun) {
     dependsOn 'classes'
     classpath = sourceSets.main.runtimeClasspath
     systemProperty 'spring.profiles.active', 'dev'
-    // Local uses defaults in application.yml, no need to inject DB envs
+    def envs = loadDotEnv()
+    def dbUrl = envs['DATABASE_URL'] ?: System.getenv('DATABASE_URL')
+    def dbUser = envs['DATABASE_USERNAME'] ?: System.getenv('DATABASE_USERNAME')
+    def dbPass = envs['DATABASE_PASSWORD'] ?: System.getenv('DATABASE_PASSWORD')
+    if (dbUrl != null && !dbUrl.toString().isBlank()) {
+        environment 'DATABASE_URL', dbUrl.toString()
+    }
+    if (dbUser != null && !dbUser.toString().isBlank()) {
+        environment 'DATABASE_USERNAME', dbUser.toString()
+    }
+    if (dbPass != null && !dbPass.toString().isBlank()) {
+        environment 'DATABASE_PASSWORD', dbPass.toString()
+    }
+    if (envs['JWT_SECRET']) {
+        environment 'JWT_SECRET', envs['JWT_SECRET']
+    }
     mainClass.set(application.mainClass)
 }
 
@@ -273,6 +292,7 @@ tasks.register('flywayMigrateProd') {
         project.extensions.flyway.schemas = ['public']
         project.extensions.flyway.defaultSchema = 'public'
         project.extensions.flyway.createSchemas = false
+        project.extensions.flyway.outOfOrder = false
     }
     finalizedBy 'flywayMigrate'
 }

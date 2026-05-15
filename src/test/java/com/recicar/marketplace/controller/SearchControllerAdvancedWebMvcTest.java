@@ -16,6 +16,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
@@ -68,7 +69,7 @@ class SearchControllerAdvancedWebMvcTest {
         Product p = new Product();
         p.setId(9L);
         p.setName("Filtro");
-        when(searchService.searchAdvanced(any(), any(), any(), any(), any(), any(), any(), any(), any()))
+        when(searchService.searchAdvanced(any(), any(), any(), any(), any(), any(), any(), any(), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(p), PageRequest.of(0, ShopListingConstants.PAGE_SIZE), 1));
 
         mockMvc.perform(get("/search/advanced")

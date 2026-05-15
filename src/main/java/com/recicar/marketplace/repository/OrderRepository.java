@@ -31,4 +31,14 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
      */
     @Query("SELECT COUNT(DISTINCT o) FROM Order o JOIN o.items i WHERE i.vendorId = :vid AND o.status IN ('PENDING', 'PROCESSING')")
     long countPendingOrdersForVendor(@Param("vid") Long vendorId);
+
+    @Query("""
+            SELECT DISTINCT o FROM Order o
+            JOIN FETCH o.items i
+            JOIN FETCH i.product
+            LEFT JOIN FETCH o.shippingInfo
+            LEFT JOIN FETCH o.payment
+            WHERE o.id = :orderId AND o.customer.id = :customerId
+            """)
+    Optional<Order> findWithLinesForCustomer(@Param("orderId") Long orderId, @Param("customerId") Long customerId);
 }

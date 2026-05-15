@@ -50,6 +50,7 @@ public interface SearchRepository extends Repository<Product, Long> {
               AND (:inStock IS NULL OR (:inStock = true AND p.stock_quantity > 0) OR (:inStock = false))
               AND (:minPrice IS NULL OR p.price >= :minPrice)
               AND (:maxPrice IS NULL OR p.price <= :maxPrice)
+              AND (:categoryId IS NULL OR p.category_id = :categoryId)
             """,
             countQuery = """
             SELECT count(DISTINCT p.id) FROM products p
@@ -63,6 +64,7 @@ public interface SearchRepository extends Repository<Product, Long> {
               AND (:inStock IS NULL OR (:inStock = true AND p.stock_quantity > 0) OR (:inStock = false))
               AND (:minPrice IS NULL OR p.price >= :minPrice)
               AND (:maxPrice IS NULL OR p.price <= :maxPrice)
+              AND (:categoryId IS NULL OR p.category_id = :categoryId)
             """,
             nativeQuery = true)
     Page<Product> searchAdvanced(
@@ -74,6 +76,7 @@ public interface SearchRepository extends Repository<Product, Long> {
             @Param("inStock") Boolean inStock,
             @Param("minPrice") BigDecimal minPrice,
             @Param("maxPrice") BigDecimal maxPrice,
+            @Param("categoryId") Long categoryId,
             Pageable pageable
     );
 

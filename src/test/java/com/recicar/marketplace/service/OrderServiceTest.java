@@ -9,6 +9,7 @@ import com.recicar.marketplace.entity.Order;
 import com.recicar.marketplace.entity.Payment;
 import com.recicar.marketplace.entity.Product;
 import com.recicar.marketplace.entity.User;
+import com.recicar.marketplace.entity.Vendor;
 import com.recicar.marketplace.repository.OrderRepository;
 import com.recicar.marketplace.repository.ProductRepository;
 import com.recicar.marketplace.repository.UserRepository;
@@ -28,9 +29,11 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -66,6 +69,8 @@ class OrderServiceTest {
 
     @BeforeEach
     void setUp() {
+        lenient().when(orderRepository.findByOrderNumber(any())).thenReturn(Optional.empty());
+
         orderRequest = new OrderRequest();
         orderRequest.setCustomerId(1L);
 
@@ -91,12 +96,17 @@ class OrderServiceTest {
         product.setName("Faro delantero");
         product.setPrice(new BigDecimal("75.00"));
         product.setStockQuantity(4);
+        Vendor vendor = new Vendor();
+        vendor.setId(55L);
+        product.setVendor(vendor);
     }
 
     @Test
     void createOrder_usesComputedAmountsAndSendsConfirmation() {
         User customer = new User();
         customer.setId(1L);
+        customer.setFirstName("Test");
+        customer.setLastName("Buyer");
 
         CartDto pricedCart = new CartDto();
         pricedCart.setSubtotal(new BigDecimal("75.00"));
@@ -121,6 +131,7 @@ class OrderServiceTest {
         Order order = orderService.createOrder(orderRequest);
 
         assertNotNull(order.getOrderNumber());
+        assertTrue(order.getOrderNumber().startsWith("ORD-" + java.time.Year.now().getValue()));
         assertEquals(new BigDecimal("75.00"), order.getSubtotal());
         assertEquals(new BigDecimal("1.50"), order.getServiceFee());
         assertEquals(new BigDecimal("18.17"), order.getTaxAmount());

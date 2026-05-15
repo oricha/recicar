@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<th:block th:fragment="section">
+    <div class="offcanvas-category-section border-bottom px-3 py-3"
+         th:if="${categories != null and !categories.isEmpty()}">
+        <h3 class="h6 text-uppercase text-muted mb-2">Categorías</h3>
+        <ul class="list-unstyled mb-0 offcanvas-category-nav" role="tree" aria-label="Categorías">
+            <th:block th:replace="~{fragments/offcanvas-category-nav :: nodes(${categories})}"></th:block>
+        </ul>
+    </div>
+</th:block>
+
+<th:block th:fragment="nodes(catList)">
+    <li th:each="cat : ${catList}" class="offcanvas-cat-item mb-1 small" role="none">
+        <div class="d-flex align-items-start gap-1 flex-wrap"
+             th:if="${cat.children != null and !cat.children.isEmpty()}">
+            <a th:href="@{/categories/view/{s}(s=${cat.slug})}"
+               class="flex-grow-1 text-break"
+               th:text="${cat.name}"
+               role="treeitem">Categoría</a>
+            <details class="offcanvas-cat-details">
+                <summary class="offcanvas-cat-toggle"
+                         th:aria-label="|Subcategorías de ${cat.name}|"><span aria-hidden="true">▾</span></summary>
+                <ul class="list-unstyled border-start ps-3 mt-1 mb-0 ms-1 small" role="group">
+                    <th:block th:replace="~{fragments/offcanvas-category-nav :: nodes(${cat.children})}"></th:block>
+                </ul>
+            </details>
+        </div>
+        <a th:unless="${cat.children != null and !cat.children.isEmpty()}"
+           th:href="@{/categories/view/{s}(s=${cat.slug})}"
+           th:text="${cat.name}"
+           role="treeitem"
+           class="d-block text-break">Categoría</a>
+    </li>
+</th:block>
+</body>
+</html>

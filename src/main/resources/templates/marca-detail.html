@@ -4,10 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:text="${pageTitle}">Marca — ReciCar</title>
-    <link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.ico">
-    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="assets/css/font.awesome.css">
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/font.awesome.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/assets/css/technical-marketplace.css">
 </head>
 <body>
 <th:block th:replace="fragments/_header :: header"></th:block>
@@ -15,13 +16,13 @@
 
 <div class="breadcrumbs_area">
     <div class="container">
-        <div class="breadcrumb_content">
+        <nav class="breadcrumb_content" aria-label="Ruta de navegación">
             <ul>
                 <li><a href="/">Inicio</a></li>
                 <li><a th:href="@{/marcas}">Marcas</a></li>
-                <li th:text="${brand.name}">Marca</li>
+                <li><span class="current" aria-current="page" th:text="${brand.name}">Marca</span></li>
             </ul>
-        </div>
+        </nav>
     </div>
 </div>
 
@@ -42,9 +43,9 @@
 
 <th:block th:replace="fragments/_calltoaction :: calltoaction"></th:block>
 <th:block th:replace="fragments/_footer :: footer"></th:block>
-<script src="assets/js/vendor/jquery-3.4.1.min.js"></script>
-<script src="assets/js/popper.js"></script>
-<script src="assets/js/bootstrap.min.js"></script>
-<script src="assets/js/main.js"></script>
+<script src="/js/vendor/jquery-3.4.1.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/assets/js/main.js"></script>
+<script src="/assets/js/technical-ux.js"></script>
 </body>
 </html>

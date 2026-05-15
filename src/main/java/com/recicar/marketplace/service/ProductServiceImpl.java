@@ -195,6 +195,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public Optional<ProductCardDto> findActiveProductCard(Long id) {
+        return findActiveById(id).map(this::toProductCardDto);
+    }
+
+    @Override
     public Page<Product> searchProducts(String searchTerm, Pageable pageable) {
         if (searchTerm == null || searchTerm.trim().isEmpty()) {
             return productRepository.findByActiveTrue(pageable);

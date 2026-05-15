@@ -71,6 +71,12 @@ class PortalNavigationCachingTest {
         rootCategory.setSlug("motor");
         rootCategory.setActive(true);
 
+        Category childCategory = new Category();
+        childCategory.setId(2L);
+        childCategory.setName("Bloque");
+        childCategory.setSlug("bloque");
+        childCategory.setActive(true);
+
         brand = new Brand();
         brand.setId(1L);
         brand.setName("BMW");
@@ -81,7 +87,9 @@ class PortalNavigationCachingTest {
         when(categoryRepository.findBySlug("motor"))
                 .thenReturn(Optional.of(rootCategory));
         when(categoryRepository.findByParentIdAndActiveTrueOrderBySortOrderAsc(1L))
-                .thenReturn(List.of(rootCategory));
+                .thenReturn(List.of(childCategory));
+        when(categoryRepository.findByParentIdAndActiveTrueOrderBySortOrderAsc(2L))
+                .thenReturn(List.of());
         when(brandRepository.findAllByOrderByNameAsc())
                 .thenReturn(List.of(brand));
         when(brandRepository.findBySlug("bmw"))

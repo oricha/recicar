@@ -1,6 +1,8 @@
 package com.recicar.marketplace.controller;
 
+import com.recicar.marketplace.dto.ProductCardDto;
 import com.recicar.marketplace.service.ProductDetailService;
+import com.recicar.marketplace.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,9 +14,21 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProductDetailApiController {
 
     private final ProductDetailService productDetailService;
+    private final ProductService productService;
 
-    public ProductDetailApiController(ProductDetailService productDetailService) {
+    public ProductDetailApiController(ProductDetailService productDetailService, ProductService productService) {
         this.productDetailService = productDetailService;
+        this.productService = productService;
+    }
+
+    /**
+     * Lightweight product payload for API consumers (listing-shaped); full detail remains under {@code /{id}/detail}.
+     */
+    @GetMapping("/{id:\\d+}")
+    public ResponseEntity<ProductCardDto> productSummary(@PathVariable Long id) {
+        return productService.findActiveProductCard(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{id}/detail")

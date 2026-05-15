@@ -13,8 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.Year;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Service
@@ -81,11 +84,14 @@ public class OrderServiceImpl implements OrderService {
         order.setTotalAmount(amounts.totalAmount());
 
         ShippingInfo shippingInfo = new ShippingInfo();
+        shippingInfo.setOrder(order);
+        shippingInfo.setRecipientName((customer.getFirstName() + " " + customer.getLastName()).trim());
         shippingInfo.setAddressLine1(orderRequest.getShippingInfo().getAddress());
         shippingInfo.setCity(orderRequest.getShippingInfo().getCity());
         shippingInfo.setState(orderRequest.getShippingInfo().getState());
         shippingInfo.setPostalCode(orderRequest.getShippingInfo().getZipCode());
         shippingInfo.setCountry(orderRequest.getShippingInfo().getCountry());
+        shippingInfo.setShippingMethod("STANDARD");
         shippingInfo.setCreatedAt(LocalDateTime.now());
         order.setShippingInfo(shippingInfo);
 
@@ -124,11 +130,27 @@ public class OrderServiceImpl implements OrderService {
         orderItem.setProduct(product);
         orderItem.setQuantity(itemRequest.getQuantity());
         orderItem.setUnitPrice(product.getPrice());
+        orderItem.setVendorId(product.getVendor().getId());
+        BigDecimal lineTotal = product.getPrice().multiply(new BigDecimal(itemRequest.getQuantity()));
+        orderItem.setTotalPrice(lineTotal);
+        orderItem.setCreatedAt(LocalDateTime.now());
         return orderItem;
     }
 
     private String generateOrderNumber() {
-        return UUID.randomUUID().toString();
+        int year = Year.now().getValue();
+        for (int attempt = 0; attempt < 32; attempt++) {
+            String suffix = String.format("%06d", ThreadLocalRandom.current().nextInt(1_000_000));
+            String candidate = "ORD-" + year + "-" + suffix;
+            if (orderRepository.findByOrderNumber(candidate).isEmpty()) {
+                return candidate;
+            }
+        }
+        String candidate;
+        do {
+            candidate = "ORD-" + year + "-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        } while (orderRepository.findByOrderNumber(candidate).isPresent());
+        return candidate;
     }
 
     @Override
@@ -147,5 +169,11 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public List<Order> findOrdersByCustomerId(Long customerId, Pageable pageable) {
         return orderRepository.findByCustomer_IdOrderByCreatedAtDesc(customerId, pageable);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Order> findOrderWithLinesForCustomer(Long orderId, Long customerId) {
+        return orderRepository.findWithLinesForCustomer(orderId, customerId);
     }
 }

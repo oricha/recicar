@@ -35,6 +35,7 @@
 
      <!-- Main Style CSS -->
      <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="/assets/css/technical-marketplace.css">
     
     <!--modernizr min js here-->
     <script src="js/vendor/modernizr-3.7.1.min.js"></script>
@@ -408,12 +409,66 @@
         <div class="container">
             <div class="row">
                 <div class="col-12">
-                    <div class="breadcrumb_content">
+                    <nav class="breadcrumb_content" aria-label="Ruta de navegación">
                             <ul>
                                 <li><a href="/">Inicio</a></li>
-                                <li>Productos </li>
+
+                                <th:block th:if="${searchType == 'category' and categoryHierarchy != null and !categoryHierarchy.isEmpty()}">
+                                    <li th:each="c, iter : ${categoryHierarchy}">
+                                        <a th:if="${!iter.last}" th:href="@{/categories/view/{s}(s=${c.slug})}" th:text="${c.name}">Cat</a>
+                                        <span th:if="${iter.last}" class="current" aria-current="page" th:text="${c.name}">Cat</span>
+                                    </li>
+                                </th:block>
+
+                                <th:block th:if="${searchType == 'advancedVehicle'}">
+                                    <li><a th:href="@{/marcas}">Marcas</a></li>
+                                    <li th:if="${vehicleMake != null and !#strings.isEmpty(vehicleMake)}">
+                                        <span th:if="${vehicleModel == null or #strings.isEmpty(vehicleModel)}"
+                                              class="current" aria-current="page" th:text="${vehicleMake}">Marca</span>
+                                        <span th:if="${vehicleModel != null and !#strings.isEmpty(vehicleModel)}"
+                                              th:text="${vehicleMake}">Marca</span>
+                                    </li>
+                                    <li th:if="${vehicleModel != null and !#strings.isEmpty(vehicleModel)}">
+                                        <span class="current" aria-current="page" th:text="${vehicleModel}">Modelo</span>
+                                    </li>
+                                </th:block>
+
+                                <th:block th:if="${searchType == 'vehicle'}">
+                                    <li><span th:text="${vehicleMake}">Marca</span></li>
+                                    <li><span th:text="${vehicleModel}">Modelo</span></li>
+                                    <li><span class="current" aria-current="page" th:text="${vehicleEngine}">Motor</span></li>
+                                </th:block>
+
+                                <th:block th:if="${searchType == 'partName'}">
+                                    <li><span class="current" aria-current="page" th:text="${partName}">Pieza</span></li>
+                                </th:block>
+
+                                <th:block th:if="${searchType == 'categories'}">
+                                    <li><span class="current" aria-current="page">Varias categorías</span></li>
+                                </th:block>
+
+                                <th:block th:if="${searchType == 'partNumber' or searchType == 'oemNumber'
+                                        or searchType == 'partNumberContaining' or searchType == 'oemNumberContaining'}">
+                                    <li><span class="current" aria-current="page">Por número de referencia</span></li>
+                                </th:block>
+
+                                <th:block th:if="${searchType == 'general'}">
+                                    <li><span class="current" aria-current="page">Resultados</span></li>
+                                </th:block>
+
+                                <th:block th:if="${searchType == null}">
+                                    <th:block th:if="${selectedCategory != null and categoryHierarchy != null}">
+                                        <li th:each="c, iter : ${categoryHierarchy}">
+                                            <a th:if="${!iter.last}" th:href="@{/categories/view/{s}(s=${c.slug})}" th:text="${c.name}">Cat</a>
+                                            <span th:if="${iter.last}" class="current" aria-current="page" th:text="${c.name}">Cat</span>
+                                        </li>
+                                    </th:block>
+                                    <li th:if="${searchType == null and selectedCategory == null}">
+                                        <span class="current" aria-current="page">Productos</span>
+                                    </li>
+                                </th:block>
                             </ul>
-                    </div>
+                    </nav>
                 </div>
             </div>
         </div>
@@ -1061,6 +1116,7 @@
 
      <!-- Main JS -->
      <script src="js/main.js"></script>
+     <script src="/assets/js/technical-ux.js"></script>
      
      <!-- Filter Sidebar JavaScript -->
      <script>

@@ -149,7 +149,9 @@ public class SecurityConfig {
                                 "/products/**",
                                 "/shop**",
                                 "/product-details**",
-                                "/orders/confirmation"
+                                "/orders/confirmation",
+                                "/health",
+                                "/actuator/health"
                         ).permitAll()
                         .requestMatchers(
                                 "/user-dashboard/**",

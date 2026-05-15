@@ -52,13 +52,14 @@ public class SearchApiController {
             @RequestParam(required = false) Boolean inStock,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(required = false) Long categoryId,
             @RequestParam(defaultValue = "relevance") String sort,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size
     ) {
         Pageable pageable = toPageable(page, size, sort);
         Page<Product> results = searchService.searchAdvanced(
-                query, brand, model, modification, condition, inStock, minPrice, maxPrice, pageable
+                query, brand, model, modification, condition, inStock, minPrice, maxPrice, categoryId, pageable
         );
         return ResponseEntity.ok(toPageResponse(results));
     }

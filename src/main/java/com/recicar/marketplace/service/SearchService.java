@@ -159,10 +159,30 @@ public class SearchService {
             BigDecimal maxPrice,
             Pageable pageable
     ) {
+        return searchAdvanced(query, brand, model, modification, condition, inStock, minPrice, maxPrice, null, pageable);
+    }
+
+    /**
+     * Advanced listing/search including optional category filter (matches catalog REST query params).
+     */
+    @Transactional(readOnly = true)
+    public Page<Product> searchAdvanced(
+            String query,
+            String brand,
+            String model,
+            String modification,
+            String condition,
+            Boolean inStock,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            Long categoryId,
+            Pageable pageable
+    ) {
         if (minPrice != null && maxPrice != null && minPrice.compareTo(maxPrice) > 0) {
             throw new IllegalArgumentException("Min price cannot be greater than max price");
         }
-        return searchRepository.searchAdvanced(query, brand, model, modification, condition, inStock, minPrice, maxPrice, pageable);
+        return searchRepository.searchAdvanced(
+                query, brand, model, modification, condition, inStock, minPrice, maxPrice, categoryId, pageable);
     }
 
     public SavedSearch saveSearch(Long userId, String query, String filtersJson) {

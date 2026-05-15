@@ -5,9 +5,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
+
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.InputStream;
 import java.util.List;
@@ -15,6 +18,7 @@ import java.util.Map;
 
 @Component
 @Profile("!test")
+@Slf4j
 public class DataLoader implements CommandLineRunner {
 
     @Autowired
@@ -55,6 +59,12 @@ public class DataLoader implements CommandLineRunner {
     }
 
     private boolean isDatabaseEmpty() {
-        return jdbcTemplate.queryForObject("SELECT COUNT(*) FROM car_make", Integer.class) == 0;
+        try {
+            Long count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM car_make", Long.class);
+            return count != null && count == 0;
+        } catch (DataAccessException ex) {
+            log.warn("Skipping vehicle JSON seed: car_make unavailable ({})", ex.getMostSpecificCause().getMessage());
+            return false;
+        }
     }
 }

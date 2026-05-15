@@ -46,6 +46,8 @@ public class ProductController {
                 productPage = productService.findByCategory(selectedCategory, page);
                 model.addAttribute("selectedCategory", selectedCategory);
                 model.addAttribute("categorySlug", categorySlug);
+                model.addAttribute("categoryHierarchy", categoryService.getCategoryHierarchy(selectedCategory));
+                model.addAttribute("searchType", "category");
             } else {
                 // Category not found, show all products
                 productPage = productService.findActiveProducts(page, ShopListingConstants.PAGE_SIZE);

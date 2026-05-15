@@ -267,8 +267,23 @@ public class CategoryService {
         return categoryRepository.findAll();
     }
 
-    private void initializeNavigationBranch(Category root) {
-        root.getChildren().size();
-        root.getChildren().forEach(child -> child.getChildren().size());
+    /**
+     * Loads the full active subtree into {@link Category#getChildren()} for storefront navigation
+     * (header/offcanvas). Uses explicit queries so depth is not limited by Hibernate batch size.
+     */
+    private static final int MAX_NAV_CATEGORY_DEPTH = 48;
+
+    private void initializeNavigationBranch(Category node) {
+        initializeNavigationBranch(node, 0);
+    }
+
+    private void initializeNavigationBranch(Category node, int depth) {
+        if (depth > MAX_NAV_CATEGORY_DEPTH) {
+            return;
+        }
+        List<Category> children = categoryRepository.findByParentIdAndActiveTrueOrderBySortOrderAsc(node.getId());
+        node.setChildren(children);
+        int next = depth + 1;
+        children.forEach(child -> initializeNavigationBranch(child, next));
     }
 }

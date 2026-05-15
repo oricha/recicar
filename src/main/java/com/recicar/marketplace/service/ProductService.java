@@ -37,6 +37,11 @@ public interface ProductService {
     Optional<Product> findActiveById(Long id);
 
     /**
+     * Active product as listing card for lightweight REST (Phase 1 catalog parity).
+     */
+    Optional<ProductCardDto> findActiveProductCard(Long id);
+
+    /**
      * Search products by name or part number
      */
     Page<Product> searchProducts(String searchTerm, Pageable pageable);

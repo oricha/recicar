@@ -97,6 +97,28 @@ Run migrations:
 ./gradlew flywayMigrateDev
 ```
 
+### Troubleshooting `./gradlew runLocal`
+
+**Hikari “memory leak” / pool threads still running** — Usually **noise during shutdown** after something else failed. Scroll **above** those lines for the real error (often Flyway or PostgreSQL).
+
+**Cannot connect to PostgreSQL** — Start the DB and wait until it accepts connections:
+
+```bash
+docker compose up -d postgres
+```
+
+Ensure `DATABASE_URL` / `DATABASE_USERNAME` / `DATABASE_PASSWORD` in `.env` match Docker Compose (or remove them to use `application.yml` defaults). `runLocal` now loads `.env` the same way as tests.
+
+**Flyway: `relation "users" does not exist`** (often on migration `V26__Authentication_enhancements.sql`) — The `recicar` schema is **empty or out of sync** with Flyway history (e.g. schema changed after partial migrations). **Local-only reset:**
+
+```bash
+docker compose up -d postgres
+./gradlew flywayClean flywayMigrate   # wipes schema `recicar` in marketplace_dev — dev DB only
+./gradlew runLocal
+```
+
+Never run `flywayClean` against shared staging/production databases.
+
 ### Testing
 
 ```bash
@@ -139,6 +161,9 @@ RESTful API with `/api/v1/` versioning:
 GET    /api/v1/categories              # List categories
 GET    /api/v1/brands                  # List brands
 GET    /api/v1/products                # Search products
+GET    /api/v1/client-preferences      # Current region / VAT + region list (cookies)
+POST   /api/v1/client-preferences      # Persist region + VAT (sets cookies)
+GET    /api/v1/search/suggestions      # Header autocomplete (q=)
 POST   /api/v1/cart                    # Add to cart
 POST   /api/v1/checkout                # Process order
 ```

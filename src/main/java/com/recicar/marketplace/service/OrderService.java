@@ -6,6 +6,7 @@ import com.recicar.marketplace.entity.Order;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface OrderService {
 
@@ -17,4 +18,9 @@ public interface OrderService {
      * Orders for a customer, newest first.
      */
     List<Order> findOrdersByCustomerId(Long customerId, Pageable pageable);
+
+    /**
+     * Single order with lines, only when it belongs to the customer (REST detail).
+     */
+    Optional<Order> findOrderWithLinesForCustomer(Long orderId, Long customerId);
 }
